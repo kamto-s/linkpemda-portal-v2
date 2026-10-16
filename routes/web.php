@@ -4,6 +4,7 @@ use App\Livewire\Admin\Category\Index as CategoryIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Role\Form as RoleForm;
 use App\Livewire\Admin\Role\Index as RoleIndex;
+use App\Livewire\Admin\User\Form as UserForm;
 use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Auth\Login;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,8 @@ Route::middleware('auth')->group(function () {
 
         // Setting
         Route::get('/users', UserIndex::class)->name('user.index');
+        Route::get('/users/create', UserForm::class)->name('user.create');
+        Route::get('/users/{user}/edit', UserForm::class)->name('user.edit');
         Route::get('/roles', RoleIndex::class)->name('role.index');
         Route::get('/roles/create', RoleForm::class)->name('role.create');
         Route::get('/roles/{role}/edit', RoleForm::class)->name('role.edit');

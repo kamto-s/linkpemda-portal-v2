@@ -42,9 +42,9 @@
                             </p>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-primary" wire:click="create">
+                            <a href="{{ route('admin.user.create') }}" wire:navigate class="btn btn-primary">
                                 <i class="mdi mdi-plus me-1"></i> Tambah
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -139,8 +139,7 @@
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
                                                     @if ($canManageThisUser)
-                                                        <a class="dropdown-item" href="javascript:void(0);"
-                                                            wire:click="edit('{{ $user->id }}')">
+                                                        <a class="dropdown-item" href="{{ route('admin.user.edit', $user->id) }}" wire:navigate>
                                                             <i class="mdi mdi-pencil me-1"></i> Edit
                                                         </a>
                                                         @if ($user->id !== auth()->id())
@@ -188,99 +187,7 @@
         </div>
     </div>
 
-    <!-- Modal Form (Tambah / Edit Pengguna) -->
-    <div class="modal fade" id="userFormModal" tabindex="-1" aria-labelledby="userFormModalLabel" aria-hidden="true"
-        wire:ignore.self
-        x-data="{ modal: null }"
-        x-init="modal = new bootstrap.Modal($el)"
-        @open-user-modal.window="modal.show()"
-        @close-user-modal.window="modal.hide()">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <form wire:submit="save">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="userFormModalLabel">
-                            <i class="mdi {{ $isEditing ? 'mdi-account-edit' : 'mdi-account-plus' }} me-1 text-primary"></i>
-                            {{ $isEditing ? 'Ubah Data Pengguna' : 'Tambah Pengguna Baru' }}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
 
-                    <div class="modal-body">
-                        <!-- Nama Lengkap -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                placeholder="Contoh: Budi Santoso" wire:model="name">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Email -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Alamat Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                placeholder="contoh: user@linkpemda.com" wire:model="email">
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Role / Peran -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Peran (Role) <span class="text-danger">*</span></label>
-                            <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
-                                @foreach ($assignableRoles as $roleOption)
-                                    <option value="{{ $roleOption->value }}">{{ $roleOption->label() }}</option>
-                                @endforeach
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <hr class="my-3 text-muted">
-
-                        <!-- Password -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                Password
-                                @if (!$isEditing)
-                                    <span class="text-danger">*</span>
-                                @endif
-                            </label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                placeholder="{{ $isEditing ? 'Kosongkan jika tidak ingin mengubah password' : 'Min. 8 karakter' }}"
-                                wire:model="password">
-                            @if ($isEditing)
-                                <small class="text-muted d-block mt-1">Biarkan kosong jika tidak ingin mengubah password.</small>
-                            @endif
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Konfirmasi Password -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Konfirmasi Password</label>
-                            <input type="password" class="form-control"
-                                placeholder="Ulangi password di atas" wire:model="password_confirmation">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                            <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                            <span wire:loading.remove wire:target="save"><i class="mdi mdi-content-save me-1"></i></span>
-                            {{ $isEditing ? 'Simpan Perubahan' : 'Tambah Pengguna' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal Konfirmasi Hapus -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true"

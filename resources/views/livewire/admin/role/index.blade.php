@@ -66,31 +66,38 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 @if ($roleItem->name === 'superadmin')
-                                                    <span class="badge badge-soft-danger px-2 py-1 fs-13 text-capitalize">
+                                                    <span
+                                                        class="badge badge-soft-danger px-2 py-1 fs-13 text-capitalize">
                                                         <i class="mdi mdi-shield-crown me-1"></i> {{ $roleItem->name }}
                                                     </span>
                                                 @elseif ($roleItem->name === 'admin')
-                                                    <span class="badge badge-soft-primary px-2 py-1 fs-13 text-capitalize">
+                                                    <span
+                                                        class="badge badge-soft-primary px-2 py-1 fs-13 text-capitalize">
                                                         <i class="mdi mdi-shield-check me-1"></i> {{ $roleItem->name }}
                                                     </span>
                                                 @elseif ($roleItem->name === 'staff')
                                                     <span class="badge badge-soft-info px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-account-group me-1"></i> {{ $roleItem->name }}
+                                                        <i class="mdi mdi-account-group me-1"></i>
+                                                        {{ $roleItem->name }}
                                                     </span>
                                                 @else
-                                                    <span class="badge badge-soft-secondary px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-shield-outline me-1"></i> {{ $roleItem->name }}
+                                                    <span
+                                                        class="badge badge-soft-secondary px-2 py-1 fs-13 text-capitalize">
+                                                        <i class="mdi mdi-shield-outline me-1"></i>
+                                                        {{ $roleItem->name }}
                                                     </span>
                                                 @endif
 
                                                 @if (in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
-                                                    <small class="badge bg-light text-muted border">Bawaan Sistem</small>
+                                                    <small class="badge bg-light text-muted border">Bawaan
+                                                        Sistem</small>
                                                 @endif
                                             </div>
                                         </td>
                                         <td>
                                             <span class="badge bg-light text-dark border">
-                                                <i class="mdi mdi-account me-1"></i> {{ $roleItem->users_count }} Pengguna
+                                                <i class="mdi mdi-account me-1"></i> {{ $roleItem->users_count }}
+                                                Pengguna
                                             </span>
                                         </td>
                                         <td>
@@ -126,8 +133,11 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
-                                                    <a class="dropdown-item" href="{{ route('admin.role.edit', $roleItem->id) }}" wire:navigate>
-                                                        <i class="mdi mdi-shield-edit me-1 text-primary"></i> Atur Hak Akses
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.role.edit', $roleItem->id) }}"
+                                                        wire:navigate>
+                                                        <i class="mdi mdi-shield-edit me-1 text-primary"></i> Atur Hak
+                                                        Akses
                                                     </a>
                                                     @if (!in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
                                                         <div class="dropdown-divider"></div>
@@ -151,11 +161,8 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus Role -->
-    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-hidden="true"
-        wire:ignore.self
-        x-data="{ modal: null }"
-        x-init="modal = new bootstrap.Modal($el)"
-        @open-delete-role-modal.window="modal.show()"
+    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-hidden="true" wire:ignore.self
+        x-data="{ modal: null }" x-init="modal = new bootstrap.Modal($el)" @open-delete-role-modal.window="modal.show()"
         @close-delete-role-modal.window="modal.hide()">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content text-center p-3">
@@ -170,7 +177,8 @@
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-danger" wire:click="delete" wire:loading.attr="disabled">
-                            <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1"
+                                role="status"></span>
                             Hapus
                         </button>
                     </div>
