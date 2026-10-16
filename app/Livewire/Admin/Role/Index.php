@@ -5,18 +5,27 @@ namespace App\Livewire\Admin\Role;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 #[Layout('layouts.admin.app')]
 class Index extends Component
 {
+    use WithPagination;
+
     public string $pageTitle = 'Role & Hak Akses';
+
+    public string $search = '';
+
+    public int $perPage = 10;
 
     // Delete confirmation
     public ?int $roleToDeleteId = null;
 
     public string $roleToDeleteName = '';
+
+    protected $paginationTheme = 'bootstrap';
 
     public function mount(): void
     {
@@ -25,6 +34,17 @@ class Index extends Component
             403,
             'Anda tidak memiliki wewenang untuk mengelola Role & Hak Akses.'
         );
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search']);
+        $this->resetPage();
     }
 
     public function confirmDelete(int $id): void
@@ -80,9 +100,14 @@ class Index extends Component
 
     public function render()
     {
-        $roles = Role::withCount('users')
+        $roles = Role::query()
+            ->withCount('users')
             ->with('permissions')
-            ->get();
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%'.$this->search.'%');
+            })
+            ->latest('id')
+            ->paginate($this->perPage);
 
         return view('livewire.admin.role.index', [
             'roles' => $roles,

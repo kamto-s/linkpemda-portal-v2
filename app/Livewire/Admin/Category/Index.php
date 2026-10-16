@@ -22,8 +22,14 @@ class Index extends Component
 
     public int $perPage = 10;
 
-    public function updateSearch(): void
+    public function updatedSearch(): void
     {
+        $this->resetPage();
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search']);
         $this->resetPage();
     }
 
@@ -31,8 +37,8 @@ class Index extends Component
     {
         $categories = Category::query()
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', "%{$this->search}")
-                    ->orWhere('slug', 'like', "%{$this->search}");
+                $query->where('name', 'like', "%{$this->search}%")
+                    ->orWhere('slug', 'like', "%{$this->search}%");
             })
             ->latest()
             ->paginate($this->perPage);

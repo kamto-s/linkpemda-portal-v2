@@ -34,7 +34,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
                             <h4 class="header-title">Daftar {{ $pageTitle }}</h4>
                             <p class="sub-header">
@@ -48,79 +48,75 @@
                         </div>
                     </div>
 
+                    <!-- Search & Filter Controls -->
+                    <div class="row g-2 mb-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
+                                <input type="text" class="form-control" placeholder="Cari nama role..."
+                                    wire:model.live.debounce.300ms="search">
+                                @if ($search !== '')
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="resetFilters" title="Hapus pencarian">
+                                        <i class="mdi mdi-close"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if ($search !== '')
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
+                                    <i class="mdi mdi-filter-remove me-1"></i> Reset
+                                </button>
+                            </div>
+                        @endif
+
+                        <div class="col d-flex justify-content-end gap-2">
+                            <select class="form-select w-auto" wire:model.live="perPage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="table-responsive" style="overflow: visible;">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
                                     <th style="width: 60px;">#</th>
-                                    <th>Nama Role</th>
+                                    <th>Role</th>
                                     <th>Pengguna</th>
-                                    <th>Cakupan Hak Akses (Permissions)</th>
-                                    <th class="text-end" style="width: 140px;">Aksi</th>
+                                    <th>Hak Akses</th>
+                                    <th class="text-end" style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($roles as $index => $roleItem)
+                                @forelse ($roles as $index => $roleItem)
                                     <tr wire:key="{{ $roleItem->id }}">
-                                        <th scope="row">{{ $index + 1 }}</th>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                @if ($roleItem->name === 'superadmin')
-                                                    <span
-                                                        class="badge badge-soft-danger px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-shield-crown me-1"></i> {{ $roleItem->name }}
-                                                    </span>
-                                                @elseif ($roleItem->name === 'admin')
-                                                    <span
-                                                        class="badge badge-soft-primary px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-shield-check me-1"></i> {{ $roleItem->name }}
-                                                    </span>
-                                                @elseif ($roleItem->name === 'staff')
-                                                    <span class="badge badge-soft-info px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-account-group me-1"></i>
-                                                        {{ $roleItem->name }}
-                                                    </span>
-                                                @else
-                                                    <span
-                                                        class="badge badge-soft-secondary px-2 py-1 fs-13 text-capitalize">
-                                                        <i class="mdi mdi-shield-outline me-1"></i>
-                                                        {{ $roleItem->name }}
-                                                    </span>
-                                                @endif
-
-                                                @if (in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
-                                                    <small class="badge bg-light text-muted border">Bawaan
-                                                        Sistem</small>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border">
-                                                <i class="mdi mdi-account me-1"></i> {{ $roleItem->users_count }}
-                                                Pengguna
-                                            </span>
-                                        </td>
+                                        <th scope="row">{{ $roles->firstItem() + $index }}</th>
                                         <td>
                                             @if ($roleItem->name === 'superadmin')
-                                                <span class="badge bg-danger rounded-pill px-2 py-1">
+                                                <span class="badge badge-soft-danger px-2 py-1">Superadmin</span>
+                                            @elseif ($roleItem->name === 'admin')
+                                                <span class="badge badge-soft-primary px-2 py-1">Admin</span>
+                                            @elseif ($roleItem->name === 'staff')
+                                                <span class="badge badge-soft-info px-2 py-1">Staff</span>
+                                            @else
+                                                <span class="badge badge-soft-secondary px-2 py-1 text-capitalize">{{ $roleItem->name }}</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $roleItem->users_count }} akun</td>
+                                        <td>
+                                            @if ($roleItem->name === 'superadmin')
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
                                                     Semua Hak Akses (Penuh)
                                                 </span>
                                             @else
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    <span class="badge bg-primary rounded-pill px-2 py-1">
-                                                        {{ $roleItem->permissions->count() }} Hak Akses Aktif
-                                                    </span>
-                                                    @foreach ($roleItem->permissions->take(3) as $perm)
-                                                        <span class="badge bg-light text-muted border fs-11">
-                                                            {{ $perm->name }}
-                                                        </span>
-                                                    @endforeach
-                                                    @if ($roleItem->permissions->count() > 3)
-                                                        <span class="badge bg-light text-muted border fs-11">
-                                                            +{{ $roleItem->permissions->count() - 3 }} lainnya
-                                                        </span>
-                                                    @endif
-                                                </div>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                                    {{ $roleItem->permissions->count() }} Hak Akses
+                                                </span>
                                             @endif
                                         </td>
                                         <td class="text-end">
@@ -136,24 +132,41 @@
                                                     <a class="dropdown-item"
                                                         href="{{ route('admin.role.edit', $roleItem->id) }}"
                                                         wire:navigate>
-                                                        <i class="mdi mdi-shield-edit me-1 text-primary"></i> Atur Hak
-                                                        Akses
+                                                        <i class="mdi mdi-pencil me-1"></i> Edit
                                                     </a>
-                                                    @if (!in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
+                                                    @if (! in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                             wire:click="confirmDelete({{ $roleItem->id }})">
-                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus Role
+                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
                                                         </a>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            <i class="mdi mdi-shield-off font-size-24 d-block mb-1"></i>
+                                            Tidak ada data role yang ditemukan.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if ($roles->hasPages())
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <small class="text-muted">
+                                Menampilkan {{ $roles->firstItem() }} - {{ $roles->lastItem() }} dari {{ $roles->total() }} data
+                            </small>
+                            <div>
+                                {{ $roles->links() }}
+                            </div>
+                        </div>
+                    @endif
 
                 </div>
             </div>

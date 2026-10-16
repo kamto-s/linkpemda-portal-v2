@@ -51,6 +51,12 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function resetFilters(): void
+    {
+        $this->reset(['search', 'selectedRole', 'selectedStatus']);
+        $this->resetPage();
+    }
+
     public function confirmDelete(string $id): void
     {
         abort_unless(Auth::user()->can('manage-users'), 403);

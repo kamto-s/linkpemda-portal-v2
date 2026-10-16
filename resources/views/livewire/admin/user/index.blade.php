@@ -55,6 +55,11 @@
                                 <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
                                 <input type="text" class="form-control" placeholder="Cari nama atau email..."
                                     wire:model.live.debounce.300ms="search">
+                                @if ($search !== '')
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="$set('search', '')" title="Hapus pencarian">
+                                        <i class="mdi mdi-close"></i>
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
@@ -75,7 +80,15 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3 d-flex justify-content-md-end gap-2">
+                        @if ($search !== '' || $selectedRole !== '' || $selectedStatus !== '')
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
+                                    <i class="mdi mdi-filter-remove me-1"></i> Reset
+                                </button>
+                            </div>
+                        @endif
+
+                        <div class="col d-flex justify-content-end gap-2">
                             <select class="form-select w-auto" wire:model.live="perPage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
