@@ -1,6 +1,10 @@
 <?php
 
+use App\Livewire\Admin\Campaign\Form as CampaignForm;
+use App\Livewire\Admin\Campaign\Index as CampaignIndex;
+use App\Livewire\Admin\Campaign\Show as CampaignShow;
 use App\Livewire\Admin\Category\Index as CategoryIndex;
+use App\Livewire\Admin\Contact\Index as ContactIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Role\Form as RoleForm;
 use App\Livewire\Admin\Role\Index as RoleIndex;
@@ -52,8 +56,16 @@ Route::middleware('auth')->group(function () {
 
         // CMS
         Route::get('/categories', CategoryIndex::class)->name('category.index');
-        // Route::get('/articles', ArticleIndex::class)->name('article.index');
+        // Route::get('/articles', ArticleIndex::class)->name('article.index'); 
         // Route::get('/materials', MaterialIndex::class)->name('material.index');
+
+        // Email Blast & Promosi
+        Route::get('/contacts', ContactIndex::class)->name('contact.index');
+        Route::get('/campaigns', CampaignIndex::class)->name('campaign.index');
+        Route::get('/campaigns/create', CampaignForm::class)->name('campaign.create');
+        Route::get('/campaigns/{campaign}/edit', CampaignForm::class)->name('campaign.edit');
+        Route::get('/campaigns/{campaign}', CampaignShow::class)->name('campaign.show');
+        Route::post('/campaigns/upload-image', [\App\Http\Controllers\Admin\CampaignImageUploadController::class, 'upload'])->name('campaign.upload-image');
 
         // Setting
         Route::get('/users', UserIndex::class)->name('user.index');

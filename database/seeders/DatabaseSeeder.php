@@ -98,5 +98,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('Admin@123'),
         ]);
         $staff->assignRole($staffRole);
+
+        // 6. Seed Kontak Target (Pemerintah & Swasta)
+        $this->call(ContactSeeder::class);
     }
 }
