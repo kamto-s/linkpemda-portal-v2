@@ -126,11 +126,14 @@
             const submenuToggle = e.target.closest('.app-menu [data-bs-toggle="collapse"]');
             if (submenuToggle) {
                 e.preventDefault();
-                const targetSelector = submenuToggle.getAttribute('data-bs-target') || submenuToggle.getAttribute('href');
+                const targetSelector = submenuToggle.getAttribute('data-bs-target') || submenuToggle
+                    .getAttribute('href');
                 if (targetSelector && targetSelector.startsWith('#')) {
                     const targetEl = document.querySelector(targetSelector);
                     if (targetEl) {
-                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(targetEl, { toggle: false });
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(targetEl, {
+                            toggle: false
+                        });
                         bsCollapse.toggle();
                     }
                 }
@@ -147,7 +150,8 @@
                     item.remove();
                     const badge = document.querySelector('.noti-icon-badge');
                     if (badge) {
-                        const remaining = document.querySelectorAll('.notification-list .notify-item:not(.border-top)').length;
+                        const remaining = document.querySelectorAll(
+                            '.notification-list .notify-item:not(.border-top)').length;
                         if (remaining > 0) {
                             badge.textContent = remaining;
                         } else {
@@ -180,9 +184,8 @@
     }
 
     function syncUIState() {
-        // 1. Sinkronisasi tema dan ikon
-        const savedTheme = sessionStorage.getItem('themeMode') ||
-            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        // 1. Sinkronisasi tema dan ikon (default: light)
+        const savedTheme = sessionStorage.getItem('themeMode') || 'light';
         applyTheme(savedTheme);
 
         // 2. Sinkronisasi status collapse sidebar desktop

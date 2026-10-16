@@ -8,12 +8,7 @@ class Config {
         }
     }
     initTheme() {
-        const savedTheme =
-            sessionStorage.getItem("themeMode") ||
-            (window.matchMedia &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light");
+        const savedTheme = sessionStorage.getItem("themeMode") || "light";
         document.documentElement.setAttribute("data-bs-theme", savedTheme);
     }
     initWindowSize() {

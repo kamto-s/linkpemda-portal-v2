@@ -46,13 +46,7 @@ class ThemeLayout {
                         o.append(n));
                 }
             });
-        var n = sessionStorage.getItem("themeMode"),
-            l =
-                window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: dark)").matches
-                    ? "dark"
-                    : "light",
-            n = n || l;
+        var n = sessionStorage.getItem("themeMode") || "light";
         (document.documentElement.setAttribute("data-bs-theme", n),
             sessionStorage.setItem("themeMode", n));
     }
