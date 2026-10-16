@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-menu-color="brand" data-topbar-color="light">
+{{-- <html lang="en" data-bs-theme="light" data-menu-color="brand" data-topbar-color="light"> --}}
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="light" data-menu-color="brand"
+    data-topbar-color="light">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
 <head>

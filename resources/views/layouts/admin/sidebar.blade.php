@@ -3,13 +3,13 @@
     <!-- Brand Logo -->
     <div class="logo-box">
         <!-- Brand Logo Light -->
-        <a class='logo-light' href='{{ route('admin.dashboard') }}'>
+        <a wire:navigate class='logo-light' href='{{ route('admin.dashboard') }}'>
             <img src="{{ asset('assets/admin') }}/images/logo-light.png" alt="logo" class="logo-lg" height="28">
             <img src="{{ asset('assets/admin') }}/images/logo-sm.png" alt="small logo" class="logo-sm" height="28">
         </a>
 
         <!-- Brand Logo Dark -->
-        <a class='logo-dark' href='{{ route('admin.dashboard') }}'>
+        <a wire:navigate class='logo-dark' href='{{ route('admin.dashboard') }}'>
             <img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt="dark logo" class="logo-lg" height="28">
             <img src="{{ asset('assets/admin') }}/images/logo-sm.png" alt="small logo" class="logo-sm" height="28">
         </a>
@@ -18,8 +18,8 @@
     <!--- Menu -->
     <div data-simplebar>
         <ul class="app-menu">
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='{{ route('admin.dashboard') }}'>
+            <li class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a wire:navigate class='menu-link waves-effect waves-light' href='{{ route('admin.dashboard') }}'>
                     <span class="menu-icon"><i class="bx bx-home-smile"></i></span>
                     <span class="menu-text"> Dashboards </span>
                 </a>
@@ -27,22 +27,36 @@
 
             <li class="menu-title">CMS</li>
 
-            <li class="menu-item">
-                <a href="#menuExpages" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+            @php
+                $isPostActive = request()->routeIs(['admin.artikel.*', 'admin.materi.*', 'admin.category.*']);
+            @endphp
+
+            <li class="menu-item {{ $isPostActive ? 'active' : '' }}">
+                <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#menuPosts"
+                    aria-expanded="{{ $isPostActive ? 'true' : 'false' }}" aria-controls="menuPosts"
+                    class="menu-link waves-effect waves-light {{ $isPostActive ? 'active' : '' }}">
                     <span class="menu-icon"><i class="bx bx-file"></i></span>
                     <span class="menu-text"> Posts </span>
                     <span class="menu-arrow"></span>
                 </a>
-                <div class="collapse" id="menuExpages">
+
+                <div class="collapse {{ $isPostActive ? 'show' : '' }}" id="menuPosts">
                     <ul class="sub-menu">
-                        <li class="menu-item">
-                            <a class='menu-link' href='pages-starter.html'>
+                        <li class="menu-item {{ request()->routeIs('artikel.*') ? 'active' : '' }}">
+                            <a class='menu-link' href='#'>
                                 <span class="menu-text">Artikel</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='pages-invoice.html'>
+                        <li class="menu-item {{ request()->routeIs('materi.*') ? 'active' : '' }}">
+                            <a class='menu-link' href='#'>
                                 <span class="menu-text">Materi</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ request()->routeIs('admin.category.*') ? 'active' : '' }}">
+                            <a wire:navigate
+                                class="menu-link {{ request()->routeIs('admin.category.*') ? 'active' : '' }}"
+                                href="{{ route('admin.category.index') }}">
+                                <span class="menu-text">Kategori</span>
                             </a>
                         </li>
                     </ul>

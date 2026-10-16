@@ -4,12 +4,12 @@
             <div class="card">
                 <div class="card-body p-4">
                     <div class="text-center w-75 mx-auto auth-logo mb-4">
-                        <a class='logo-dark' href='index.html'>
+                        <a class='logo-dark' href="{{ route('home') }}">
                             <span><img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt=""
                                     height="34"></span>
                         </a>
 
-                        <a class='logo-light' href='index.html'>
+                        <a class='logo-light' href="{{ route('home') }}">
                             <span><img src="{{ asset('assets/admin') }}/images/logo-light.png" alt=""
                                     height="34"></span>
                         </a>

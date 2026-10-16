@@ -4,14 +4,14 @@
         <div class="topbar-menu d-flex align-items-center gap-lg-2 gap-1">
 
             <div class="logo-box">
-                <a class='logo-light' href='index.html'>
-                    <img src="assets/images/logo-light.png" alt="logo" class="logo-lg" height="22">
-                    <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="22">
+                <a class='logo-light' href="{{ route('admin.dashboard') }}">
+                    <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg" height="22">
+                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm" height="22">
                 </a>
 
-                <a class='logo-dark' href='index.html'>
-                    <img src="assets/images/logo-dark.png" alt="dark logo" class="logo-lg" height="22">
-                    <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="22">
+                <a class='logo-dark' href="{{ route('admin.dashboard') }}">
+                    <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="dark logo" class="logo-lg" height="22">
+                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm" height="22">
                 </a>
             </div>
 
@@ -88,7 +88,7 @@
 
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown"
-                    href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    href="javascript:void(0);" role="button" aria-haspopup="false" aria-expanded="false">
 
                     <span
                         class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase shadow-sm"
