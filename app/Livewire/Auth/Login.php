@@ -14,12 +14,12 @@ class Login extends Component
 {
     #[Validate('required|email', message: [
         'required' => 'Email wajib diisi.',
-        'email' => 'Format email tidak valid.'
+        'email' => 'Format email tidak valid.',
     ])]
     public string $email = '';
 
     #[Validate('required', message: [
-        'required' => 'Password wajib diisi.'
+        'required' => 'Password wajib diisi.',
     ])]
     public string $password = '';
 
@@ -29,8 +29,19 @@ class Login extends Component
     {
         $this->validate();
 
-        if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             $this->addError('email', 'Email atau Password yang Anda masukkan salah.');
+
+            return;
+        }
+
+        if (! Auth::user()->is_active) {
+            Auth::logout();
+            session()->invalidate();
+            session()->regenerateToken();
+
+            $this->addError('email', 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.');
+
             return;
         }
 

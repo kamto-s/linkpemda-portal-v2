@@ -67,7 +67,15 @@
                             </select>
                         </div>
 
-                        <div class="col-md-5 d-flex justify-content-md-end gap-2">
+                        <div class="col-md-2">
+                            <select class="form-select" wire:model.live="selectedStatus">
+                                <option value="">Semua Status</option>
+                                <option value="active">Aktif</option>
+                                <option value="inactive">Nonaktif</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 d-flex justify-content-md-end gap-2">
                             <select class="form-select w-auto" wire:model.live="perPage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -85,6 +93,7 @@
                                     <th>Pengguna</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Status</th>
                                     <th>Terdaftar</th>
                                     <th class="text-end" style="width: 120px;">Aksi</th>
                                 </tr>
@@ -123,6 +132,13 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if ($user->is_active)
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Aktif</span>
+                                            @else
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Nonaktif</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <small class="text-muted">{{ $user->created_at->translatedFormat('d M Y, H:i') }}</small>
                                         </td>
                                         <td class="text-end">
@@ -143,6 +159,11 @@
                                                             <i class="mdi mdi-pencil me-1"></i> Edit
                                                         </a>
                                                         @if ($user->id !== auth()->id())
+                                                            <a class="dropdown-item" href="javascript:void(0);"
+                                                                wire:click="toggleStatus('{{ $user->id }}')">
+                                                                <i class="mdi {{ $user->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
+                                                                {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                            </a>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                                 wire:click="confirmDelete('{{ $user->id }}')">
@@ -160,7 +181,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">
+                                        <td colspan="7" class="text-center py-4 text-muted">
                                             <i class="mdi mdi-account-off font-size-24 d-block mb-1"></i>
                                             Tidak ada data pengguna yang ditemukan.
                                         </td>

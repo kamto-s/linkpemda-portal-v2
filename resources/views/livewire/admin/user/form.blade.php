@@ -15,7 +15,8 @@
                 <div class="d-none d-lg-block">
                     <ol class="breadcrumb m-0 float-end">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.user.index') }}" wire:navigate>Pengguna & Staff</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.user.index') }}" wire:navigate>Pengguna &
+                                Staff</a></li>
                         <li class="breadcrumb-item active">{{ $isEditing ? 'Ubah' : 'Tambah' }}</li>
                     </ol>
                 </div>
@@ -23,8 +24,15 @@
         </div>
     </div>
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-alert-circle me-1"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
                     <form wire:submit="save">
@@ -37,22 +45,13 @@
                                     Lengkapi informasi akun pengguna dan tentukan perannya.
                                 </p>
                             </div>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('admin.user.index') }}" wire:navigate class="btn btn-light">
-                                    Batal
-                                </a>
-                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                                    <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1" role="status"></span>
-                                    <span wire:loading.remove wire:target="save"><i class="mdi mdi-content-save me-1"></i></span>
-                                    {{ $isEditing ? 'Simpan Perubahan' : 'Tambah Pengguna' }}
-                                </button>
-                            </div>
                         </div>
 
                         <div class="row g-3">
                             <!-- Nama Lengkap -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Nama Lengkap <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
                                     placeholder="Contoh: Budi Santoso" wire:model="name">
                                 @error('name')
@@ -61,8 +60,9 @@
                             </div>
 
                             <!-- Email -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Alamat Email <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Alamat Email <span
+                                        class="text-danger">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                     placeholder="contoh: user@linkpemda.com" wire:model="email">
                                 @error('email')
@@ -71,8 +71,9 @@
                             </div>
 
                             <!-- Role / Peran -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Peran (Role) <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Peran (Role) <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
                                     @foreach ($assignableRoles as $roleOption)
                                         <option value="{{ $roleOption->value }}">{{ $roleOption->label() }}</option>
@@ -83,12 +84,32 @@
                                 @enderror
                             </div>
 
+                            <!-- Status Akun (Aktif / Nonaktif) -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold d-block">Status Akun</label>
+                                <div class="form-check form-switch form-switch-md">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="userIsActive"
+                                        wire:model.live="isActive"
+                                        {{ $isEditing && $user->id === auth()->id() ? 'disabled' : '' }}>
+                                    <label class="form-check-label fw-semibold ms-1" for="userIsActive">
+                                        <span
+                                            class="badge {{ $isActive ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' }}">
+                                            {{ $isActive ? 'Aktif' : 'Nonaktif' }}
+                                        </span>
+                                    </label>
+                                </div>
+                                @if ($isEditing && $user->id === auth()->id())
+                                    <small class="text-muted d-block mt-1">Anda tidak dapat menonaktifkan akun
+                                        sendiri.</small>
+                                @endif
+                            </div>
+
                             <div class="col-12">
                                 <hr class="my-2 text-muted">
                             </div>
 
                             <!-- Password -->
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label fw-bold">
                                     Password
                                     @if (!$isEditing)
@@ -99,7 +120,8 @@
                                     placeholder="{{ $isEditing ? 'Kosongkan jika tidak diubah' : 'Min. 8 karakter' }}"
                                     wire:model="password">
                                 @if ($isEditing)
-                                    <small class="text-muted d-block mt-1">Biarkan kosong jika tidak ingin mengganti password.</small>
+                                    <small class="text-muted d-block mt-1">Biarkan kosong jika tidak ingin mengganti
+                                        password.</small>
                                 @endif
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -107,10 +129,10 @@
                             </div>
 
                             <!-- Konfirmasi Password -->
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label fw-bold">Konfirmasi Password</label>
-                                <input type="password" class="form-control"
-                                    placeholder="Ulangi password" wire:model="password_confirmation">
+                                <input type="password" class="form-control" placeholder="Ulangi password"
+                                    wire:model="password_confirmation">
                             </div>
 
                             <!-- Tombol Aksi Bawah -->
@@ -119,8 +141,10 @@
                                     Batal
                                 </a>
                                 <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                                    <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1" role="status"></span>
-                                    <span wire:loading.remove wire:target="save"><i class="mdi mdi-content-save me-1"></i></span>
+                                    <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1"
+                                        role="status"></span>
+                                    <span wire:loading.remove wire:target="save"><i
+                                            class="mdi mdi-content-save me-1"></i></span>
                                     {{ $isEditing ? 'Simpan Perubahan' : 'Tambah Pengguna' }}
                                 </button>
                             </div>

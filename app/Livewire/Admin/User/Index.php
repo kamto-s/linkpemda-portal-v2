@@ -20,6 +20,8 @@ class Index extends Component
 
     public string $selectedRole = '';
 
+    public string $selectedStatus = '';
+
     public int $perPage = 10;
 
     // Delete confirmation properties
@@ -40,6 +42,11 @@ class Index extends Component
     }
 
     public function updatedSelectedRole(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectedStatus(): void
     {
         $this->resetPage();
     }
@@ -110,12 +117,39 @@ class Index extends Component
         $this->reset(['userToDeleteId', 'userToDeleteName']);
     }
 
-    /**
-     * Role yang boleh di-assign: Jika login sebagai Superadmin boleh semua role.
-     * Jika login sebagai Admin biasa, role Superadmin disembunyikan.
-     *
-     * @return array<UserRole>
-     */
+    public function toggleStatus(string $id): void
+    {
+        abort_unless(Auth::user()->can('manage-users'), 403);
+
+        if ($id === Auth::id()) {
+            session()->flash('error', 'Anda tidak dapat mengubah status akun Anda sendiri.');
+
+            return;
+        }
+
+        $user = User::with('roles')->findOrFail($id);
+
+        // Hierarki: Admin biasa tidak boleh mengubah status Superadmin
+        if ($user->hasRole(UserRole::Superadmin->value) && ! Auth::user()->hasRole(UserRole::Superadmin->value)) {
+            session()->flash('error', 'Hanya Superadmin yang berwenang mengubah status Superadmin.');
+
+            return;
+        }
+
+        // Proteksi: Tidak boleh menonaktifkan Superadmin aktif terakhir
+        if ($user->is_active && $user->hasRole(UserRole::Superadmin->value) && User::role(UserRole::Superadmin->value)->where('is_active', true)->count() <= 1) {
+            session()->flash('error', 'Tidak dapat menonaktifkan Superadmin aktif terakhir dalam sistem.');
+
+            return;
+        }
+
+        $user->is_active = ! $user->is_active;
+        $user->save();
+
+        $statusText = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        session()->flash('success', "Status akun \"{$user->name}\" berhasil {$statusText}.");
+    }
+
     public function render()
     {
         $users = User::query()
@@ -128,6 +162,12 @@ class Index extends Component
             })
             ->when($this->selectedRole, function ($query) {
                 $query->role($this->selectedRole);
+            })
+            ->when($this->selectedStatus === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($this->selectedStatus === 'inactive', function ($query) {
+                $query->where('is_active', false);
             })
             ->latest()
             ->paginate($this->perPage);

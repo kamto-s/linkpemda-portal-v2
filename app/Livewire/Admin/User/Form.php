@@ -24,6 +24,8 @@ class Form extends Component
 
     public string $password_confirmation = '';
 
+    public bool $isActive = true;
+
     public bool $isEditing = false;
 
     public function mount(User|string|null $user = null): void
@@ -41,9 +43,11 @@ class Form extends Component
             $this->name = $this->user->name;
             $this->email = $this->user->email;
             $this->role = $this->user->roles->first()?->name ?? UserRole::Staff->value;
+            $this->isActive = (bool) $this->user->is_active;
             $this->isEditing = true;
         } else {
             $this->role = UserRole::Staff->value;
+            $this->isActive = true;
             $this->isEditing = false;
         }
     }
@@ -68,9 +72,24 @@ class Form extends Component
                 abort(403, 'Hanya Superadmin yang berwenang mengubah akun Superadmin.');
             }
 
+            // Proteksi: Tidak boleh menonaktifkan akun sendiri
+            if ($this->user->id === Auth::id() && ! $this->isActive) {
+                session()->flash('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+
+                return null;
+            }
+
+            // Proteksi: Tidak boleh menonaktifkan Superadmin aktif terakhir
+            if ($this->user->hasRole(UserRole::Superadmin->value) && ! $this->isActive && User::role(UserRole::Superadmin->value)->where('is_active', true)->count() <= 1) {
+                session()->flash('error', 'Tidak dapat menonaktifkan Superadmin aktif terakhir dalam sistem.');
+
+                return null;
+            }
+
             $updateData = [
                 'name' => $this->name,
                 'email' => $this->email,
+                'is_active' => $this->isActive,
             ];
 
             if (! empty($this->password)) {
@@ -93,6 +112,7 @@ class Form extends Component
                 'name' => $this->name,
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
+                'is_active' => $this->isActive,
             ]);
 
             $user->assignRole($this->role);
