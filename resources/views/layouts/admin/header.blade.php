@@ -5,13 +5,17 @@
 
             <div class="logo-box">
                 <a class='logo-light' href="{{ route('admin.dashboard') }}">
-                    <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg" height="22">
-                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm" height="22">
+                    <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg"
+                        height="22">
+                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm"
+                        height="22">
                 </a>
 
                 <a class='logo-dark' href="{{ route('admin.dashboard') }}">
-                    <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="dark logo" class="logo-lg" height="22">
-                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm" height="22">
+                    <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="dark logo" class="logo-lg"
+                        height="22">
+                    <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm"
+                        height="22">
                 </a>
             </div>
 
@@ -126,7 +130,7 @@
                     <div class="dropdown-divider"></div>
 
                     <a href="javascript:void(0);" class="dropdown-item notify-item">
-                        <i class="fe-user"></i>
+                        <i class="mdi mdi-account-circle"></i>
                         <span>Profile</span>
                     </a>
 
@@ -136,15 +140,13 @@
                         @csrf
                         <button type="submit"
                             class="dropdown-item notify-item text-danger border-0 bg-transparent w-100 text-start">
-                            <i class="fe-log-out"></i>
+                            <i class="mdi mdi-logout"></i>
                             <span>Keluar</span>
                         </button>
                     </form>
 
                 </div>
             </li>
-
         </ul>
     </div>
 </div>
-<!-- ========== Topbar End ========== -->

@@ -182,6 +182,26 @@
 
             <li class="menu-title">Pengaturan</li>
 
+            @can('manage-users')
+                <li class="menu-item {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
+                    <a wire:navigate
+                        class='menu-link waves-effect waves-light {{ request()->routeIs('admin.user.*') ? 'active' : '' }}'
+                        href='{{ route('admin.user.index') }}'>
+                        <span class="menu-icon"><i class="bx bx-user-check"></i></span>
+                        <span class="menu-text"> User </span>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('admin.role.*') ? 'active' : '' }}">
+                    <a wire:navigate
+                        class='menu-link waves-effect waves-light {{ request()->routeIs('admin.role.*') ? 'active' : '' }}'
+                        href='{{ route('admin.role.index') }}'>
+                        <span class="menu-icon"><i class="bx bx-shield-quarter"></i></span>
+                        <span class="menu-text"> Role & Hak Akses </span>
+                    </a>
+                </li>
+            @endcan
+
             <li class="menu-item">
                 <a class='menu-link waves-effect waves-light' href='#'>
                     <span class="menu-icon"><i class="bx bx-cog"></i></span>
@@ -189,24 +209,11 @@
                 </a>
             </li>
 
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-user-check"></i></span>
-                    <span class="menu-text"> Pengguna & Staff </span>
-                </a>
-            </li>
 
             <li class="menu-item">
                 <a class='menu-link waves-effect waves-light' href='#'>
                     <span class="menu-icon"><i class="bx bx-id-card"></i></span>
                     <span class="menu-text"> Konfigurasi Sertifikat </span>
-                </a>
-            </li>
-
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-shield-quarter"></i></span>
-                    <span class="menu-text"> Role & Hak Akses </span>
                 </a>
             </li>
 

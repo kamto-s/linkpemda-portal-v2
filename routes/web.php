@@ -2,6 +2,9 @@
 
 use App\Livewire\Admin\Category\Index as CategoryIndex;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Role\Form as RoleForm;
+use App\Livewire\Admin\Role\Index as RoleIndex;
+use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Auth\Login;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -46,12 +49,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/', Dashboard::class)->name('dashboard');
         Route::get('/dashboard', Dashboard::class);
 
-        // CMS - Categories (URL: /admin/categories | Route Name: admin.category.index)
+        // CMS
         Route::get('/categories', CategoryIndex::class)->name('category.index');
-
-        // Nanti route Artikel & Materi tinggal dimasukkan di sini:
         // Route::get('/articles', ArticleIndex::class)->name('article.index');
         // Route::get('/materials', MaterialIndex::class)->name('material.index');
 
+        // Setting
+        Route::get('/users', UserIndex::class)->name('user.index');
+        Route::get('/roles', RoleIndex::class)->name('role.index');
+        Route::get('/roles/create', RoleForm::class)->name('role.create');
+        Route::get('/roles/{role}/edit', RoleForm::class)->name('role.edit');
     });
 });
