@@ -3,7 +3,130 @@
 <script src="{{ asset('assets/admin/js/app.js') }}" data-navigate-once></script>
 
 <script>
-    document.addEventListener('livewire:navigated', () => {
+    // 1. Sidebar Toggle (Mendukung Desktop Collapse & Mobile Off-canvas Drawer)
+    function toggleSidebarMenu() {
+        const html = document.documentElement;
+        const isMobile = window.innerWidth <= 1200 || html.getAttribute('data-sidebar-size') === 'full';
+
+        if (isMobile) {
+            const isOpen = html.classList.toggle('sidebar-enable');
+            let backdrop = document.getElementById('custom-backdrop');
+
+            if (isOpen) {
+                if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.id = 'custom-backdrop';
+                    backdrop.className = 'offcanvas-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                    document.body.style.overflow = 'hidden';
+
+                    backdrop.addEventListener('click', function () {
+                        html.classList.remove('sidebar-enable');
+                        if (backdrop && backdrop.parentNode) {
+                            backdrop.parentNode.removeChild(backdrop);
+                        }
+                        document.body.style.overflow = '';
+                    });
+                }
+            } else {
+                if (backdrop && backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+                document.body.style.overflow = '';
+            }
+        } else {
+            // Desktop: toggle class sidebar-enable untuk memperkecil (icon-only) / memperlebar menu
+            html.classList.toggle('sidebar-enable');
+        }
+    }
+
+    // 2. Theme Mode Toggle (Dark / Light)
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        sessionStorage.setItem('themeMode', theme);
+
+        const themeIcon = document.querySelector('#theme-mode i');
+        if (themeIcon) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bx bx-sun font-size-24';
+            } else {
+                themeIcon.className = 'bx bx-moon font-size-24';
+            }
+        }
+    }
+
+    function toggleThemeMode() {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+    }
+
+    // 3. Fullscreen Toggle
+    function toggleFullScreen() {
+        document.body.classList.toggle('fullscreen-enable');
+        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    // Event delegation global pada document:
+    // Selalu aktif dan tidak akan pernah terlepas saat berpindah halaman via wire:navigate
+    document.addEventListener('click', function (e) {
+        // Toggle Sidebar
+        const toggleBtn = e.target.closest('.button-toggle-menu');
+        if (toggleBtn) {
+            e.preventDefault();
+            toggleSidebarMenu();
+            return;
+        }
+
+        // Toggle Theme Mode
+        const themeBtn = e.target.closest('#theme-mode');
+        if (themeBtn) {
+            e.preventDefault();
+            toggleThemeMode();
+            return;
+        }
+
+        // Toggle Fullscreen
+        const fullscreenBtn = e.target.closest('[data-bs-toggle="fullscreen"]');
+        if (fullscreenBtn) {
+            e.preventDefault();
+            toggleFullScreen();
+            return;
+        }
+    });
+
+    function syncUIState() {
+        // Sinkronisasi tema dan ikon
+        const savedTheme = sessionStorage.getItem('themeMode') ||
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        applyTheme(savedTheme);
+
+        // Bersihkan backdrop jika ada saat berpindah halaman
+        const backdrop = document.getElementById('custom-backdrop');
+        if (backdrop && backdrop.parentNode) {
+            backdrop.parentNode.removeChild(backdrop);
+            document.body.style.overflow = '';
+        }
+        if (window.innerWidth <= 1200) {
+            document.documentElement.classList.remove('sidebar-enable');
+        }
+
         // Re-inisialisasi semua Dropdown Bootstrap 5 (termasuk profile header & tabel)
         document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el) {
             bootstrap.Dropdown.getOrCreateInstance(el);
@@ -23,5 +146,8 @@
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', syncUIState);
+    document.addEventListener('livewire:navigated', syncUIState);
 </script>

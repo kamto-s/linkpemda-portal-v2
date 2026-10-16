@@ -56,7 +56,8 @@
                                 <input type="text" class="form-control" placeholder="Cari nama atau email..."
                                     wire:model.live.debounce.300ms="search">
                                 @if ($search !== '')
-                                    <button class="btn btn-outline-secondary" type="button" wire:click="$set('search', '')" title="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        wire:click="$set('search', '')" title="Hapus pencarian">
                                         <i class="mdi mdi-close"></i>
                                     </button>
                                 @endif
@@ -102,7 +103,7 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width: 60px;">#</th>
+                                    {{-- <th style="width: 60px;">#</th> --}}
                                     <th>Pengguna</th>
                                     <th>Email</th>
                                     <th>Role</th>
@@ -114,7 +115,7 @@
                             <tbody>
                                 @forelse ($users as $index => $user)
                                     <tr wire:key="{{ $user->id }}">
-                                        <th scope="row">{{ $users->firstItem() + $index }}</th>
+                                        {{-- <th scope="row">{{ $users->firstItem() + $index }}</th> --}}
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span
@@ -146,13 +147,16 @@
                                         </td>
                                         <td>
                                             @if ($user->is_active)
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Aktif</span>
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Aktif</span>
                                             @else
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Nonaktif</span>
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Nonaktif</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <small class="text-muted">{{ $user->created_at->translatedFormat('d M Y, H:i') }}</small>
+                                            <small
+                                                class="text-muted">{{ $user->created_at->translatedFormat('d M Y, H:i') }}</small>
                                         </td>
                                         <td class="text-end">
                                             @php
@@ -168,24 +172,29 @@
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
                                                     @if ($canManageThisUser)
-                                                        <a class="dropdown-item" href="{{ route('admin.user.edit', $user->id) }}" wire:navigate>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('admin.user.edit', $user->id) }}"
+                                                            wire:navigate>
                                                             <i class="mdi mdi-pencil me-1"></i> Edit
                                                         </a>
                                                         @if ($user->id !== auth()->id())
                                                             <a class="dropdown-item" href="javascript:void(0);"
                                                                 wire:click="toggleStatus('{{ $user->id }}')">
-                                                                <i class="mdi {{ $user->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
+                                                                <i
+                                                                    class="mdi {{ $user->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
                                                                 {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                                             </a>
                                                             <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                            <a class="dropdown-item text-danger"
+                                                                href="javascript:void(0);"
                                                                 wire:click="confirmDelete('{{ $user->id }}')">
                                                                 <i class="mdi mdi-trash-can me-1"></i> Hapus
                                                             </a>
                                                         @endif
                                                     @else
                                                         <span class="dropdown-item text-muted disabled py-1 fs-12">
-                                                            <i class="mdi mdi-shield-lock me-1 text-danger"></i> Terproteksi (Superadmin)
+                                                            <i class="mdi mdi-shield-lock me-1 text-danger"></i>
+                                                            Terproteksi (Superadmin)
                                                         </span>
                                                     @endif
                                                 </div>
@@ -224,11 +233,8 @@
 
 
     <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true"
-        wire:ignore.self
-        x-data="{ modal: null }"
-        x-init="modal = new bootstrap.Modal($el)"
-        @open-delete-modal.window="modal.show()"
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" wire:ignore.self
+        x-data="{ modal: null }" x-init="modal = new bootstrap.Modal($el)" @open-delete-modal.window="modal.show()"
         @close-delete-modal.window="modal.hide()">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content text-center p-3">
@@ -238,12 +244,15 @@
                     </div>
                     <h5 class="fw-bold mb-2">Hapus Pengguna?</h5>
                     <p class="text-muted fs-13 mb-3">
-                        Apakah Anda yakin ingin menghapus akun <strong>{{ $userToDeleteName }}</strong>? Tindakan ini tidak dapat dibatalkan.
+                        Apakah Anda yakin ingin menghapus akun <strong>{{ $userToDeleteName }}</strong>? Tindakan ini
+                        tidak dapat dibatalkan.
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-danger" wire:click="delete" wire:loading.attr="disabled">
-                            <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        <button type="button" class="btn btn-danger" wire:click="delete"
+                            wire:loading.attr="disabled">
+                            <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1"
+                                role="status"></span>
                             Hapus
                         </button>
                     </div>

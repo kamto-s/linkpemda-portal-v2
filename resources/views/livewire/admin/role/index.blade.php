@@ -56,7 +56,8 @@
                                 <input type="text" class="form-control" placeholder="Cari nama role..."
                                     wire:model.live.debounce.300ms="search">
                                 @if ($search !== '')
-                                    <button class="btn btn-outline-secondary" type="button" wire:click="resetFilters" title="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="resetFilters"
+                                        title="Hapus pencarian">
                                         <i class="mdi mdi-close"></i>
                                     </button>
                                 @endif
@@ -85,7 +86,7 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width: 60px;">#</th>
+                                    {{-- <th style="width: 60px;">#</th> --}}
                                     <th>Role</th>
                                     <th>Pengguna</th>
                                     <th>Hak Akses</th>
@@ -95,7 +96,7 @@
                             <tbody>
                                 @forelse ($roles as $index => $roleItem)
                                     <tr wire:key="{{ $roleItem->id }}">
-                                        <th scope="row">{{ $roles->firstItem() + $index }}</th>
+                                        {{-- <th scope="row">{{ $roles->firstItem() + $index }}</th> --}}
                                         <td>
                                             @if ($roleItem->name === 'superadmin')
                                                 <span class="badge badge-soft-danger px-2 py-1">Superadmin</span>
@@ -104,17 +105,20 @@
                                             @elseif ($roleItem->name === 'staff')
                                                 <span class="badge badge-soft-info px-2 py-1">Staff</span>
                                             @else
-                                                <span class="badge badge-soft-secondary px-2 py-1 text-capitalize">{{ $roleItem->name }}</span>
+                                                <span
+                                                    class="badge badge-soft-secondary px-2 py-1 text-capitalize">{{ $roleItem->name }}</span>
                                             @endif
                                         </td>
                                         <td>{{ $roleItem->users_count }} akun</td>
                                         <td>
                                             @if ($roleItem->name === 'superadmin')
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
                                                     Semua Hak Akses (Penuh)
                                                 </span>
                                             @else
-                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                                <span
+                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
                                                     {{ $roleItem->permissions->count() }} Hak Akses
                                                 </span>
                                             @endif
@@ -134,7 +138,7 @@
                                                         wire:navigate>
                                                         <i class="mdi mdi-pencil me-1"></i> Edit
                                                     </a>
-                                                    @if (! in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
+                                                    @if (!in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                             wire:click="confirmDelete({{ $roleItem->id }})">
@@ -160,7 +164,8 @@
                     @if ($roles->hasPages())
                         <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                             <small class="text-muted">
-                                Menampilkan {{ $roles->firstItem() }} - {{ $roles->lastItem() }} dari {{ $roles->total() }} data
+                                Menampilkan {{ $roles->firstItem() }} - {{ $roles->lastItem() }} dari
+                                {{ $roles->total() }} data
                             </small>
                             <div>
                                 {{ $roles->links() }}
@@ -189,7 +194,8 @@
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-danger" wire:click="delete" wire:loading.attr="disabled">
+                        <button type="button" class="btn btn-danger" wire:click="delete"
+                            wire:loading.attr="disabled">
                             <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1"
                                 role="status"></span>
                             Hapus

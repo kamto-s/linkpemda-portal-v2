@@ -19,7 +19,7 @@
                 </a>
             </div>
 
-            <button class="button-toggle-menu">
+            <button type="button" class="button-toggle-menu" id="sidebarToggleBtn" aria-label="Toggle Sidebar">
                 <i class="mdi mdi-menu"></i>
             </button>
         </div>
@@ -86,7 +86,7 @@
                 </div>
             </li>
 
-            <li class="nav-link" id="theme-mode">
+            <li class="nav-link" id="theme-mode" role="button" style="cursor: pointer;" title="Ubah Tema (Gelap / Terang)">
                 <i class="bx bx-moon font-size-24"></i>
             </li>
 
