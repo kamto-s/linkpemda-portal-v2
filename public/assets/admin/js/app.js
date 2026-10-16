@@ -46,19 +46,7 @@ class ThemeLayout {
                         o.append(n));
                 }
             });
-        var n = document.getElementById("theme-mode"),
-            n =
-                (n &&
-                    n.addEventListener("click", function (e) {
-                        var t = document.documentElement,
-                            n =
-                                "light" === t.getAttribute("data-bs-theme")
-                                    ? "dark"
-                                    : "light";
-                        (t.setAttribute("data-bs-theme", n),
-                            sessionStorage.setItem("themeMode", n));
-                    }),
-                sessionStorage.getItem("themeMode")),
+        var n = sessionStorage.getItem("themeMode"),
             l =
                 window.matchMedia &&
                 window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -110,22 +98,6 @@ class ThemeLayout {
     initMainMenu() {
         var e, t;
         ($(".app-menu").length &&
-            ((e = $(".app-menu .menu-item .collapse")),
-            $(document).on(
-                "click",
-                ".app-menu li [data-bs-toggle='collapse']",
-                function (e) {
-                    e.preventDefault();
-                    var targetId = $(this).attr("data-bs-target") || $(this).attr("href");
-                    if (targetId && targetId.startsWith("#")) {
-                        var $target = $(targetId);
-                        if ($target.length) {
-                            $target.collapse("toggle");
-                        }
-                    }
-                    return false;
-                },
-            ),
             e.on({
                 "show.bs.collapse": function (e) {
                     var t = $(e.target).parents(".collapse.show");
@@ -234,10 +206,8 @@ class ThemeLayout {
     }
     init() {
         (this.initComponents(),
-            this.initfullScreenListener(),
             this.initFormValidation(),
-            this.initMainMenu(),
-            this.initSwitchListener());
+            this.initMainMenu());
     }
 }
 new ThemeLayout().init();

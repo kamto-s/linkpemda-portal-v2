@@ -4,14 +4,14 @@
         <div class="topbar-menu d-flex align-items-center gap-lg-2 gap-1">
 
             <div class="logo-box">
-                <a class='logo-light' href="{{ route('admin.dashboard') }}">
+                <a wire:navigate class='logo-light' href="{{ route('admin.dashboard') }}">
                     <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg"
                         height="22">
                     <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm"
                         height="22">
                 </a>
 
-                <a class='logo-dark' href="{{ route('admin.dashboard') }}">
+                <a wire:navigate class='logo-dark' href="{{ route('admin.dashboard') }}">
                     <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="dark logo" class="logo-lg"
                         height="22">
                     <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm"
@@ -27,14 +27,14 @@
         <ul class="topbar-menu d-flex align-items-center gap-4">
 
             <li class="d-none d-md-inline-block">
-                <a class="nav-link" href="#" data-bs-toggle="fullscreen">
+                <a class="nav-link" href="javascript:void(0);" data-bs-toggle="fullscreen" title="Layar Penuh">
                     <i class="mdi mdi-fullscreen font-size-24"></i>
                 </a>
             </li>
 
             <li class="dropdown notification-list">
                 <a class="nav-link dropdown-toggle waves-effect waves-light arrow-none" data-bs-toggle="dropdown"
-                    href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    href="javascript:void(0);" role="button" aria-haspopup="false" aria-expanded="false">
                     <i class="mdi mdi-bell font-size-24"></i>
                     <span class="badge bg-danger rounded-circle noti-icon-badge">1</span>
                 </a>
@@ -52,10 +52,9 @@
                         <h5 class="text-muted font-size-13 fw-normal mt-2">Today</h5>
 
                         <!-- item-->
-                        <a href="javascript:void(0);"
-                            class="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
+                        <div class="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                             <div class="card-body">
-                                <span class="float-end noti-close-btn text-muted"><i class="mdi mdi-close"></i></span>
+                                <span class="float-end noti-close-btn text-muted" style="cursor: pointer;" title="Tutup"><i class="mdi mdi-close"></i></span>
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
                                         <div class="notify-icon bg-info">
@@ -70,10 +69,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
-
-                        <div class="text-center">
-                            <i class="mdi mdi-dots-circle mdi-spin text-muted h3 mt-0"></i>
                         </div>
                     </div>
 
@@ -86,8 +81,11 @@
                 </div>
             </li>
 
-            <li class="nav-link" id="theme-mode" role="button" style="cursor: pointer;" title="Ubah Tema (Gelap / Terang)">
-                <i class="bx bx-moon font-size-24"></i>
+            <li class="d-inline-block">
+                <a class="nav-link" id="theme-mode" href="javascript:void(0);" role="button" style="cursor: pointer;"
+                    title="Ubah Tema (Gelap / Terang)">
+                    <i class="bx bx-moon font-size-24"></i>
+                </a>
             </li>
 
             <li class="dropdown">
@@ -101,7 +99,7 @@
                     </span>
 
                     <span class="ms-1 d-none d-md-inline-block">
-                        {{ auth()->user()->name ?? 'User' }} <i class="mdi mdi-chevron-down"></i>
+                        {{ auth()->user()?->name ?? 'User' }} <i class="mdi mdi-chevron-down"></i>
                     </span>
                 </a>
 
@@ -115,7 +113,6 @@
 
                         <h4 class="text-dark fw-bold mb-0 text-truncate px-1">
                             {{ auth()->user()?->name ?? 'User' }}
-
                         </h4>
 
                         <p class="text-muted mb-1 fs-12 text-truncate px-1">
@@ -129,10 +126,17 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                        <i class="mdi mdi-account-circle"></i>
-                        <span>Profile</span>
-                    </a>
+                    @if(auth()->user()?->can('manage-users'))
+                        <a wire:navigate href="{{ route('admin.user.edit', auth()->user()) }}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-account-circle"></i>
+                            <span>Profile</span>
+                        </a>
+                    @else
+                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <i class="mdi mdi-account-circle"></i>
+                            <span>Profile</span>
+                        </a>
+                    @endif
 
                     <div class="dropdown-divider"></div>
 
