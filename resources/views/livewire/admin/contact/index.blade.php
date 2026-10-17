@@ -41,19 +41,22 @@
                                 Kelola data kontak sasaran promosi dan pengiriman email blast.
                             </p>
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('admin.contact.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus me-1"></i> Tambah
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-success" wire:click="openImportModal">
+                                <i class="mdi mdi-file-excel"></i> Import Excel
+                            </button>
+                            <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-light">
+                                <i class="bx bx-send"></i> Kirim Email
                             </a>
-                            <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-outline-success">
-                                <i class="mdi mdi-email-fast-outline me-1"></i> Buat Email Blast
+                            <a href="{{ route('admin.contact.create') }}" wire:navigate class="btn btn-primary">
+                                <i class="mdi mdi-plus"></i> Tambah
                             </a>
                         </div>
                     </div>
 
                     <!-- Search & Filter Controls -->
                     <div class="row g-2 mb-3 align-items-center">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
                                 <input type="text" class="form-control" placeholder="Cari nama, email, instansi..."
@@ -67,7 +70,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select class="form-select" wire:model.live="selectedCategory">
                                 <option value="">Semua Kategori</option>
                                 @foreach ($categories as $cat)
@@ -120,43 +123,49 @@
                                     <tr wire:key="{{ $contact->id }}">
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                <span
+                                                    class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
                                                     style="width: 34px; height: 34px; font-size: 12px; flex-shrink: 0;">
                                                     {{ mb_substr($contact->name, 0, 2) }}
                                                 </span>
                                                 <div>
                                                     <div class="fw-semibold text-dark">{{ $contact->name }}</div>
-                                                    <small class="text-muted">{{ $contact->position ?? 'PIC / Staff' }}</small>
+                                                    <small
+                                                        class="text-muted">{{ $contact->position ?? 'PIC / Staff' }}</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div>
-                                                <a href="mailto:{{ $contact->email }}" class="text-primary text-decoration-none">
+                                                <a href="mailto:{{ $contact->email }}"
+                                                    class="text-primary text-decoration-none">
                                                     {{ $contact->email }}
                                                 </a>
                                             </div>
                                             <small class="text-muted">{{ $contact->phone ?: '-' }}</small>
                                         </td>
                                         <td>
-                                            <span class="fw-semibold text-dark">{{ $contact->organization_name }}</span>
+                                            <span
+                                                class="fw-semibold text-dark">{{ $contact->organization_name }}</span>
                                         </td>
                                         <td>
                                             @if ($contact->category->value === 'pemerintah')
                                                 <span class="badge badge-soft-info px-2 py-1">
-                                                    <i class="mdi mdi-city me-1"></i> Pemerintah
+                                                    Pemerintah
                                                 </span>
                                             @else
                                                 <span class="badge badge-soft-warning px-2 py-1">
-                                                    <i class="mdi mdi-domain me-1"></i> Swasta
+                                                    Swasta
                                                 </span>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($contact->is_active)
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Aktif</span>
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Aktif</span>
                                             @else
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Nonaktif</span>
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Nonaktif</span>
                                             @endif
                                         </td>
                                         <td class="text-end">
@@ -169,12 +178,15 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
-                                                    <a class="dropdown-item" href="{{ route('admin.contact.edit', $contact->id) }}" wire:navigate>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.contact.edit', $contact->id) }}"
+                                                        wire:navigate>
                                                         <i class="mdi mdi-pencil me-1"></i> Edit
                                                     </a>
                                                     <a class="dropdown-item" href="javascript:void(0);"
                                                         wire:click="toggleStatus('{{ $contact->id }}')">
-                                                        <i class="mdi {{ $contact->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
+                                                        <i
+                                                            class="mdi {{ $contact->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
                                                         {{ $contact->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                                     </a>
                                                     <div class="dropdown-divider"></div>
@@ -199,14 +211,8 @@
                     </div>
 
                     @if ($contacts->hasPages())
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                Menampilkan {{ $contacts->firstItem() }} - {{ $contacts->lastItem() }} dari
-                                {{ $contacts->total() }} data
-                            </small>
-                            <div>
-                                {{ $contacts->links() }}
-                            </div>
+                        <div class="mt-3 pt-3 border-top">
+                            {{ $contacts->links() }}
                         </div>
                     @endif
 
@@ -215,6 +221,145 @@
         </div>
     </div>
 
+
+    <!-- Modal Import Excel -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true" wire:ignore.self
+        x-data="{ modal: null }" x-init="modal = new bootstrap.Modal($el)" @open-import-modal.window="modal.show()"
+        @close-import-modal.window="modal.hide()">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-dark">
+                        <i class="mdi mdi-file-excel text-success me-1"></i> Import Kontak dari Excel / CSV
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click="closeImportModal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Panduan & Download Format Template -->
+                    <div
+                        class="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                        <div>
+                            <div class="fw-bold mb-1"><i class="mdi mdi-information me-1"></i> Format Kolom Excel:
+                            </div>
+                            <small class="d-block text-muted">
+                                Kolom yang dikenali: <strong>Nama</strong>, <strong>Email</strong>,
+                                <strong>Instansi</strong>, <strong>Jabatan</strong>, <strong>Telepon/WA</strong>,
+                                <strong>Kategori</strong> (Pemerintah/Swasta), dan <strong>Status</strong>.
+                            </small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary bg-white"
+                            wire:click="downloadTemplate">
+                            <i class="mdi mdi-download me-1"></i> Download Template Excel
+                        </button>
+                    </div>
+
+                    <!-- Ringkasan Hasil Import -->
+                    @if ($importSummary)
+                        <div class="card bg-light border mb-3">
+                            <div class="card-body p-3">
+                                <h6 class="fw-bold mb-2">Hasil Import:</h6>
+                                <div class="row g-2 text-center">
+                                    <div class="col-3">
+                                        <div class="border rounded bg-white p-2">
+                                            <div class="fs-18 fw-bold text-dark">{{ $importSummary['total'] }}</div>
+                                            <small class="text-muted fs-11">Total Baris</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded bg-white p-2">
+                                            <div class="fs-18 fw-bold text-success">{{ $importSummary['imported'] }}
+                                            </div>
+                                            <small class="text-muted fs-11">Ditambahkan</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded bg-white p-2">
+                                            <div class="fs-18 fw-bold text-info">{{ $importSummary['updated'] }}</div>
+                                            <small class="text-muted fs-11">Diperbarui</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="border rounded bg-white p-2">
+                                            <div class="fs-18 fw-bold text-warning">{{ $importSummary['skipped'] }}
+                                            </div>
+                                            <small class="text-muted fs-11">Dilewati</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (!empty($importSummary['errors']))
+                                    <div class="mt-3">
+                                        <small class="fw-bold text-danger d-block mb-1">Catatan Kendala / Baris Tidak
+                                            Valid:</small>
+                                        <ul class="text-danger fs-12 ps-3 mb-0"
+                                            style="max-height: 120px; overflow-y: auto;">
+                                            @foreach ($importSummary['errors'] as $err)
+                                                <li>{{ $err }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    <form wire:submit="importExcel">
+                        <!-- File Upload Input -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pilih Berkas Excel / CSV <span
+                                    class="text-danger">*</span></label>
+                            <input type="file" class="form-control @error('importFile') is-invalid @enderror"
+                                wire:model="importFile" accept=".xlsx,.xls,.csv">
+                            @error('importFile')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Mendukung berkas .xlsx, .xls, dan .csv (Maksimal 10 MB).</small>
+
+                            <!-- Livewire Uploading Indicator -->
+                            <div wire:loading wire:target="importFile" class="text-primary fs-12 mt-1">
+                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                Mengunggah berkas ke sistem...
+                            </div>
+                        </div>
+
+                        <!-- Opsi Duplikasi Email -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Jika Alamat Email Sudah Ada di Sistem:</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" value="update" id="dupUpdate"
+                                        wire:model="duplicateHandling">
+                                    <label class="form-check-label" for="dupUpdate">
+                                        <strong>Perbarui data</strong> kontak dengan data terbaru
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" value="skip" id="dupSkip"
+                                        wire:model="duplicateHandling">
+                                    <label class="form-check-label" for="dupSkip">
+                                        <strong>Lewati</strong> (jangan ubah kontak yang sudah ada)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer bg-light px-0 pb-0 pt-3">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                                wire:click="closeImportModal">Tutup</button>
+                            <button type="submit" class="btn btn-success px-3" wire:loading.attr="disabled"
+                                wire:target="importExcel,importFile">
+                                <span wire:loading wire:target="importExcel"
+                                    class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                <i class="mdi mdi-upload me-1" wire:loading.remove wire:target="importExcel"></i>
+                                Mulai Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Konfirmasi Hapus -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" wire:ignore.self
@@ -228,7 +373,8 @@
                     </div>
                     <h5 class="fw-bold mb-2">Hapus Kontak?</h5>
                     <p class="text-muted fs-13 mb-3">
-                        Apakah Anda yakin ingin menghapus kontak <strong>{{ $contactToDeleteName }}</strong>? Tindakan ini tidak dapat dibatalkan.
+                        Apakah Anda yakin ingin menghapus kontak <strong>{{ $contactToDeleteName }}</strong>? Tindakan
+                        ini tidak dapat dibatalkan.
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>

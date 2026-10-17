@@ -214,14 +214,8 @@
                     </div>
 
                     @if ($users->hasPages())
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                Menampilkan {{ $users->firstItem() }} - {{ $users->lastItem() }} dari
-                                {{ $users->total() }} data
-                            </small>
-                            <div>
-                                {{ $users->links() }}
-                            </div>
+                        <div class="mt-3 pt-3 border-top">
+                            {{ $users->links() }}
                         </div>
                     @endif
 

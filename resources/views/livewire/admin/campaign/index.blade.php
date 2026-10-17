@@ -184,14 +184,8 @@
                     </div>
 
                     @if ($campaigns->hasPages())
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                Menampilkan {{ $campaigns->firstItem() }} - {{ $campaigns->lastItem() }} dari
-                                {{ $campaigns->total() }} data
-                            </small>
-                            <div>
-                                {{ $campaigns->links() }}
-                            </div>
+                        <div class="mt-3 pt-3 border-top">
+                            {{ $campaigns->links() }}
                         </div>
                     @endif
 

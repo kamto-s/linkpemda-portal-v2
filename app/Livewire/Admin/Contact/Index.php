@@ -4,15 +4,18 @@ namespace App\Livewire\Admin\Contact;
 
 use App\Enums\ContactCategory;
 use App\Models\Contact;
+use App\Services\ContactImportService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin.app')]
 #[Title('Kontak Target')]
 class Index extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     protected string $paginationTheme = 'bootstrap';
@@ -32,6 +35,13 @@ class Index extends Component
 
     public string $contactToDeleteName = '';
 
+    // Import Excel properties
+    public $importFile = null;
+
+    public string $duplicateHandling = 'update';
+
+    public ?array $importSummary = null;
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -50,6 +60,59 @@ class Index extends Component
     public function resetFilters(): void
     {
         $this->reset(['search', 'selectedCategory', 'selectedStatus']);
+        $this->resetPage();
+    }
+
+    public function openImportModal(): void
+    {
+        $this->resetValidation();
+        $this->reset(['importFile', 'importSummary']);
+        $this->dispatch('open-import-modal');
+    }
+
+    public function closeImportModal(): void
+    {
+        $this->reset(['importFile', 'importSummary']);
+        $this->dispatch('close-import-modal');
+    }
+
+    public function downloadTemplate(ContactImportService $service)
+    {
+        return response()->streamDownload(function () use ($service) {
+            echo $service->generateTemplate();
+        }, 'template-import-kontak.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function importExcel(ContactImportService $service): void
+    {
+        $this->validate([
+            'importFile' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
+        ], [
+            'importFile.required' => 'Silakan pilih berkas Excel atau CSV terlebih dahulu.',
+            'importFile.mimes' => 'Format berkas harus .xlsx, .xls, atau .csv.',
+            'importFile.max' => 'Ukuran berkas maksimal 10 MB.',
+        ]);
+
+        $filePath = $this->importFile->getRealPath();
+        $summary = $service->import($filePath, $this->duplicateHandling);
+
+        $this->importSummary = $summary;
+
+        if ($summary['imported'] > 0 || $summary['updated'] > 0) {
+            $msg = "Proses import selesai: {$summary['imported']} kontak baru ditambahkan";
+            if ($summary['updated'] > 0) {
+                $msg .= ", {$summary['updated']} kontak diperbarui";
+            }
+            if ($summary['skipped'] > 0) {
+                $msg .= ", {$summary['skipped']} kontak dilewati";
+            }
+            $msg .= '.';
+            session()->flash('success', $msg);
+        }
+
+        $this->reset('importFile');
         $this->resetPage();
     }
 
