@@ -24,11 +24,11 @@ enum CampaignStatus: string
     public function badgeClass(): string
     {
         return match ($this) {
-            self::Draft => 'badge bg-secondary',
-            self::Queued => 'badge bg-info',
-            self::Processing => 'badge bg-primary',
-            self::Completed => 'badge bg-success',
-            self::Failed => 'badge bg-danger',
+            self::Draft => 'badge badge-soft-secondary',
+            self::Queued => 'badge badge-soft-warning',
+            self::Processing => 'badge badge-soft-primary',
+            self::Completed => 'badge bg-success-subtle text-success border border-success-subtle',
+            self::Failed => 'badge bg-danger-subtle text-danger border border-danger-subtle',
         };
     }
 }

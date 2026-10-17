@@ -88,42 +88,43 @@
             <!-- ============================================== -->
             <!-- PROMOSI & EMAIL BLAST -->
             <!-- ============================================== -->
-            <li class="menu-title">Promosi</li>
+            <li class="menu-title">Email Marketing</li>
 
-            @php
-                $isEmailBlastActive = request()->routeIs(['admin.campaign.*', 'admin.contact.*']);
-            @endphp
-
-            <li class="menu-item {{ $isEmailBlastActive ? 'active' : '' }}">
-                <a href="#menuEmailBlast" data-bs-toggle="collapse"
-                    aria-expanded="{{ $isEmailBlastActive ? 'true' : 'false' }}" aria-controls="menuEmailBlast"
-                    class="menu-link waves-effect waves-light {{ $isEmailBlastActive ? 'active' : '' }}">
-                    <span class="menu-icon"><i class="bx bx-broadcast"></i></span>
-                    <span class="menu-text"> Email Blast </span>
-                    <span class="menu-arrow"></span>
+            <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
+                <a wire:navigate
+                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
+                    href='{{ route('admin.campaign.create') }}'>
+                    <span class="menu-icon"><i class="bx bx-send"></i></span>
+                    <span class="menu-text"> Kirim Email </span>
                 </a>
-                <div class="collapse {{ $isEmailBlastActive ? 'show' : '' }}" id="menuEmailBlast">
-                    <ul class="sub-menu">
-                        <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
-                            <a wire:navigate class='menu-link {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
-                                href='{{ route('admin.campaign.create') }}'>
-                                <span class="menu-text">Kirim Baru</span>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ request()->routeIs('admin.campaign.index') || request()->routeIs('admin.campaign.show') ? 'active' : '' }}">
-                            <a wire:navigate class='menu-link {{ request()->routeIs('admin.campaign.index') || request()->routeIs('admin.campaign.show') ? 'active' : '' }}'
-                                href='{{ route('admin.campaign.index') }}'>
-                                <span class="menu-text">Campaign</span>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
-                            <a wire:navigate class='menu-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}'
-                                href='{{ route('admin.contact.index') }}'>
-                                <span class="menu-text">Kontak</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+            </li>
+
+            <li
+                class="menu-item {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
+                <a wire:navigate
+                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
+                    href='{{ route('admin.campaign.index') }}'>
+                    <span class="menu-icon"><i class="bx bx-broadcast"></i></span>
+                    <span class="menu-text"> Campaign </span>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->routeIs('admin.template.*') ? 'active' : '' }}">
+                <a wire:navigate
+                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.template.*') ? 'active' : '' }}'
+                    href='{{ route('admin.template.index') }}'>
+                    <span class="menu-icon"><i class="bx bx-layer"></i></span>
+                    <span class="menu-text"> Template </span>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
+                <a wire:navigate
+                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}'
+                    href='{{ route('admin.contact.index') }}'>
+                    <span class="menu-icon"><i class="bx bx-book-content"></i></span>
+                    <span class="menu-text"> Kontak </span>
+                </a>
             </li>
 
             <li class="menu-title">Administrasi</li>
@@ -212,7 +213,6 @@
                     <span class="menu-text"> Identitas Portal </span>
                 </a>
             </li>
-
 
             <li class="menu-item">
                 <a class='menu-link waves-effect waves-light' href='#'>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('subject');
             $table->longText('body_content');
-            $table->string('status')->default('draft')->index(); // draft, queued, processing, completed, failed
+            $table->string('status')->default('draft')->index();
             $table->unsignedInteger('total_recipients')->default(0);
             $table->unsignedInteger('sent_count')->default(0);
             $table->unsignedInteger('failed_count')->default(0);
@@ -34,4 +34,3 @@ return new class extends Migration
         Schema::dropIfExists('email_campaigns');
     }
 };
-
