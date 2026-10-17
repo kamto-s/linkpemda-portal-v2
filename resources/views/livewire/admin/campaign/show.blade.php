@@ -2,7 +2,12 @@
     <div class="py-3 py-lg-4">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <h4 class="page-title mb-0">Monitoring Email Blast</h4>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('admin.campaign.index') }}" wire:navigate class="btn btn-sm btn-light border" title="Kembali">
+                        <i class="mdi mdi-arrow-left"></i>
+                    </a>
+                    <h4 class="page-title mb-0">Monitoring Email Blast</h4>
+                </div>
             </div>
             <div class="col-lg-6">
                 <div class="d-none d-lg-block">
@@ -43,24 +48,29 @@
                                     {{ $campaign->status->label() }}
                                 </span>
                             </div>
-                            <p class="text-muted mb-0">
-                                <strong>Subjek:</strong> {{ $campaign->subject }} •
-                                <span>Dibuat: {{ $campaign->created_at->format('d M Y, H:i') }}</span>
+                            <div class="text-muted mb-0 fs-13 d-flex flex-wrap align-items-center gap-1">
+                                <span><strong>Subjek:</strong> {{ $campaign->subject }}</span>
+                                <span class="text-muted mx-1">•</span>
+                                <span><i class="mdi mdi-play-circle-outline text-primary me-1"></i>Mulai: <strong>{{ ($campaign->started_at ?? $campaign->created_at)->format('d M Y, H:i:s') }}</strong></span>
                                 @if ($campaign->sent_at)
-                                    • <span>Selesai: {{ $campaign->sent_at->format('d M Y, H:i') }}</span>
+                                    <span class="text-muted mx-1">•</span>
+                                    <span><i class="mdi mdi-check-circle-outline text-success me-1"></i>Selesai: <strong>{{ $campaign->sent_at->format('d M Y, H:i:s') }}</strong></span>
                                 @endif
-                            </p>
+                                @if ($campaign->delivery_duration)
+                                    <span class="text-muted mx-1">•</span>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fs-12">
+                                        <i class="mdi mdi-timer-outline me-1"></i>Durasi: {{ $campaign->delivery_duration }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a wire:navigate href="{{ route('admin.campaign.index') }}" class="btn btn-outline-secondary">
-                                <i class="mdi mdi-arrow-left me-1"></i> Kembali
-                            </a>
-                            @if ($campaign->failed_count > 0)
+                        @if ($campaign->failed_count > 0)
+                            <div class="d-flex align-items-center gap-2">
                                 <button type="button" class="btn btn-warning" wire:click="retryFailed">
                                     <i class="mdi mdi-refresh me-1"></i> Kirim Ulang {{ $campaign->failed_count }} yang Gagal
                                 </button>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Progress Bar & Statistics -->
@@ -82,7 +92,7 @@
                         </div>
                     </div>
 
-                    <div class="row text-center pt-2">
+                    <div class="row text-center pt-2 g-2">
                         <div class="col-6 col-md-3 border-end">
                             <h4 class="fw-bold mb-0 text-dark">{{ $campaign->total_recipients }}</h4>
                             <small class="text-muted text-uppercase fs-11">Total Penerima</small>
@@ -109,63 +119,113 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-light py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                    <h5 class="card-title m-0 fw-bold">Daftar Status Penerima</h5>
-                    <div class="d-flex align-items-center gap-2">
-                        <select class="form-select form-select-sm" wire:model.live="filterRecipientStatus" style="width: 160px;">
-                            <option value="all">Semua Status</option>
-                            <option value="sent">Hanya Terkirim</option>
-                            <option value="failed">Hanya Gagal</option>
-                            <option value="pending">Hanya Menunggu</option>
-                        </select>
-                        <div class="input-group input-group-sm" style="max-width: 240px;">
-                            <span class="input-group-text bg-white border-end-0"><i class="mdi mdi-magnify"></i></span>
-                            <input type="text" class="form-control border-start-0" placeholder="Cari nama / email..."
-                                wire:model.live.debounce.300ms="searchRecipient">
-                        </div>
-                    </div>
-                </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div>
+                            <h4 class="header-title mb-1">Daftar Status Penerima</h4>
+                            <p class="sub-header mb-0">
+                                Rincian status pengiriman email blast ke masing-masing kontak target.
+                            </p>
+                        </div>
+                        <span class="badge bg-light text-dark border px-2 py-1 fs-12">
+                            Total: <strong>{{ $recipients->count() }}</strong> kontak
+                        </span>
+                    </div>
+
+                    <!-- Filter & Search Toolbar -->
+                    <div class="row g-2 align-items-center mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
+                                <input type="text" class="form-control" placeholder="Cari nama, email, instansi..."
+                                    wire:model.live.debounce.300ms="searchRecipient">
+                                @if ($searchRecipient)
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        wire:click="$set('searchRecipient', '')" title="Hapus pencarian">
+                                        <i class="mdi mdi-close"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-select" wire:model.live="filterRecipientStatus">
+                                <option value="all">Semua Status</option>
+                                <option value="sent">Terkirim</option>
+                                <option value="failed">Gagal</option>
+                                <option value="pending">Menunggu Antrean</option>
+                            </select>
+                        </div>
+
+                        @if ($searchRecipient !== '' || $filterRecipientStatus !== 'all')
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
+                                    <i class="mdi mdi-filter-remove me-1"></i> Reset
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Tabel Kontak Scrollable (Los) -->
+                    <div class="table-responsive border rounded" style="max-height: 540px; overflow-y: auto;">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead class="table-light sticky-top" style="top: 0; z-index: 2;">
                                 <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th>Nama Penerima</th>
-                                    <th>Email</th>
-                                    <th>Instansi / Perusahaan</th>
-                                    <th>Kategori</th>
-                                    <th>Status</th>
-                                    <th>Waktu Kirim / Catatan Error</th>
+                                    <th style="width: 50px;" class="text-center bg-light">#</th>
+                                    <th class="bg-light">Penerima</th>
+                                    <th class="bg-light">Email &amp; No. HP</th>
+                                    <th class="bg-light">Instansi / Perusahaan</th>
+                                    <th class="text-center bg-light" style="width: 120px;">Kategori</th>
+                                    <th class="text-center bg-light" style="width: 110px;">Status</th>
+                                    <th class="bg-light" style="width: 220px;">Waktu Kirim / Catatan</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($recipients as $index => $item)
-                                    <tr>
-                                        <td>{{ $recipients->firstItem() + $index }}</td>
+                                @forelse ($recipients as $item)
+                                    <tr wire:key="{{ $item->id }}">
+                                        <td class="text-center text-muted fs-12">{{ $loop->iteration }}</td>
                                         <td>
-                                            <div class="fw-bold text-dark">{{ $item->contact->name ?? '-' }}</div>
-                                            <small class="text-muted">{{ $item->contact->position ?? '-' }}</small>
-                                        </td>
-                                        <td>
-                                            <a href="mailto:{{ $item->contact->email ?? '' }}" class="text-primary">
-                                                {{ $item->contact->email ?? '-' }}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <span class="fw-semibold">{{ $item->contact->organization_name ?? '-' }}</span>
-                                        </td>
-                                        <td>
-                                            @if ($item->contact)
-                                                <span class="badge {{ $item->contact->category->badgeClass() }} rounded-pill font-size-11">
-                                                    {{ $item->contact->category->label() }}
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                    style="width: 34px; height: 34px; font-size: 12px; flex-shrink: 0;">
+                                                    {{ mb_substr($item->contact->name ?? '?', 0, 2) }}
                                                 </span>
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ $item->contact->name ?? '-' }}</div>
+                                                    <small class="text-muted">{{ $item->contact->position ?? 'PIC / Staff' }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <a href="mailto:{{ $item->contact->email ?? '' }}" class="text-primary text-decoration-none">
+                                                    {{ $item->contact->email ?? '-' }}
+                                                </a>
+                                            </div>
+                                            <small class="text-muted">{{ $item->contact->phone ?: '-' }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold text-dark">{{ $item->contact->organization_name ?? '-' }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($item->contact)
+                                                @if ($item->contact->category === \App\Enums\ContactCategory::Pemerintah || $item->contact->category?->value === 'pemerintah')
+                                                    <span class="badge badge-soft-info px-2 py-1">Pemerintah</span>
+                                                @else
+                                                    <span class="badge badge-soft-warning px-2 py-1">Swasta</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">-</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <span class="{{ $item->status->badgeClass() }} rounded-pill px-2 py-1 font-size-11">
-                                                {{ $item->status->label() }}
-                                            </span>
+                                        <td class="text-center">
+                                            @if ($item->status->value === 'sent')
+                                                <span class="badge badge-soft-success px-2 py-1">Terkirim</span>
+                                            @elseif ($item->status->value === 'failed')
+                                                <span class="badge badge-soft-danger px-2 py-1">Gagal</span>
+                                            @else
+                                                <span class="badge badge-soft-secondary px-2 py-1">Menunggu</span>
+                                            @endif
                                         </td>
                                         <td>
                                             @if ($item->status->value === 'sent' && $item->sent_at)
@@ -182,16 +242,13 @@
                                 @empty
                                     <tr>
                                         <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="mdi mdi-account-search-outline fs-24 d-block mb-1 text-muted"></i>
                                             Tidak ada data penerima yang sesuai filter.
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
-
-                    <div class="mt-3">
-                        {{ $recipients->links() }}
                     </div>
                 </div>
             </div>

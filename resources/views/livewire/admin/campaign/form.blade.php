@@ -201,89 +201,64 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <h4 class="header-title mb-0">Target Penerima</h4>
-                    <span class="badge bg-primary px-3 py-2 fs-12">
-                        {{ count($selectedContacts) }} dipilih
+                    <div>
+                        <h4 class="header-title mb-1">Target Penerima</h4>
+                        <p class="sub-header mb-0">
+                            Pilih kontak sasaran yang akan menerima pengiriman email blast ini.
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary px-3 py-2 fs-12">
+                            {{ count($selectedContacts) }} dipilih
+                            @if (count($selectedContacts) > 0)
+                                (Pemerintah: {{ $selectedPemerintahCount }}, Swasta: {{ $selectedSwastaCount }})
+                            @endif
+                        </span>
                         @if (count($selectedContacts) > 0)
-                            (Pemerintah: {{ $selectedPemerintahCount }}, Swasta: {{ $selectedSwastaCount }})
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 fs-12"
+                                wire:click="deselectAll('all')" title="Kosongkan Pilihan">
+                                <i class="mdi mdi-close me-1"></i>Kosongkan
+                            </button>
                         @endif
-                    </span>
+                    </div>
                 </div>
 
-                <!-- Filter & Search Toolbar -->
+                <!-- Filter & Bulk Actions Toolbar -->
                 <div class="row g-2 align-items-center mb-3">
-                    <div class="col-md-5 col-lg-4">
-                        <div class="btn-group btn-group-sm w-100" role="group">
-                            <button type="button"
-                                class="btn {{ $contactCategory === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}"
-                                wire:click="$set('contactCategory', 'all')">
-                                Semua ({{ $allContactsCount }})
-                            </button>
-                            <button type="button"
-                                class="btn {{ $contactCategory === 'pemerintah' ? 'btn-info text-white' : 'btn-outline-info' }}"
-                                wire:click="$set('contactCategory', 'pemerintah')">
-                                Pemerintah ({{ $pemdaCount }})
-                            </button>
-                            <button type="button"
-                                class="btn {{ $contactCategory === 'swasta' ? 'btn-warning text-dark' : 'btn-outline-warning' }}"
-                                wire:click="$set('contactCategory', 'swasta')">
-                                Swasta ({{ $swastaCount }})
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 col-lg-5">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light border-end-0"><i
-                                    class="mdi mdi-magnify"></i></span>
-                            <input type="text" class="form-control border-start-0"
-                                placeholder="Cari nama, instansi, email..."
-                                wire:model.live.debounce.250ms="searchContact">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
+                            <input type="text" class="form-control" placeholder="Cari nama, email, instansi..."
+                                wire:model.live.debounce.300ms="searchContact">
                             @if ($searchContact)
-                                <button class="btn btn-light border" type="button"
-                                    wire:click="$set('searchContact', '')">
+                                <button class="btn btn-outline-secondary" type="button"
+                                    wire:click="$set('searchContact', '')" title="Hapus pencarian">
                                     <i class="mdi mdi-close"></i>
                                 </button>
                             @endif
                         </div>
                     </div>
 
-                    <div class="col-md-3 col-lg-3 text-md-end">
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light border dropdown-toggle w-100" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Pilih Cepat
+                    <div class="col-md-3">
+                        <select class="form-select" wire:model.live="contactCategory">
+                            <option value="all">Semua Kategori ({{ $allContactsCount }})</option>
+                            <option value="pemerintah">Pemerintah ({{ $pemdaCount }})</option>
+                            <option value="swasta">Swasta ({{ $swastaCount }})</option>
+                        </select>
+                    </div>
+
+                    @if ($searchContact !== '' || $contactCategory !== 'all')
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
+                                <i class="mdi mdi-filter-remove me-1"></i> Reset
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li>
-                                    <a class="dropdown-item py-1 fs-13" href="javascript:void(0)"
-                                        wire:click="selectAll('all')">
-                                        Pilih Semua ({{ $allContactsCount }})
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-1 fs-13" href="javascript:void(0)"
-                                        wire:click="selectAll('pemerintah')">
-                                        Pilih Semua Pemerintah ({{ $pemdaCount }})
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-1 fs-13" href="javascript:void(0)"
-                                        wire:click="selectAll('swasta')">
-                                        Pilih Semua Swasta ({{ $swastaCount }})
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider my-1">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-1 fs-13 text-danger" href="javascript:void(0)"
-                                        wire:click="deselectAll('all')">
-                                        Kosongkan Pilihan
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
+                    @endif
+
+                    <div class="col d-flex justify-content-end align-items-center">
+                        <span class="text-muted fs-13">
+                            Total: <strong>{{ $contacts->count() }}</strong> kontak
+                        </span>
                     </div>
                 </div>
 
@@ -293,57 +268,91 @@
                     </div>
                 @enderror
 
-                <!-- Tabel Kontak -->
+                <!-- Tabel Kontak Scrollable -->
                 <div class="table-responsive border rounded" style="max-height: 520px; overflow-y: auto;">
                     <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light sticky-top">
+                        <thead class="table-light sticky-top" style="top: 0; z-index: 2;">
                             <tr>
-                                <th style="width: 45px;" class="text-center">
-                                    <input class="form-check-input" type="checkbox" wire:click="toggleSelectVisible"
-                                        {{ $isAllVisibleSelected ? 'checked' : '' }}
+                                <th style="width: 45px;" class="text-center bg-light">
+                                    <input class="form-check-input" type="checkbox"
+                                        wire:model.live="selectAll"
+                                        wire:key="header-checkbox-{{ $selectAll ? '1' : '0' }}"
+                                        id="selectAllCheckbox"
+                                        @disabled($contacts->count() === 0)
                                         title="Pilih Semua yang Ditampilkan">
                                 </th>
-                                <th>Kontak</th>
-                                <th>Instansi</th>
-                                <th>Jabatan</th>
-                                <th>Telepon</th>
-                                <th class="text-center" style="width: 100px;">Kategori</th>
+                                <th class="bg-light">Kontak</th>
+                                <th class="bg-light">Email &amp; No. HP</th>
+                                <th class="bg-light">Instansi / Perusahaan</th>
+                                <th class="text-center bg-light" style="width: 130px;">Kategori</th>
+                                <th class="text-center bg-light" style="width: 100px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($contacts as $contact)
-                                <tr
+                                <tr wire:key="{{ $contact->id }}"
                                     class="{{ in_array($contact->id, $selectedContacts) ? 'table-primary-subtle' : '' }}">
                                     <td class="text-center">
                                         <input class="form-check-input" type="checkbox" value="{{ $contact->id }}"
                                             wire:model.live="selectedContacts" id="c_{{ $contact->id }}">
                                     </td>
                                     <td>
-                                        <label class="form-check-label fw-bold d-block text-dark mb-0 cursor-pointer"
-                                            for="c_{{ $contact->id }}" style="cursor: pointer;">
-                                            {{ $contact->name }}
-                                        </label>
-                                        <small class="text-muted">{{ $contact->email }}</small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span
+                                                class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                style="width: 34px; height: 34px; font-size: 12px; flex-shrink: 0;">
+                                                {{ mb_substr($contact->name, 0, 2) }}
+                                            </span>
+                                            <div>
+                                                <label
+                                                    class="form-check-label fw-bold d-block text-dark mb-0 cursor-pointer"
+                                                    for="c_{{ $contact->id }}" style="cursor: pointer;">
+                                                    {{ $contact->name }}
+                                                </label>
+                                                <small
+                                                    class="text-muted">{{ $contact->position ?? 'PIC / Staff' }}</small>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
-                                        <span class="text-dark fs-13">{{ $contact->organization_name }}</span>
+                                        <div>
+                                            <a href="mailto:{{ $contact->email }}"
+                                                class="text-primary text-decoration-none">
+                                                {{ $contact->email }}
+                                            </a>
+                                        </div>
+                                        <small class="text-muted">{{ $contact->phone ?: '-' }}</small>
                                     </td>
                                     <td>
-                                        <span class="text-secondary fs-13">{{ $contact->position ?? '-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="text-muted fs-13">{{ $contact->phone ?? '-' }}</span>
+                                        <span class="fw-semibold text-dark">{{ $contact->organization_name }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <span
-                                            class="badge {{ $contact->category === \App\Enums\ContactCategory::Pemerintah ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle' }} px-2 py-1 fs-11">
-                                            {{ $contact->category === \App\Enums\ContactCategory::Pemerintah ? 'Pemerintah' : 'Swasta' }}
-                                        </span>
+                                        @if ($contact->category === \App\Enums\ContactCategory::Pemerintah || $contact->category?->value === 'pemerintah')
+                                            <span class="badge badge-soft-info px-2 py-1">
+                                                Pemerintah
+                                            </span>
+                                        @else
+                                            <span class="badge badge-soft-warning px-2 py-1">
+                                                Swasta
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ($contact->is_active)
+                                            <span class="badge badge-soft-success px-2 py-1">
+                                                Aktif
+                                            </span>
+                                        @else
+                                            <span class="badge badge-soft-secondary px-2 py-1">
+                                                Nonaktif
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="mdi mdi-account-search-outline fs-24 d-block mb-1 text-muted"></i>
                                         Tidak ada data kontak ditemukan.
                                     </td>
                                 </tr>
@@ -354,7 +363,7 @@
             </div>
 
             <!-- Footer Aksi Langkah 2 -->
-            <div class="card-footer bg-light px-3 py-3 border-top">
+            <div class="card-footer">
                 <div class="d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary" wire:click="goToStep(1)">
                         <i class="mdi mdi-arrow-left me-1"></i> Kembali
@@ -501,9 +510,11 @@
                 <div class="modal-header py-3 bg-light border-bottom">
                     <div>
                         <h5 class="modal-title fw-bold text-dark mb-0" id="templateModalLabel">
-                            <i class="mdi mdi-email-newsletter text-primary me-1"></i> Katalog Template Email Pelatihan &amp; Bimtek
+                            <i class="mdi mdi-email-newsletter text-primary me-1"></i> Katalog Template Email Pelatihan
+                            &amp; Bimtek
                         </h5>
-                        <p class="text-muted fs-12 mb-0">Pilih template siap pakai dengan gaya komunikasi santai, ramah, dan persuasif untuk penawaran kelas pelatihan atau update seputar bimtek.</p>
+                        <p class="text-muted fs-12 mb-0">Pilih template siap pakai dengan gaya komunikasi santai,
+                            ramah, dan persuasif untuk penawaran kelas pelatihan atau update seputar bimtek.</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -513,11 +524,14 @@
                     <div class="row g-2 align-items-center mb-3">
                         <div class="col-md-7 col-lg-6">
                             <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0"><i class="mdi mdi-magnify text-muted"></i></span>
-                                <input type="text" id="templateSearchInput" class="form-control border-start-0" 
-                                    placeholder="Cari template (misal: early bird, tips, in-house, webinar, kalender, reminder)..." 
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="mdi mdi-magnify text-muted"></i></span>
+                                <input type="text" id="templateSearchInput" class="form-control border-start-0"
+                                    placeholder="Cari template (misal: early bird, tips, in-house, webinar, kalender, reminder)..."
                                     oninput="filterTemplates()">
-                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="clearTemplateSearch()" id="btnClearTemplateSearch" style="display: none;">
+                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                    onclick="clearTemplateSearch()" id="btnClearTemplateSearch"
+                                    style="display: none;">
                                     <i class="mdi mdi-close"></i>
                                 </button>
                             </div>
@@ -531,14 +545,19 @@
 
                     <!-- Kategori Filter Pills -->
                     <div class="d-flex gap-1 flex-wrap mb-3" id="templateCategoryFilters">
-                        <button type="button" class="btn btn-sm btn-primary py-1 px-2 fs-12 template-cat-btn active" data-cat="all" onclick="filterTemplateCategory('all', this)">
+                        <button type="button" class="btn btn-sm btn-primary py-1 px-2 fs-12 template-cat-btn active"
+                            data-cat="all" onclick="filterTemplateCategory('all', this)">
                             Semua ({{ $emailTemplates->count() }})
                         </button>
                         @foreach ($templateCategories as $cat)
                             @php $cCount = $emailTemplates->where('category', $cat)->count(); @endphp
                             @if ($cCount > 0)
-                                <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 fs-12 template-cat-btn" data-cat="{{ $cat->value }}" onclick="filterTemplateCategory('{{ $cat->value }}', this)">
-                                    <i class="{{ $cat->icon() }} me-1"></i>{{ $cat->label() }} ({{ $cCount }})
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-secondary py-1 px-2 fs-12 template-cat-btn"
+                                    data-cat="{{ $cat->value }}"
+                                    onclick="filterTemplateCategory('{{ $cat->value }}', this)">
+                                    <i class="{{ $cat->icon() }} me-1"></i>{{ $cat->label() }}
+                                    ({{ $cCount }})
                                 </button>
                             @endif
                         @endforeach
@@ -548,27 +567,30 @@
                     <div id="templateEmptyState" class="text-center py-5" style="display: none;">
                         <i class="mdi mdi-text-box-search-outline text-muted" style="font-size: 40px;"></i>
                         <p class="text-muted fs-14 mt-2 mb-1">Tidak ada template yang cocok dengan pencarian Anda.</p>
-                        <button type="button" class="btn btn-sm btn-light border mt-2" onclick="clearTemplateSearch()">Reset Pencarian</button>
+                        <button type="button" class="btn btn-sm btn-light border mt-2"
+                            onclick="clearTemplateSearch()">Reset Pencarian</button>
                     </div>
 
                     <!-- Grid Card Template (Dynamic from Database) -->
                     <div class="row g-3" id="templateCardContainer">
                         @foreach ($emailTemplates as $tpl)
-                            <div class="col-md-6 col-lg-6 template-item-col" data-category="{{ $tpl->category->value }}">
+                            <div class="col-md-6 col-lg-6 template-item-col"
+                                data-category="{{ $tpl->category->value }}">
                                 <div class="card h-100 border shadow-sm template-card">
                                     <div class="card-body p-3 d-flex flex-column">
                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                             <span class="badge {{ $tpl->category->badgeClass() }} fs-11">
-                                                <i class="{{ $tpl->category->icon() }} me-1"></i>{{ $tpl->category->label() }}
+                                                <i
+                                                    class="{{ $tpl->category->icon() }} me-1"></i>{{ $tpl->category->label() }}
                                             </span>
                                         </div>
                                         <h6 class="fw-bold mb-1 text-dark">{{ $tpl->name }}</h6>
-                                        <p class="text-muted fs-12 mb-3 flex-grow-1 text-truncate" title="{{ $tpl->subject }}">
+                                        <p class="text-muted fs-12 mb-3 flex-grow-1 text-truncate"
+                                            title="{{ $tpl->subject }}">
                                             <i class="mdi mdi-email-outline me-1"></i>{{ $tpl->subject }}
                                         </p>
                                         <div class="d-flex gap-2 mt-auto">
-                                            <button type="button" 
-                                                class="btn btn-primary btn-sm w-100 fw-semibold" 
+                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold"
                                                 onclick="applyEmailTemplate('{{ $tpl->id }}')">
                                                 <i class="mdi mdi-check-circle-outline me-1"></i> Gunakan Template Ini
                                             </button>
@@ -582,9 +604,11 @@
 
                 <div class="modal-footer py-2 bg-white d-flex justify-content-between align-items-center">
                     <span class="text-muted fs-12">
-                        <i class="mdi mdi-information-outline me-1"></i> Template dapat disesuaikan kembali setelah dimasukkan ke editor.
+                        <i class="mdi mdi-information-outline me-1"></i> Template dapat disesuaikan kembali setelah
+                        dimasukkan ke editor.
                     </span>
-                    <button type="button" class="btn btn-sm btn-light border px-3" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-sm btn-light border px-3"
+                        data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -1494,7 +1518,7 @@
 
         window.filterTemplateCategory = function(category, btnEl) {
             currentTemplateCategory = category;
-            
+
             document.querySelectorAll('.template-cat-btn').forEach(btn => {
                 btn.classList.remove('btn-primary', 'active');
                 btn.classList.add('btn-outline-secondary');
@@ -1528,7 +1552,8 @@
 
             items.forEach(item => {
                 const itemCat = item.getAttribute('data-category');
-                const matchesCategory = (currentTemplateCategory === 'all' || itemCat === currentTemplateCategory);
+                const matchesCategory = (currentTemplateCategory === 'all' || itemCat ===
+                    currentTemplateCategory);
                 const textContent = item.textContent.toLowerCase();
                 const matchesSearch = (!query || textContent.includes(query));
 
@@ -1558,7 +1583,7 @@
             if (currentContent !== '' && currentContent !== '<p></p>') {
                 if (!confirm(
                         'Editor saat ini sudah memiliki konten. Apakah Anda yakin ingin mengganti isi email dengan template ini?'
-                        )) {
+                    )) {
                     return;
                 }
             }

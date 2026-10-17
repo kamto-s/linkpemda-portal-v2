@@ -10,34 +10,24 @@ use App\Models\EmailCampaignRecipient;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 #[Layout('layouts.admin.app')]
 #[Title('Monitoring Email Blast')]
 class Show extends Component
 {
-    use WithPagination;
-
-    protected string $paginationTheme = 'bootstrap';
-
     public EmailCampaign $campaign;
     public string $filterRecipientStatus = 'all';
     public string $searchRecipient = '';
-    public int $perPage = 15;
 
     public function mount(EmailCampaign $campaign): void
     {
         $this->campaign = $campaign;
     }
 
-    public function updatedFilterRecipientStatus(): void
+    public function resetFilters(): void
     {
-        $this->resetPage();
-    }
-
-    public function updatedSearchRecipient(): void
-    {
-        $this->resetPage();
+        $this->reset(['searchRecipient']);
+        $this->filterRecipientStatus = 'all';
     }
 
     public function retryFailed(): void
@@ -79,11 +69,13 @@ class Show extends Component
                 $q->whereHas('contact', function ($sub) {
                     $sub->where('name', 'like', "%{$this->searchRecipient}%")
                         ->orWhere('email', 'like', "%{$this->searchRecipient}%")
-                        ->orWhere('organization_name', 'like', "%{$this->searchRecipient}%");
+                        ->orWhere('organization_name', 'like', "%{$this->searchRecipient}%")
+                        ->orWhere('position', 'like', "%{$this->searchRecipient}%")
+                        ->orWhere('phone', 'like', "%{$this->searchRecipient}%");
                 });
             })
             ->latest('updated_at')
-            ->paginate($this->perPage);
+            ->get();
 
         $pendingCount = $this->campaign->recipients()->where('status', RecipientStatus::Pending->value)->count();
 

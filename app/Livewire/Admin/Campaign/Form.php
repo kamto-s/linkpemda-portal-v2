@@ -34,6 +34,7 @@ class Form extends Component
     public array $selectedContacts = [];
     public string $contactCategory = 'all'; // all, pemerintah, swasta
     public string $searchContact = '';
+    public bool $selectAll = false;
 
     // Preview
     public bool $showPreview = false;
@@ -165,66 +166,115 @@ class Form extends Component
         }
     }
 
-    public function toggleSelectVisible(): void
+    public function syncSelectAllState(): void
     {
-        $visibleIds = Contact::query()
+        $visibleIds = $this->getVisibleContactIds();
+        $selected = array_map('strval', $this->selectedContacts);
+        $this->selectAll = !empty($visibleIds) && count(array_intersect($visibleIds, $selected)) === count($visibleIds);
+    }
+
+    public function updatedSelectAll(bool $value): void
+    {
+        if ($value) {
+            $this->selectAll('visible');
+        } else {
+            $this->deselectAll('visible');
+        }
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['searchContact']);
+        $this->contactCategory = 'all';
+        $this->syncSelectAllState();
+    }
+
+    public function updatedSearchContact(): void
+    {
+        $this->syncSelectAllState();
+    }
+
+    public function updatedContactCategory(): void
+    {
+        $this->syncSelectAllState();
+    }
+
+    public function updatedSelectedContacts(): void
+    {
+        $this->selectedContacts = array_values(array_map('strval', (array) $this->selectedContacts));
+        $this->syncSelectAllState();
+    }
+
+    protected function getFilteredContactsQuery()
+    {
+        return Contact::query()
             ->where('is_active', true)
             ->when($this->contactCategory !== 'all', fn($q) => $q->where('category', $this->contactCategory))
             ->when($this->searchContact, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('name', 'like', "%{$this->searchContact}%")
                         ->orWhere('organization_name', 'like', "%{$this->searchContact}%")
-                        ->orWhere('email', 'like', "%{$this->searchContact}%");
+                        ->orWhere('position', 'like', "%{$this->searchContact}%")
+                        ->orWhere('email', 'like', "%{$this->searchContact}%")
+                        ->orWhere('phone', 'like', "%{$this->searchContact}%");
                 });
-            })
+            });
+    }
+
+    protected function getVisibleContactIds(): array
+    {
+        return array_map('strval', $this->getFilteredContactsQuery()
+            ->orderBy('name')
             ->pluck('id')
-            ->toArray();
+            ->toArray());
+    }
 
-        $allSelected = !empty($visibleIds) && count(array_intersect($visibleIds, $this->selectedContacts)) === count($visibleIds);
-
-        if ($allSelected) {
-            $this->selectedContacts = array_values(array_diff($this->selectedContacts, $visibleIds));
-        } else {
-            $this->selectedContacts = array_values(array_unique(array_merge($this->selectedContacts, $visibleIds)));
-        }
+    public function toggleSelectVisible(): void
+    {
+        $this->updatedSelectAll(!$this->selectAll);
     }
 
     public function selectAll(string $type = 'all'): void
     {
-        $query = Contact::where('is_active', true);
-        if ($type !== 'all') {
+        $selected = array_map('strval', $this->selectedContacts);
+
+        if ($type === 'visible' || $type === 'filtered') {
+            $ids = $this->getVisibleContactIds();
+            $this->selectedContacts = array_values(array_unique(array_merge($selected, $ids)));
+            $this->syncSelectAllState();
+            return;
+        }
+
+        $query = Contact::query()->where('is_active', true);
+        if ($type === 'pemerintah' || $type === 'swasta') {
             $query->where('category', $type);
         }
-        if ($this->searchContact) {
-            $query->where(function ($sub) {
-                $sub->where('name', 'like', "%{$this->searchContact}%")
-                    ->orWhere('organization_name', 'like', "%{$this->searchContact}%")
-                    ->orWhere('email', 'like', "%{$this->searchContact}%");
-            });
-        }
-        $ids = $query->pluck('id')->toArray();
-        $this->selectedContacts = array_values(array_unique(array_merge($this->selectedContacts, $ids)));
+
+        $ids = array_map('strval', $query->pluck('id')->toArray());
+        $this->selectedContacts = array_values(array_unique(array_merge($selected, $ids)));
+        $this->syncSelectAllState();
     }
 
     public function deselectAll(string $type = 'all'): void
     {
-        if ($type === 'all' && empty($this->searchContact)) {
-            $this->selectedContacts = [];
-        } else {
-            $query = Contact::where('is_active', true);
-            if ($type !== 'all') {
-                $query->where('category', $type);
-            }
-            if ($this->searchContact) {
-                $query->where(function ($sub) {
-                    $sub->where('name', 'like', "%{$this->searchContact}%")
-                        ->orWhere('organization_name', 'like', "%{$this->searchContact}%")
-                        ->orWhere('email', 'like', "%{$this->searchContact}%");
-                });
-            }
-            $idsToRemove = $query->pluck('id')->toArray();
-            $this->selectedContacts = array_values(array_diff($this->selectedContacts, $idsToRemove));
+        $selected = array_map('strval', $this->selectedContacts);
+
+        if ($type === 'visible' || $type === 'filtered') {
+            $visibleIds = $this->getVisibleContactIds();
+            $this->selectedContacts = array_values(array_diff($selected, $visibleIds));
+            $this->syncSelectAllState();
+            return;
         }
+
+        if ($type === 'pemerintah' || $type === 'swasta') {
+            $idsToRemove = array_map('strval', Contact::where('is_active', true)->where('category', $type)->pluck('id')->toArray());
+            $this->selectedContacts = array_values(array_diff($selected, $idsToRemove));
+            $this->syncSelectAllState();
+            return;
+        }
+
+        $this->selectedContacts = [];
+        $this->selectAll = false;
     }
 
     public function generatePreview(): void
@@ -358,16 +408,7 @@ class Form extends Component
 
     public function render()
     {
-        $contacts = Contact::query()
-            ->where('is_active', true)
-            ->when($this->contactCategory !== 'all', fn($q) => $q->where('category', $this->contactCategory))
-            ->when($this->searchContact, function ($q) {
-                $q->where(function ($sub) {
-                    $sub->where('name', 'like', "%{$this->searchContact}%")
-                        ->orWhere('organization_name', 'like', "%{$this->searchContact}%")
-                        ->orWhere('email', 'like', "%{$this->searchContact}%");
-                });
-            })
+        $contacts = $this->getFilteredContactsQuery()
             ->orderBy('name')
             ->get();
 
@@ -375,11 +416,12 @@ class Form extends Component
         $pemdaCount = Contact::where('is_active', true)->where('category', ContactCategory::Pemerintah)->count();
         $swastaCount = Contact::where('is_active', true)->where('category', ContactCategory::Swasta)->count();
 
-        $selectedPemerintahCount = Contact::whereIn('id', $this->selectedContacts)->where('category', ContactCategory::Pemerintah)->count();
-        $selectedSwastaCount = Contact::whereIn('id', $this->selectedContacts)->where('category', ContactCategory::Swasta)->count();
+        $selectedIds = array_map('strval', $this->selectedContacts);
+        $selectedPemerintahCount = Contact::whereIn('id', $selectedIds)->where('category', ContactCategory::Pemerintah)->count();
+        $selectedSwastaCount = Contact::whereIn('id', $selectedIds)->where('category', ContactCategory::Swasta)->count();
 
-        $visibleIds = $contacts->pluck('id')->toArray();
-        $isAllVisibleSelected = !empty($visibleIds) && count(array_intersect($visibleIds, $this->selectedContacts)) === count($visibleIds);
+        $this->syncSelectAllState();
+        $isAllVisibleSelected = $this->selectAll;
 
         $sampleContact = null;
         if (!empty($this->selectedContacts)) {
