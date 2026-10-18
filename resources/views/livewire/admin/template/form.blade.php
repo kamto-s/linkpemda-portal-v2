@@ -37,18 +37,16 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
+                    <div class="card-header">
+                        <h4 class="header-title">
+                            {{ $isEditing ? 'Form Ubah Template Email' : 'Form Tambah Template Email Baru' }}
+                        </h4>
+                        <p class="sub-header mb-0">
+                            Tentukan nama, subjek default, dan susun konten email yang dapat digunakan berkali-kali.
+                        </p>
+                    </div>
+
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h4 class="header-title">
-                                    {{ $isEditing ? 'Form Ubah Template Email' : 'Form Tambah Template Email' }}
-                                </h4>
-                                <p class="sub-header">
-                                    Tentukan nama, subjek default, dan susun konten email yang dapat digunakan
-                                    berkali-kali.
-                                </p>
-                            </div>
-                        </div>
 
                         <div class="row g-3">
                             <!-- Nama Template -->
@@ -140,19 +138,20 @@
                                 </small>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Tombol Aksi Bawah -->
-                        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.template.index') }}" wire:navigate class="btn btn-light px-3">
+                    <div class="card-footer text-muted">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a href="{{ route('admin.template.index') }}" wire:navigate
+                                class="btn btn-light border me-2">
                                 Batal
                             </a>
-                            <button type="button" class="btn btn-primary px-4 fw-semibold"
+                            <button type="button" class="btn btn-primary px-3"
                                 onclick="handleSaveTemplate()" wire:loading.attr="disabled">
                                 <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1"
                                     role="status"></span>
-                                <span wire:loading.remove wire:target="save"><i
-                                        class="mdi mdi-content-save-outline me-1"></i></span>
-                                {{ $isEditing ? 'Simpan Perubahan' : 'Buat Template' }}
+                                <i class="mdi mdi-content-save me-1" wire:loading.remove wire:target="save"></i>
+                                Simpan
                             </button>
                         </div>
                     </div>

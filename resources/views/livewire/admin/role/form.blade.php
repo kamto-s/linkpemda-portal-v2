@@ -8,7 +8,8 @@
                 <div class="d-none d-lg-block">
                     <ol class="breadcrumb m-0 float-end">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.role.index') }}" wire:navigate>Role & Hak Akses</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.role.index') }}" wire:navigate>Role & Hak
+                                Akses</a></li>
                         <li class="breadcrumb-item active">{{ $isEditing ? 'Ubah' : 'Tambah' }}</li>
                     </ol>
                 </div>
@@ -27,34 +28,24 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
+                    <div class="card-header">
+                        <h4 class="header-title">
+                            {{ $isEditing ? 'Form Ubah Role: ' . ucfirst($name) : 'Form Tambah Role Baru' }}
+                        </h4>
+                        <p class="sub-header mb-0">
+                            Tentukan hak akses untuk role ini dengan saklar di bawah.
+                        </p>
+                    </div>
+
                     <div class="card-body">
-                        <!-- Header & Tombol Simpan -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h4 class="header-title">{{ $isEditing ? 'Atur Hak Akses Role: ' . ucfirst($name) : 'Tambah Role Baru' }}</h4>
-                                <p class="sub-header">
-                                    Tentukan hak akses untuk role ini dengan saklar di bawah.
-                                </p>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('admin.role.index') }}" wire:navigate class="btn btn-light">
-                                    Batal
-                                </a>
-                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                                    <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1" role="status"></span>
-                                    <span wire:loading.remove wire:target="save"><i class="mdi mdi-content-save me-1"></i></span>
-                                    Simpan
-                                </button>
-                            </div>
-                        </div>
 
                         <!-- Baris Input Nama Role & Tombol Cepat -->
                         <div class="row g-2 mb-3 align-items-end">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold mb-1">Nama Role <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold mb-1">Nama Role <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    placeholder="Contoh: editor, keuangan"
-                                    wire:model="name"
+                                    placeholder="Contoh: editor, keuangan" wire:model="name"
                                     {{ $isEditing && in_array(strtolower($name), ['superadmin', 'admin', 'staff']) ? 'readonly' : '' }}>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -66,10 +57,12 @@
                                     <strong>{{ $totalSelected }}</strong> / {{ $totalAllPermissions }} Izin Aktif
                                 </span>
                                 @if (!($isEditing && strtolower($name) === 'superadmin'))
-                                    <button type="button" class="btn btn-outline-primary btn-sm" wire:click="selectAll">
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        wire:click="selectAll">
                                         Pilih Semua
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" wire:click="deselectAll">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                        wire:click="deselectAll">
                                         Reset
                                     </button>
                                 @endif
@@ -92,12 +85,14 @@
                                 <tbody>
                                     @foreach ($matrixFeatures as $feat)
                                         @php
-                                            $rowKeys = array_values(array_filter([
-                                                $feat['view'],
-                                                $feat['create'],
-                                                $feat['edit'],
-                                                $feat['delete'],
-                                            ]));
+                                            $rowKeys = array_values(
+                                                array_filter([
+                                                    $feat['view'],
+                                                    $feat['create'],
+                                                    $feat['edit'],
+                                                    $feat['delete'],
+                                                ]),
+                                            );
                                             $selectedInRow = count(array_intersect($rowKeys, $selectedPermissions));
                                             $allRowSelected = count($rowKeys) > 0 && $selectedInRow === count($rowKeys);
                                             $isSuper = $isEditing && strtolower($name) === 'superadmin';
@@ -186,6 +181,21 @@
                             </table>
                         </div>
 
+                    </div>
+
+                    <div class="card-footer text-muted">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a href="{{ route('admin.role.index') }}" wire:navigate
+                                class="btn btn-light border me-2">
+                                Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary px-3" wire:loading.attr="disabled">
+                                <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1"
+                                    role="status"></span>
+                                <i class="mdi mdi-content-save me-1" wire:loading.remove wire:target="save"></i>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -12,7 +12,7 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin.app')]
-#[Title('Kontak Target')]
+#[Title('Kontak')]
 class Index extends Component
 {
     use WithFileUploads;
@@ -20,7 +20,7 @@ class Index extends Component
 
     protected string $paginationTheme = 'bootstrap';
 
-    public string $pageTitle = 'Kontak Target';
+    public string $pageTitle = 'Kontak';
 
     public string $search = '';
 

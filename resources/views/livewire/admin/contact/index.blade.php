@@ -33,13 +33,11 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-body">
+                <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
-                            <h4 class="header-title">Daftar {{ $pageTitle }}</h4>
-                            <p class="sub-header">
-                                Kelola data kontak sasaran promosi dan pengiriman email blast.
-                            </p>
+                            <h4 class="">Daftar {{ $pageTitle }}</h4>
+                            <p class="mb-0"> Kelola data kontak sasaran promosi dan pengiriman email.</p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
                             <button type="button" class="btn btn-soft-success waves-effect waves-light"
@@ -55,8 +53,9 @@
                             </a>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Search & Filter Controls -->
+                <div class="card-body">
                     <div class="row g-2 mb-3 align-items-center">
                         <div class="col-md-3">
                             <div class="input-group">
@@ -211,14 +210,13 @@
                             </tbody>
                         </table>
                     </div>
-
-                    @if ($contacts->hasPages())
-                        <div class="mt-3 pt-3 border-top">
-                            {{ $contacts->links() }}
-                        </div>
-                    @endif
-
                 </div>
+
+                @if ($contacts->hasPages())
+                    <div class="card-footer mb-0">
+                        {{ $contacts->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

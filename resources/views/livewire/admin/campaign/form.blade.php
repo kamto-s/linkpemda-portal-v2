@@ -115,6 +115,15 @@
     <!-- ========================================================================================= -->
     <div style="{{ $currentStep === 1 ? '' : 'display: none;' }}">
         <div class="card">
+            <div class="card-header">
+                <h4 class="header-title">
+                    {{ $isEditing ? 'Form Ubah Email: ' . $campaign->title : 'Form Konten Email Blast' }}
+                </h4>
+                <p class="sub-header mb-0">
+                    Tentukan judul campaign, subjek email, dan susun pesan penawaran.
+                </p>
+            </div>
+
             <div class="card-body p-4">
                 <div class="row g-3">
                     <div class="col-12 mb-3">
@@ -199,11 +208,11 @@
     <!-- ========================================================================================= -->
     @if ($currentStep === 2)
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                     <div>
-                        <h4 class="header-title mb-1">Target Penerima</h4>
-                        <p class="sub-header mb-0">
+                        <h4 class="">Target Penerima</h4>
+                        <p class="mb-0">
                             Pilih kontak sasaran yang akan menerima pengiriman email blast ini.
                         </p>
                     </div>
@@ -222,6 +231,9 @@
                         @endif
                     </div>
                 </div>
+            </div>
+
+            <div class="card-body">
 
                 <!-- Filter & Bulk Actions Toolbar -->
                 <div class="row g-2 align-items-center mb-3">
@@ -385,6 +397,15 @@
     <!-- ========================================================================================= -->
     @if ($currentStep === 3)
         <div class="card mb-3">
+            <div class="card-header">
+                <h4 class="header-title">
+                    Review &amp; Konfirmasi Pengiriman
+                </h4>
+                <p class="sub-header mb-0">
+                    Periksa kembali data kampanye dan pratinjau tampilan email sebelum dikirim.
+                </p>
+            </div>
+
             <div class="card-body">
                 <!-- Ringkasan Singkat -->
                 <div class="row g-2 mb-3">

@@ -32,17 +32,17 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-body">
-                    <form wire:submit="save">
-                        <div class="mb-3">
-                            <h4 class="header-title">
-                                {{ $isEditing ? 'Form Ubah Kontak' : 'Form Tambah Kontak Baru' }}
-                            </h4>
-                            <p class="sub-header">
-                                Lengkapi profil dan detail kontak email.
-                            </p>
-                        </div>
+                <form wire:submit="save">
+                    <div class="card-header">
+                        <h4 class="header-title">
+                            {{ $isEditing ? 'Form Ubah Kontak' : 'Form Tambah Kontak Baru' }}
+                        </h4>
+                        <p class="sub-header mb-0">
+                            Lengkapi profil dan detail kontak email.
+                        </p>
+                    </div>
 
+                    <div class="card-body">
                         <!-- Kategori Kontak -->
                         <div class="mb-3">
                             <label class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
@@ -118,7 +118,7 @@
                         <div class="row g-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Nomor Telepon / WhatsApp</label>
-                                <input type="text" class="form-control @error('phone') is-invalid @enderror"
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror"
                                     wire:model="phone">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -133,8 +133,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="d-flex justify-content-end align-items-center pt-3 border-top">
+                    <div class="card-footer text-muted">
+                        <div class="d-flex justify-content-end align-items-center">
                             <a href="{{ route('admin.contact.index') }}" wire:navigate
                                 class="btn btn-light border me-2">
                                 Batal
@@ -146,8 +148,8 @@
                                 Simpan
                             </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

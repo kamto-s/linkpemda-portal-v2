@@ -18,11 +18,11 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
-                            <h4 class="header-title">Daftar {{ $pageTitle }}</h4>
-                            <p class="sub-header">
+                            <h4 class="">Daftar {{ $pageTitle }}</h4>
+                            <p class="mb-0">
                                 Kelola kategori untuk pengelompokan artikel dan materi.
                             </p>
                         </div>
@@ -30,6 +30,9 @@
                             <a href="" class="btn btn-primary"><i class="mdi mdi-plus me-1"></i> Tambah</a>
                         </div>
                     </div>
+                </div>
+
+                <div class="card-body">
 
                     <div class="table-responsive" style="overflow: visible;">
                         <table class="table table-hover mb-0">

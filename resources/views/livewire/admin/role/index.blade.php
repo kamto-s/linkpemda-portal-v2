@@ -33,11 +33,11 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
-                            <h4 class="header-title">Daftar {{ $pageTitle }}</h4>
-                            <p class="sub-header">
+                            <h4 class="">Daftar {{ $pageTitle }}</h4>
+                            <p class="mb-0">
                                 Atur izin akses (permissions) untuk setiap tingkatan pengguna di dalam portal.
                             </p>
                         </div>
@@ -47,6 +47,9 @@
                             </a>
                         </div>
                     </div>
+                </div>
+
+                <div class="card-body">
 
                     <!-- Search & Filter Controls -->
                     <div class="row g-2 mb-3 align-items-center">
@@ -160,20 +163,13 @@
                             </tbody>
                         </table>
                     </div>
-
-                    @if ($roles->hasPages())
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                Menampilkan {{ $roles->firstItem() }} - {{ $roles->lastItem() }} dari
-                                {{ $roles->total() }} data
-                            </small>
-                            <div>
-                                {{ $roles->links() }}
-                            </div>
-                        </div>
-                    @endif
-
                 </div>
+
+                @if ($roles->hasPages())
+                    <div class="card-footer mb-0">
+                        {{ $roles->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -119,11 +119,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
-                            <h4 class="header-title mb-1">Daftar Status Penerima</h4>
-                            <p class="sub-header mb-0">
+                            <h4 class="">Daftar Status Penerima</h4>
+                            <p class="mb-0">
                                 Rincian status pengiriman email blast ke masing-masing kontak target.
                             </p>
                         </div>
@@ -131,6 +131,9 @@
                             Total: <strong>{{ $recipients->count() }}</strong> kontak
                         </span>
                     </div>
+                </div>
+
+                <div class="card-body">
 
                     <!-- Filter & Search Toolbar -->
                     <div class="row g-2 align-items-center mb-3">
@@ -250,6 +253,12 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <div class="card-footer mb-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="mdi mdi-information-outline me-1"></i>Menampilkan seluruh <strong>{{ $recipients->count() }}</strong> penerima kontak.
+                    </small>
                 </div>
             </div>
         </div>

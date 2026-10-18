@@ -34,18 +34,17 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-body">
-                    <form wire:submit="save">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h4 class="header-title">
-                                    {{ $isEditing ? 'Form Ubah Pengguna' : 'Form Tambah Pengguna' }}
-                                </h4>
-                                <p class="sub-header">
-                                    Lengkapi informasi akun pengguna dan tentukan perannya.
-                                </p>
-                            </div>
-                        </div>
+                <form wire:submit="save">
+                    <div class="card-header">
+                        <h4 class="header-title">
+                            {{ $isEditing ? 'Form Ubah Pengguna' : 'Form Tambah Pengguna Baru' }}
+                        </h4>
+                        <p class="sub-header mb-0">
+                            Lengkapi informasi akun pengguna dan tentukan perannya.
+                        </p>
+                    </div>
+
+                    <div class="card-body">
 
                         <div class="row g-3">
                             <!-- Nama Lengkap -->
@@ -135,22 +134,23 @@
                                     wire:model="password_confirmation">
                             </div>
 
-                            <!-- Tombol Aksi Bawah -->
-                            <div class="col-12 mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.user.index') }}" wire:navigate class="btn btn-light">
-                                    Batal
-                                </a>
-                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                                    <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1"
-                                        role="status"></span>
-                                    <span wire:loading.remove wire:target="save"><i
-                                            class="mdi mdi-content-save me-1"></i></span>
-                                    {{ $isEditing ? 'Simpan Perubahan' : 'Tambah Pengguna' }}
-                                </button>
-                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="card-footer text-muted">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a href="{{ route('admin.user.index') }}" wire:navigate class="btn btn-light border me-2">
+                                Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary px-3" wire:loading.attr="disabled">
+                                <span wire:loading wire:target="save" class="spinner-border spinner-border-sm me-1"
+                                    role="status"></span>
+                                <i class="mdi mdi-content-save me-1" wire:loading.remove wire:target="save"></i>
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
