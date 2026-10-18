@@ -79,38 +79,7 @@ class Form extends Component
                 $this->subject = $customTemplate->subject;
                 $this->body_content = $customTemplate->body_content;
             } else {
-                // Default template
-                $this->body_content = '
-                <p>Halo Bapak/Ibu <strong>{nama}</strong> (<em>{jabatan} &ndash; {instansi}</em>),</p>
-
-                <p>Semoga pesan ini menemui Anda dalam keadaan sehat dan penuh semangat!</p>
-
-                <p>Ingin tingkatkan performa tim dan tata kelola di <strong>{instansi}</strong> agar semakin efektif dan siap menghadapi regulasi terbaru? <strong>Linkpemda Portal</strong> hadir kembali membawa program pelatihan &amp; Bimtek interaktif yang dirancang khusus untuk Anda!</p>
-
-                <p><strong>Kenapa Bimtek di Linkpemda Jadi Pilihan Favorit?</strong></p>
-                <ul>
-                    <li>🚀 <strong>Materi Praktis &amp; Up-to-Date:</strong> Langsung berfokus pada solusi tantangan kerja sehari-hari.</li>
-                    <li>💡 <strong>Mentor &amp; Praktisi Ahli:</strong> Sesi diskusi interaktif, bukan sekadar teori!</li>
-                    <li>📜 <strong>Fasilitas Lengkap:</strong> Modul eksklusif, sertifikat resmi, dan jaringan kolaborasi antar-daerah.</li>
-                </ul>
-
-                <p>Jangan lewatkan kesempatan untuk memperluas wawasan dan memperkuat kompetensi SDM di {instansi}.</p>
-
-                <!-- ===== BUTTON CALL TO ACTION (PRESISI DI TENGAH) ===== -->
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 24px auto; text-align: center;">
-                    <tr>
-                        <td align="center" bgcolor="#22c55e" style="border-radius: 6px;">
-                            <a href="https://linkpemda.com/layanan" target="_blank" style="display: inline-block; padding: 12px 26px; font-family: \'Plus Jakarta Sans\', Arial, sans-serif; font-size: 14px; color: #ffffff; font-weight: 700; text-decoration: none; border-radius: 6px; background-color: #22c55e;">
-                                Daftar &amp; Amankan Kuota Sekarang &rarr;
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-
-                <p>Ada pertanyaan seputar materi atau jadwal? Kami siap membantu diskusi lebih lanjut melalui WhatsApp maupun Balas Email ini.</p>
-
-                <p>Sampai jumpa di kelas pelatihan!<br><br>Salam hangat,<br><strong>Tim Linkpemda Portal</strong></p>
-                ';
+                $this->body_content = '';
                 // Default: mulai kosong agar admin leluasa memilih kontak per campaign
                 $this->selectedContacts = [];
             }

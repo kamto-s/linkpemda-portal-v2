@@ -42,11 +42,13 @@
                             </p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
-                            <button type="button" class="btn btn-success" wire:click="openImportModal">
+                            <button type="button" class="btn btn-soft-success waves-effect waves-light"
+                                wire:click="openImportModal">
                                 <i class="mdi mdi-file-excel"></i> Import Excel
                             </button>
-                            <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-light">
-                                <i class="bx bx-send"></i> Kirim Email
+                            <a href="{{ route('admin.campaign.create') }}" wire:navigate
+                                class="btn btn-soft-primary waves-effect waves-light">
+                                <i class="mdi mdi-email-send-outline"></i> Kirim Email
                             </a>
                             <a href="{{ route('admin.contact.create') }}" wire:navigate class="btn btn-primary">
                                 <i class="mdi mdi-plus"></i> Tambah

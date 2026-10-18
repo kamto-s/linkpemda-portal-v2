@@ -166,7 +166,7 @@
                         </div>
 
                         <div wire:ignore class="tinymce-wrapper border rounded">
-                            <textarea id="tinymce-editor">{!! $body_content !!}</textarea>
+                            <textarea id="tinymce-editor" placeholder="Tulis isi pesan email di sini atau pilih template siap pakai di atas...">{!! $body_content !!}</textarea>
                         </div>
                         @error('body_content')
                             <div class="text-danger fs-12 mt-1">{{ $message }}</div>
@@ -274,11 +274,9 @@
                         <thead class="table-light sticky-top" style="top: 0; z-index: 2;">
                             <tr>
                                 <th style="width: 45px;" class="text-center bg-light">
-                                    <input class="form-check-input" type="checkbox"
-                                        wire:model.live="selectAll"
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selectAll"
                                         wire:key="header-checkbox-{{ $selectAll ? '1' : '0' }}"
-                                        id="selectAllCheckbox"
-                                        @disabled($contacts->count() === 0)
+                                        id="selectAllCheckbox" @disabled($contacts->count() === 0)
                                         title="Pilih Semua yang Ditampilkan">
                                 </th>
                                 <th class="bg-light">Kontak</th>
@@ -842,6 +840,7 @@
             tinymce.init({
                 selector: '#tinymce-editor',
                 license_key: 'gpl',
+                placeholder: 'Tulis isi pesan email Anda di sini atau pilih template siap pakai di atas...',
                 height: 550,
                 base_url: '{{ asset('assets/admin/libs/tinymce') }}',
                 suffix: '.min',
@@ -1003,6 +1002,10 @@
                     line-height: 1.7;
                     color: #374151;
                     padding: 18px 24px;
+                }
+                .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+                    color: #94a3b8 !important;
+                    font-style: normal !important;
                 }
                 img {
                     max-width: 100%;
