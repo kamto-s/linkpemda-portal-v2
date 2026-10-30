@@ -43,7 +43,7 @@
                         </div>
                         <div class="d-flex gap-2">
                             <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus me-1"></i> Tambah
+                                <i class="mdi mdi-plus"></i> Tambah
                             </a>
                         </div>
                     </div>

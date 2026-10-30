@@ -43,7 +43,7 @@
                         </div>
                         <div>
                             <a href="{{ route('admin.user.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus me-1"></i> Tambah
+                                <i class="mdi mdi-plus"></i> Tambah
                             </a>
                         </div>
                     </div>
@@ -117,7 +117,6 @@
                                     {{-- <th style="width: 60px;">#</th> --}}
                                     <th>Pengguna</th>
                                     <th>Email</th>
-                                    <th>Role</th>
                                     <th>Status Akun</th>
                                     <th>Aktivasi</th>
                                     <th>Terdaftar</th>
@@ -126,37 +125,37 @@
                             </thead>
                             <tbody>
                                 @forelse ($users as $index => $user)
+                                    @php
+                                        $primaryRole = $user->roles->first()?->name;
+                                    @endphp
                                     <tr wire:key="{{ $user->id }}">
                                         {{-- <th scope="row">{{ $users->firstItem() + $index }}</th> --}}
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span
-                                                    class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                    class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase flex-shrink-0"
                                                     style="width: 34px; height: 34px; font-size: 12px;">
                                                     {{ $user->initials() }}
                                                 </span>
-                                                <div>
+                                                <div class="d-flex flex-column gap-1">
                                                     <div class="fw-semibold text-dark">{{ $user->name }}
                                                         @if ($user->id === auth()->id())
-                                                            <span class="badge bg-primary">Akun Anda</span>
+                                                            <span class="badge bg-primary ms-1">Akun Anda</span>
+                                                        @endif
+                                                    </div>
+                                                    <div>
+                                                        @if ($primaryRole === 'superadmin')
+                                                            <span class="badge badge-soft-danger px-2 py-1">Superadmin</span>
+                                                        @elseif ($primaryRole === 'admin')
+                                                            <span class="badge badge-soft-primary px-2 py-1">Admin</span>
+                                                        @else
+                                                            <span class="badge badge-soft-info px-2 py-1">Staff</span>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{ $user->email }}</td>
-                                        <td>
-                                            @php
-                                                $primaryRole = $user->roles->first()?->name;
-                                            @endphp
-                                            @if ($primaryRole === 'superadmin')
-                                                <span class="badge badge-soft-danger px-2 py-1">Superadmin</span>
-                                            @elseif ($primaryRole === 'admin')
-                                                <span class="badge badge-soft-primary px-2 py-1">Admin</span>
-                                            @else
-                                                <span class="badge badge-soft-info px-2 py-1">Staff</span>
-                                            @endif
-                                        </td>
                                         <td>
                                             @if ($user->is_active)
                                                 <span
@@ -235,7 +234,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-4 text-muted">
+                                        <td colspan="6" class="text-center py-4 text-muted">
                                             <i class="mdi mdi-account-off font-size-24 d-block mb-1"></i>
                                             Tidak ada data pengguna yang ditemukan.
                                         </td>

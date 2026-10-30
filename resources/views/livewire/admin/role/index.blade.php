@@ -43,7 +43,7 @@
                         </div>
                         <div>
                             <a href="{{ route('admin.role.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus me-1"></i> Tambah Role
+                                <i class="mdi mdi-plus"></i> Tambah Role
                             </a>
                         </div>
                     </div>

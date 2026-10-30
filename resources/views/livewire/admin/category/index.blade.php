@@ -27,7 +27,7 @@
                             </p>
                         </div>
                         <div>
-                            <a href="" class="btn btn-primary"><i class="mdi mdi-plus me-1"></i> Tambah</a>
+                            <a href="" class="btn btn-primary"><i class="mdi mdi-plus"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
