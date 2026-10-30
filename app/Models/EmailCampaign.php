@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CampaignStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -43,11 +44,11 @@ class EmailCampaign extends BaseModel
         return $this->hasManyThrough(Contact::class, EmailCampaignRecipient::class, 'campaign_id', 'id', 'id', 'contact_id');
     }
 
-    public function getStartedAtAttribute(): ?\Carbon\Carbon
+    public function getStartedAtAttribute(): ?Carbon
     {
         $firstSent = $this->recipients()->whereNotNull('sent_at')->min('sent_at');
         if ($firstSent) {
-            return \Carbon\Carbon::parse($firstSent);
+            return Carbon::parse($firstSent);
         }
 
         if ($this->status !== CampaignStatus::Draft) {
@@ -60,7 +61,7 @@ class EmailCampaign extends BaseModel
     public function getDeliveryDurationAttribute(): ?string
     {
         $start = $this->recipients()->whereNotNull('sent_at')->min('sent_at');
-        if (!$start) {
+        if (! $start) {
             if ($this->status !== CampaignStatus::Draft) {
                 $start = $this->created_at;
             } else {
@@ -69,7 +70,7 @@ class EmailCampaign extends BaseModel
         }
 
         $end = $this->sent_at ?? $this->recipients()->whereNotNull('sent_at')->max('sent_at');
-        if (!$end) {
+        if (! $end) {
             if ($this->status === CampaignStatus::Processing || $this->status === CampaignStatus::Queued) {
                 $end = now();
             } else {
@@ -77,8 +78,8 @@ class EmailCampaign extends BaseModel
             }
         }
 
-        $startCarbon = \Carbon\Carbon::parse($start);
-        $endCarbon = \Carbon\Carbon::parse($end);
+        $startCarbon = Carbon::parse($start);
+        $endCarbon = Carbon::parse($end);
 
         $diffSeconds = abs($endCarbon->diffInSeconds($startCarbon));
 
@@ -86,11 +87,12 @@ class EmailCampaign extends BaseModel
             if ($this->sent_count > 0 || $this->failed_count > 0) {
                 return '< 1 detik';
             }
+
             return null;
         }
 
         if ($diffSeconds < 60) {
-            $duration = $diffSeconds . ' detik';
+            $duration = $diffSeconds.' detik';
         } else {
             $days = floor($diffSeconds / 86400);
             $hours = floor(($diffSeconds % 86400) / 3600);
@@ -99,26 +101,25 @@ class EmailCampaign extends BaseModel
 
             $parts = [];
             if ($days > 0) {
-                $parts[] = $days . ' hari';
+                $parts[] = $days.' hari';
             }
             if ($hours > 0) {
-                $parts[] = $hours . ' jam';
+                $parts[] = $hours.' jam';
             }
             if ($minutes > 0) {
-                $parts[] = $minutes . ' menit';
+                $parts[] = $minutes.' menit';
             }
             if ($seconds > 0) {
-                $parts[] = $seconds . ' detik';
+                $parts[] = $seconds.' detik';
             }
 
             $duration = implode(' ', $parts);
         }
 
-        if (!$this->sent_at && ($this->status === CampaignStatus::Processing || $this->status === CampaignStatus::Queued)) {
+        if (! $this->sent_at && ($this->status === CampaignStatus::Processing || $this->status === CampaignStatus::Queued)) {
             $duration .= ' (Sedang Berjalan)';
         }
 
         return $duration;
     }
 }
-

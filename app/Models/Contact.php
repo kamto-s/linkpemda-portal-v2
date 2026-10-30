@@ -33,4 +33,3 @@ class Contact extends BaseModel
         return $this->hasMany(EmailCampaignRecipient::class, 'contact_id');
     }
 }
-

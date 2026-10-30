@@ -39,4 +39,3 @@ test('non-image files are rejected', function () {
 
     $response->assertStatus(422);
 });
-

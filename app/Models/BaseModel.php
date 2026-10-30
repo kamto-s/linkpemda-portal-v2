@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model
 {
-  use HasUuids, HasAuditTrail;
+    use HasAuditTrail, HasUuids;
 
-  protected $guarded = ['id'];
+    protected $guarded = ['id'];
 }

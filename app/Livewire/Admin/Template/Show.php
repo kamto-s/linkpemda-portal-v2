@@ -12,6 +12,7 @@ use Livewire\Component;
 class Show extends Component
 {
     public EmailTemplate $template;
+
     public string $previewDevice = 'desktop'; // 'desktop' or 'mobile'
 
     public function mount(EmailTemplate|string $template): void
@@ -26,7 +27,7 @@ class Show extends Component
 
     public function toggleActive(): void
     {
-        $this->template->update(['is_active' => !$this->template->is_active]);
+        $this->template->update(['is_active' => ! $this->template->is_active]);
         $this->template->refresh();
         session()->flash('success', 'Status keaktifan template berhasil diubah.');
     }
@@ -35,18 +36,20 @@ class Show extends Component
     {
         if ($this->template->is_system) {
             session()->flash('error', 'Template bawaan sistem tidak dapat dihapus.');
+
             return null;
         }
 
         $this->template->delete();
         session()->flash('success', 'Template email berhasil dihapus.');
+
         return redirect()->route('admin.template.index');
     }
 
     public function render()
     {
         $sampleContact = Contact::where('is_active', true)->first();
-        if (!$sampleContact) {
+        if (! $sampleContact) {
             $sampleContact = new Contact([
                 'name' => 'Bpk. Hendra Gunawan, S.STP, M.Si',
                 'organization_name' => 'Dinas Kominfo Provinsi Jawa Barat',
@@ -78,7 +81,6 @@ class Show extends Component
         return view('livewire.admin.template.show', [
             'previewHtml' => $previewHtml,
             'sampleContact' => $sampleContact,
-        ])->title('Detail Template: ' . $this->template->name);
+        ])->title('Detail Template: '.$this->template->name);
     }
 }
-

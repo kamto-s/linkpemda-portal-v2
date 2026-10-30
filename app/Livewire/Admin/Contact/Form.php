@@ -89,7 +89,7 @@ class Form extends Component
 
     public function render()
     {
-        $pageTitle = $this->isEditing ? 'Ubah Kontak: ' . $this->contact->name : 'Tambah Kontak Baru';
+        $pageTitle = $this->isEditing ? 'Ubah Kontak: '.$this->contact->name : 'Tambah Kontak Baru';
 
         return view('livewire.admin.contact.form', [
             'categories' => ContactCategory::cases(),
@@ -97,4 +97,3 @@ class Form extends Component
         ])->title($pageTitle);
     }
 }
-

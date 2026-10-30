@@ -69,4 +69,3 @@ class CampaignEmail extends Mailable
         return str_ireplace(array_keys($replacements), array_values($replacements), $content);
     }
 }
-

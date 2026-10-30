@@ -32,7 +32,7 @@
     @endif
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="card">
                 <form wire:submit="save">
                     <div class="card-header">
@@ -103,36 +103,49 @@
                                 @endif
                             </div>
 
-                            <div class="col-12">
+                         
+
+                            @if ($isEditing && $isSuperadmin)
+                               <div class="col-12">
                                 <hr class="my-2 text-muted">
                             </div>
+                                <!-- Ubah Password (Khusus Superadmin) -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">
+                                        Ubah Password
+                                    </label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                        placeholder="Kosongkan jika tidak ingin mengubah password"
+                                        wire:model="password">
+                                    <small class="text-muted d-block mt-1">Biarkan kosong jika tidak ingin mengganti password pengguna.</small>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <!-- Password -->
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">
-                                    Password
-                                    @if (!$isEditing)
-                                        <span class="text-danger">*</span>
-                                    @endif
-                                </label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="{{ $isEditing ? 'Kosongkan jika tidak diubah' : 'Min. 8 karakter' }}"
-                                    wire:model="password">
-                                @if ($isEditing)
-                                    <small class="text-muted d-block mt-1">Biarkan kosong jika tidak ingin mengganti
-                                        password.</small>
-                                @endif
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <!-- Konfirmasi Password -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Konfirmasi Password</label>
+                                    <input type="password" class="form-control" placeholder="Ulangi password baru"
+                                        wire:model="password_confirmation">
+                                </div>
+                            @endif
 
-                            <!-- Konfirmasi Password -->
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Konfirmasi Password</label>
-                                <input type="password" class="form-control" placeholder="Ulangi password"
-                                    wire:model="password_confirmation">
-                            </div>
+                            @if ($isEditing)
+                                <div class="col-12">
+                                    <div class="border rounded p-3 bg-light-subtle d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                        <div>
+                                            <div class="fw-bold fs-13 text-dark">Kirim Tautan Atur Password ke Email</div>
+                                            <small class="text-muted">Kirimkan email berisi tautan ke {{ $user->email }} agar pengguna dapat mengatur ulang password akunnya.</small>
+                                        </div>
+                                        <button type="button" wire:click="resendInvitation" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">
+                                            <span wire:loading wire:target="resendInvitation" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                            <i class="mdi mdi-email-send me-1" wire:loading.remove wire:target="resendInvitation"></i>
+                                            Kirim Tautan Email
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
 
                         </div>
                     </div>

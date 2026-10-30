@@ -36,6 +36,7 @@ class EmailTemplate extends BaseModel
     public function scopeByCategory(Builder $query, string|EmailTemplateCategory $category): Builder
     {
         $val = $category instanceof EmailTemplateCategory ? $category->value : $category;
+
         return $query->where('category', $val);
     }
 }

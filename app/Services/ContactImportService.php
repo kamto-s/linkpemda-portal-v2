@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Enums\ContactCategory;
 use App\Models\Contact;
 use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -18,9 +18,7 @@ class ContactImportService
     /**
      * Import contacts from an Excel or CSV file.
      *
-     * @param string $filePath
-     * @param string $duplicateHandling 'update' or 'skip'
-     * @return array
+     * @param  string  $duplicateHandling  'update' or 'skip'
      */
     public function import(string $filePath, string $duplicateHandling = 'update'): array
     {
@@ -94,11 +92,13 @@ class ContactImportService
                 // Validation
                 if ($name === '') {
                     $errors[] = "Baris #{$rowNumber}: Nama kontak tidak boleh kosong.";
+
                     continue;
                 }
 
                 if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $errors[] = "Baris #{$rowNumber}: Format email \"{$email}\" tidak valid.";
+
                     continue;
                 }
 
@@ -206,7 +206,7 @@ class ContactImportService
      */
     public function generateTemplate(): string
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Template Kontak');
 
@@ -286,7 +286,7 @@ class ContactImportService
         foreach ($samples as $sample) {
             $colLetter = 'A';
             foreach ($sample as $val) {
-                $sheet->setCellValueExplicit($colLetter . $rowIndex, $val, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit($colLetter.$rowIndex, $val, DataType::TYPE_STRING);
                 $colLetter++;
             }
             $sheet->getRowDimension($rowIndex)->setRowHeight(22);
@@ -316,6 +316,7 @@ class ContactImportService
         $writer = new Xlsx($spreadsheet);
         ob_start();
         $writer->save('php://output');
+
         return ob_get_clean();
     }
 }

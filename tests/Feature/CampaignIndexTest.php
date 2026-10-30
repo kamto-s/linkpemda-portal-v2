@@ -1,8 +1,13 @@
 <?php
 
 use App\Enums\CampaignStatus;
+use App\Enums\ContactCategory;
+use App\Enums\RecipientStatus;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
+use App\Livewire\Admin\Campaign\Show;
+use App\Models\Contact;
 use App\Models\EmailCampaign;
+use App\Models\EmailCampaignRecipient;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -76,23 +81,23 @@ test('authenticated user can view campaign show page with duration and recipient
         'sent_at' => now()->addSeconds(45),
     ]);
 
-    $contact = \App\Models\Contact::create([
+    $contact = Contact::create([
         'name' => 'Bpk. Hendra',
         'email' => 'hendra@example.com',
         'organization_name' => 'Dinas Kominfo',
-        'category' => \App\Enums\ContactCategory::Pemerintah,
+        'category' => ContactCategory::Pemerintah,
         'is_active' => true,
     ]);
 
-    \App\Models\EmailCampaignRecipient::create([
+    EmailCampaignRecipient::create([
         'campaign_id' => $campaign->id,
         'contact_id' => $contact->id,
-        'status' => \App\Enums\RecipientStatus::Sent,
+        'status' => RecipientStatus::Sent,
         'sent_at' => now(),
     ]);
 
     Livewire::actingAs($user)
-        ->test(\App\Livewire\Admin\Campaign\Show::class, ['campaign' => $campaign])
+        ->test(Show::class, ['campaign' => $campaign])
         ->assertOk()
         ->assertSee('Monitoring Email Blast')
         ->assertSee('Durasi:')
@@ -101,4 +106,3 @@ test('authenticated user can view campaign show page with duration and recipient
 
     expect($campaign->delivery_duration)->not->toBeNull();
 });
-

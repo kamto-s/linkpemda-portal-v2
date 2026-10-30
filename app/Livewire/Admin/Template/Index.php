@@ -54,7 +54,7 @@ class Index extends Component
     public function toggleStatus(string $id): void
     {
         $tpl = EmailTemplate::findOrFail($id);
-        $tpl->update(['is_active' => !$tpl->is_active]);
+        $tpl->update(['is_active' => ! $tpl->is_active]);
         $statusText = $tpl->is_active ? 'diaktifkan' : 'dinonaktifkan';
         session()->flash('success', "Status template \"{$tpl->name}\" berhasil {$statusText}.");
     }
@@ -70,6 +70,7 @@ class Index extends Component
 
         if ($tpl->is_system) {
             session()->flash('error', 'Template bawaan sistem tidak dapat dihapus.');
+
             return;
         }
 
@@ -83,7 +84,7 @@ class Index extends Component
     {
         $targetId = $id ?: $this->templateToDeleteId;
 
-        if (!$targetId) {
+        if (! $targetId) {
             return;
         }
 
@@ -92,6 +93,7 @@ class Index extends Component
         if ($tpl->is_system) {
             session()->flash('error', 'Template bawaan sistem tidak dapat dihapus.');
             $this->dispatch('close-delete-modal');
+
             return;
         }
 

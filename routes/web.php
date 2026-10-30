@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CampaignImageUploadController;
 use App\Livewire\Admin\Campaign\Form as CampaignForm;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
 use App\Livewire\Admin\Campaign\Show as CampaignShow;
@@ -14,7 +15,9 @@ use App\Livewire\Admin\Template\Index as TemplateIndex;
 use App\Livewire\Admin\Template\Show as TemplateShow;
 use App\Livewire\Admin\User\Form as UserForm;
 use App\Livewire\Admin\User\Index as UserIndex;
+use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\SetPassword;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +36,9 @@ Route::view('/', 'welcome')->name('home');
 */
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
+    Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
+    Route::get('/set-password/{token}', SetPassword::class)->name('password.set');
+    Route::get('/reset-password/{token}', SetPassword::class)->name('password.reset');
 });
 
 /*
@@ -60,7 +66,7 @@ Route::middleware('auth')->group(function () {
 
         // CMS
         Route::get('/categories', CategoryIndex::class)->name('category.index');
-        // Route::get('/articles', ArticleIndex::class)->name('article.index'); 
+        // Route::get('/articles', ArticleIndex::class)->name('article.index');
         // Route::get('/materials', MaterialIndex::class)->name('material.index');
 
         // Email Blast & Promosi
@@ -75,7 +81,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/campaigns/create', CampaignForm::class)->name('campaign.create');
         Route::get('/campaigns/{campaign}/edit', CampaignForm::class)->name('campaign.edit');
         Route::get('/campaigns/{campaign}', CampaignShow::class)->name('campaign.show');
-        Route::post('/campaigns/upload-image', [\App\Http\Controllers\Admin\CampaignImageUploadController::class, 'upload'])->name('campaign.upload-image');
+        Route::post('/campaigns/upload-image', [CampaignImageUploadController::class, 'upload'])->name('campaign.upload-image');
 
         // Setting
         Route::get('/users', UserIndex::class)->name('user.index');

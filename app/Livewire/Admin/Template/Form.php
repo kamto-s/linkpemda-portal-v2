@@ -11,12 +11,17 @@ use Livewire\Component;
 class Form extends Component
 {
     public ?EmailTemplate $template = null;
+
     public bool $isEditing = false;
 
     public string $name = '';
+
     public string $category = 'marketing';
+
     public string $subject = '';
+
     public string $body_content = '';
+
     public bool $is_active = true;
 
     public function mount(EmailTemplate|string|null $template = null): void
@@ -85,7 +90,7 @@ class Form extends Component
 
     public function render()
     {
-        $pageTitle = $this->isEditing ? 'Ubah Template: ' . $this->template->name : 'Tambah Template Email Baru';
+        $pageTitle = $this->isEditing ? 'Ubah Template: '.$this->template->name : 'Tambah Template Email Baru';
 
         return view('livewire.admin.template.form', [
             'categories' => EmailTemplateCategory::cases(),

@@ -16,6 +16,13 @@
                         <p class="text-muted fs-13 mt-3">Silahkan login menggunakan akun Anda</p>
                     </div>
 
+                    @if (session('status'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="mdi mdi-check-circle-outline me-1"></i> {{ session('status') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <form wire:submit="login">
 
                         <div class="form-group mb-3">
@@ -61,8 +68,11 @@
 
             <div class="row mt-3">
                 <div class="col-12 text-center">
-                    <p class="text-white-50"> <a class='text-white-50 ms-1' href='pages-register.html'>Forgot your
-                            password?</a></p>
+                    <p class="text-white">
+                        <a class="text-white fw-semibold text-decoration-underline" href="{{ route('password.request') }}" wire:navigate>
+                            <i class="mdi mdi-lock-question me-1"></i> Lupa password Anda?
+                        </a>
+                    </p>
                 </div>
             </div>
 

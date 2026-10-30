@@ -45,11 +45,12 @@ class SendCampaignEmailJob implements ShouldQueue
         $campaign = $this->recipient->campaign;
         $contact = $this->recipient->contact;
 
-        if (!$campaign || !$contact || !$contact->is_active) {
+        if (! $campaign || ! $contact || ! $contact->is_active) {
             $this->recipient->update([
                 'status' => RecipientStatus::Failed,
                 'error_message' => 'Kontak tidak aktif atau data campaign tidak ditemukan.',
             ]);
+
             return;
         }
 
@@ -72,7 +73,7 @@ class SendCampaignEmailJob implements ShouldQueue
             $campaign->increment('sent_count');
 
         } catch (\Throwable $e) {
-            Log::error("Gagal mengirim email campaign ID {$campaign->id} ke {$contact->email}: " . $e->getMessage());
+            Log::error("Gagal mengirim email campaign ID {$campaign->id} ke {$contact->email}: ".$e->getMessage());
 
             // Tandai gagal
             $this->recipient->update([
@@ -99,4 +100,3 @@ class SendCampaignEmailJob implements ShouldQueue
         }
     }
 }
-

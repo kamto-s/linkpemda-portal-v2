@@ -48,4 +48,3 @@ class UserSeeder extends Seeder
         $staff->syncRoles([UserRole::Staff->value]);
     }
 }
-

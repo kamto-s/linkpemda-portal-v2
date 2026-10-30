@@ -20,6 +20,7 @@ use Livewire\Component;
 class Form extends Component
 {
     public ?EmailCampaign $campaign = null;
+
     public bool $isEditing = false;
 
     // Wizard Step
@@ -27,17 +28,23 @@ class Form extends Component
 
     // Fields
     public string $title = '';
+
     public string $subject = '';
+
     public string $body_content = '';
 
     // Target Selection
     public array $selectedContacts = [];
+
     public string $contactCategory = 'all'; // all, pemerintah, swasta
+
     public string $searchContact = '';
+
     public bool $selectAll = false;
 
     // Preview
     public bool $showPreview = false;
+
     public string $previewHtml = '';
 
     protected function rules(): array
@@ -139,7 +146,7 @@ class Form extends Component
     {
         $visibleIds = $this->getVisibleContactIds();
         $selected = array_map('strval', $this->selectedContacts);
-        $this->selectAll = !empty($visibleIds) && count(array_intersect($visibleIds, $selected)) === count($visibleIds);
+        $this->selectAll = ! empty($visibleIds) && count(array_intersect($visibleIds, $selected)) === count($visibleIds);
     }
 
     public function updatedSelectAll(bool $value): void
@@ -178,7 +185,7 @@ class Form extends Component
     {
         return Contact::query()
             ->where('is_active', true)
-            ->when($this->contactCategory !== 'all', fn($q) => $q->where('category', $this->contactCategory))
+            ->when($this->contactCategory !== 'all', fn ($q) => $q->where('category', $this->contactCategory))
             ->when($this->searchContact, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('name', 'like', "%{$this->searchContact}%")
@@ -200,7 +207,7 @@ class Form extends Component
 
     public function toggleSelectVisible(): void
     {
-        $this->updatedSelectAll(!$this->selectAll);
+        $this->updatedSelectAll(! $this->selectAll);
     }
 
     public function selectAll(string $type = 'all'): void
@@ -211,6 +218,7 @@ class Form extends Component
             $ids = $this->getVisibleContactIds();
             $this->selectedContacts = array_values(array_unique(array_merge($selected, $ids)));
             $this->syncSelectAllState();
+
             return;
         }
 
@@ -232,6 +240,7 @@ class Form extends Component
             $visibleIds = $this->getVisibleContactIds();
             $this->selectedContacts = array_values(array_diff($selected, $visibleIds));
             $this->syncSelectAllState();
+
             return;
         }
 
@@ -239,6 +248,7 @@ class Form extends Component
             $idsToRemove = array_map('strval', Contact::where('is_active', true)->where('category', $type)->pluck('id')->toArray());
             $this->selectedContacts = array_values(array_diff($selected, $idsToRemove));
             $this->syncSelectAllState();
+
             return;
         }
 
@@ -249,11 +259,11 @@ class Form extends Component
     public function generatePreview(): void
     {
         $sampleContact = null;
-        if (!empty($this->selectedContacts)) {
+        if (! empty($this->selectedContacts)) {
             $sampleContact = Contact::find($this->selectedContacts[0]);
         }
 
-        if (!$sampleContact) {
+        if (! $sampleContact) {
             $sampleContact = new Contact([
                 'name' => 'Bpk. Hendra Gunawan, S.STP, M.Si',
                 'organization_name' => 'Instansi Pemerintah',
@@ -312,7 +322,7 @@ class Form extends Component
             'body_content' => 'required|string',
         ]);
 
-        $campaign = $this->campaign ?? new EmailCampaign();
+        $campaign = $this->campaign ?? new EmailCampaign;
         $campaign->fill([
             'title' => $this->title,
             'subject' => $this->subject,
@@ -325,6 +335,7 @@ class Form extends Component
         $this->syncRecipients($campaign);
 
         session()->flash('success', 'Draft berhasil disimpan.');
+
         return $this->redirect(route('admin.campaign.index'), navigate: true);
     }
 
@@ -332,7 +343,7 @@ class Form extends Component
     {
         $this->validate();
 
-        $campaign = $this->campaign ?? new EmailCampaign();
+        $campaign = $this->campaign ?? new EmailCampaign;
         $campaign->fill([
             'title' => $this->title,
             'subject' => $this->subject,
@@ -351,6 +362,7 @@ class Form extends Component
         }
 
         session()->flash('success', "Email blast siap dikirimkan ke {$campaign->total_recipients} kontak.");
+
         return $this->redirect(route('admin.campaign.show', $campaign->id), navigate: true);
     }
 
@@ -360,7 +372,7 @@ class Form extends Component
         $toAdd = array_diff($this->selectedContacts, $existing);
         $toRemove = array_diff($existing, $this->selectedContacts);
 
-        if (!empty($toRemove)) {
+        if (! empty($toRemove)) {
             $campaign->recipients()->whereIn('contact_id', $toRemove)->delete();
         }
 
@@ -393,10 +405,10 @@ class Form extends Component
         $isAllVisibleSelected = $this->selectAll;
 
         $sampleContact = null;
-        if (!empty($this->selectedContacts)) {
+        if (! empty($this->selectedContacts)) {
             $sampleContact = Contact::find($this->selectedContacts[0]);
         }
-        if (!$sampleContact) {
+        if (! $sampleContact) {
             $sampleContact = new Contact([
                 'name' => 'Bpk. Hendra Gunawan, S.STP, M.Si',
                 'organization_name' => 'Instansi Pemerintah',

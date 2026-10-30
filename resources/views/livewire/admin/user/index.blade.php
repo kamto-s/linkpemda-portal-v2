@@ -53,7 +53,7 @@
 
                     <!-- Search & Filter Controls -->
                     <div class="row g-2 mb-3 align-items-center">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
                                 <input type="text" class="form-control" placeholder="Cari nama atau email..."
@@ -78,13 +78,21 @@
 
                         <div class="col-md-2">
                             <select class="form-select" wire:model.live="selectedStatus">
-                                <option value="">Semua Status</option>
+                                <option value="">Semua Status Akun</option>
                                 <option value="active">Aktif</option>
                                 <option value="inactive">Nonaktif</option>
                             </select>
                         </div>
 
-                        @if ($search !== '' || $selectedRole !== '' || $selectedStatus !== '')
+                        <div class="col-md-2">
+                            <select class="form-select" wire:model.live="selectedVerification">
+                                <option value="">Semua Aktivasi</option>
+                                <option value="verified">Terverifikasi</option>
+                                <option value="unverified">Menunggu Aktivasi</option>
+                            </select>
+                        </div>
+
+                        @if ($search !== '' || $selectedRole !== '' || $selectedStatus !== '' || $selectedVerification !== '')
                             <div class="col-auto">
                                 <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
                                     <i class="mdi mdi-filter-remove me-1"></i> Reset
@@ -110,7 +118,8 @@
                                     <th>Pengguna</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th>Status</th>
+                                    <th>Status Akun</th>
+                                    <th>Aktivasi</th>
                                     <th>Terdaftar</th>
                                     <th class="text-end" style="width: 120px;">Aksi</th>
                                 </tr>
@@ -158,6 +167,21 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if ($user->email_verified_at)
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
+                                                    title="Diaktivasi pada: {{ $user->email_verified_at->translatedFormat('d M Y, H:i') }}">
+                                                    <i class="mdi mdi-check-circle-outline me-1"></i> Terverifikasi
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"
+                                                    title="Menunggu pengguna membuat password">
+                                                    <i class="mdi mdi-clock-outline me-1"></i> Menunggu Aktivasi
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             <small
                                                 class="text-muted">{{ $user->created_at->translatedFormat('d M Y, H:i') }}</small>
                                         </td>
@@ -179,6 +203,11 @@
                                                             href="{{ route('admin.user.edit', $user->id) }}"
                                                             wire:navigate>
                                                             <i class="mdi mdi-pencil me-1"></i> Edit
+                                                        </a>
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="sendPasswordResetLink('{{ $user->id }}')">
+                                                            <i class="mdi {{ $user->email_verified_at ? 'mdi-email-send text-info' : 'mdi-email-sync text-warning' }} me-1"></i>
+                                                            {{ $user->email_verified_at ? 'Kirim Link Password' : 'Kirim Ulang Undangan' }}
                                                         </a>
                                                         @if ($user->id !== auth()->id())
                                                             <a class="dropdown-item" href="javascript:void(0);"

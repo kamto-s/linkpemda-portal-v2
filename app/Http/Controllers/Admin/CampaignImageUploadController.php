@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CampaignImageUploadController extends Controller
@@ -18,13 +17,12 @@ class CampaignImageUploadController extends Controller
 
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
-        $filename = Str::uuid() . '.' . $extension;
+        $filename = Str::uuid().'.'.$extension;
 
         $path = $file->storeAs('campaigns/images', $filename, 'public');
 
         return response()->json([
-            'location' => asset('storage/' . $path),
+            'location' => asset('storage/'.$path),
         ]);
     }
 }
-        

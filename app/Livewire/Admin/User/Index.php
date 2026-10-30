@@ -3,8 +3,12 @@
 namespace App\Livewire\Admin\User;
 
 use App\Enums\UserRole;
+use App\Mail\UserInvitationMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -21,6 +25,8 @@ class Index extends Component
     public string $selectedRole = '';
 
     public string $selectedStatus = '';
+
+    public string $selectedVerification = '';
 
     public int $perPage = 10;
 
@@ -51,9 +57,14 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatedSelectedVerification(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters(): void
     {
-        $this->reset(['search', 'selectedRole', 'selectedStatus']);
+        $this->reset(['search', 'selectedRole', 'selectedStatus', 'selectedVerification']);
         $this->resetPage();
     }
 
@@ -156,10 +167,40 @@ class Index extends Component
         session()->flash('success', "Status akun \"{$user->name}\" berhasil {$statusText}.");
     }
 
+    public function sendPasswordResetLink(string $id): void
+    {
+        abort_unless(Auth::user()->can('manage-users'), 403);
+
+        $user = User::with('roles')->findOrFail($id);
+
+        if ($user->hasRole(UserRole::Superadmin->value) && ! Auth::user()->hasRole(UserRole::Superadmin->value)) {
+            session()->flash('error', 'Hanya Superadmin yang berwenang mengirim link atur password ke akun Superadmin.');
+
+            return;
+        }
+
+        try {
+            $token = Password::broker()->createToken($user);
+            Mail::to($user->email)->send(new UserInvitationMail($user, $token));
+
+            session()->flash('success', "Tautan atur password berhasil dikirim ke {$user->email}.");
+        } catch (\Throwable $e) {
+            Log::error("Gagal mengirim tautan atur password ke {$user->email}: ".$e->getMessage());
+            session()->flash('error', 'Gagal mengirim email: '.$e->getMessage());
+        }
+    }
+
     public function render()
     {
+        $isSuperadmin = (bool) Auth::user()?->hasRole(UserRole::Superadmin->value);
+
         $users = User::query()
             ->with('roles')
+            ->when(! $isSuperadmin, function ($query) {
+                $query->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', UserRole::Superadmin->value);
+                });
+            })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%'.$this->search.'%')
@@ -175,13 +216,23 @@ class Index extends Component
             ->when($this->selectedStatus === 'inactive', function ($query) {
                 $query->where('is_active', false);
             })
+            ->when($this->selectedVerification === 'verified', function ($query) {
+                $query->whereNotNull('email_verified_at');
+            })
+            ->when($this->selectedVerification === 'unverified', function ($query) {
+                $query->whereNull('email_verified_at');
+            })
             ->latest()
             ->paginate($this->perPage);
 
+        $roles = $isSuperadmin
+            ? UserRole::cases()
+            : array_values(array_filter(UserRole::cases(), fn (UserRole $r) => $r !== UserRole::Superadmin));
+
         return view('livewire.admin.user.index', [
             'users' => $users,
-            'roles' => UserRole::cases(),
-            'isSuperadmin' => Auth::user()?->hasRole(UserRole::Superadmin->value),
+            'roles' => $roles,
+            'isSuperadmin' => $isSuperadmin,
         ]);
     }
 }

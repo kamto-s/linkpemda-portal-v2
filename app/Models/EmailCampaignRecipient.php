@@ -31,4 +31,3 @@ class EmailCampaignRecipient extends Model
         return $this->belongsTo(Contact::class, 'contact_id');
     }
 }
-

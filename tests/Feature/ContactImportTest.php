@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 test('contact import service can generate an excel template', function () {
-    $service = new ContactImportService();
+    $service = new ContactImportService;
     $binary = $service->generateTemplate();
 
     expect($binary)->not->toBeEmpty()
@@ -27,7 +27,7 @@ test('contact import service imports new contacts and handles duplicates', funct
         'is_active' => true,
     ]);
 
-    $spreadsheet = new Spreadsheet();
+    $spreadsheet = new Spreadsheet;
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setCellValue('A1', 'Nama Lengkap');
     $sheet->setCellValue('B1', 'Alamat Email');
@@ -60,11 +60,11 @@ test('contact import service imports new contacts and handles duplicates', funct
     $sheet->setCellValue('B4', 'invalid-email-format');
     $sheet->setCellValue('C4', 'Dinas');
 
-    $tempFile = tempnam(sys_get_temp_dir(), 'test_import_') . '.xlsx';
+    $tempFile = tempnam(sys_get_temp_dir(), 'test_import_').'.xlsx';
     $writer = new Xlsx($spreadsheet);
     $writer->save($tempFile);
 
-    $service = new ContactImportService();
+    $service = new ContactImportService;
     $result = $service->import($tempFile, 'update');
 
     expect($result['imported'])->toBe(1)
@@ -89,7 +89,7 @@ test('contact import service imports new contacts and handles duplicates', funct
 test('authenticated user can upload excel file through contact index component', function () {
     $user = User::factory()->create();
 
-    $spreadsheet = new Spreadsheet();
+    $spreadsheet = new Spreadsheet;
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setCellValue('A1', 'Nama');
     $sheet->setCellValue('B1', 'Email');
@@ -99,7 +99,7 @@ test('authenticated user can upload excel file through contact index component',
     $sheet->setCellValue('B2', 'rudi@diskominfo.go.id');
     $sheet->setCellValue('C2', 'Diskominfo Jabar');
 
-    $tempFile = tempnam(sys_get_temp_dir(), 'test_lw_') . '.xlsx';
+    $tempFile = tempnam(sys_get_temp_dir(), 'test_lw_').'.xlsx';
     $writer = new Xlsx($spreadsheet);
     $writer->save($tempFile);
 

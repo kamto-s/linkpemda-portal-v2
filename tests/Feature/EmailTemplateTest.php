@@ -84,7 +84,7 @@ test('user can open edit page and update a template', function () {
     $this->actingAs($user)
         ->get(route('admin.template.edit', $tpl->id))
         ->assertOk()
-        ->assertSee('Ubah Template: ' . $tpl->name);
+        ->assertSee('Ubah Template: '.$tpl->name);
 
     Livewire::actingAs($user)
         ->test(TemplateForm::class, ['template' => $tpl])

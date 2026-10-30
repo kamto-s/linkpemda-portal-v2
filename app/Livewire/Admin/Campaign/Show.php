@@ -6,7 +6,6 @@ use App\Enums\CampaignStatus;
 use App\Enums\RecipientStatus;
 use App\Jobs\SendCampaignEmailJob;
 use App\Models\EmailCampaign;
-use App\Models\EmailCampaignRecipient;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -16,7 +15,9 @@ use Livewire\Component;
 class Show extends Component
 {
     public EmailCampaign $campaign;
+
     public string $filterRecipientStatus = 'all';
+
     public string $searchRecipient = '';
 
     public function mount(EmailCampaign $campaign): void
@@ -38,6 +39,7 @@ class Show extends Component
 
         if ($failedRecipients->isEmpty()) {
             session()->flash('warning', 'Tidak ada pengiriman email yang gagal.');
+
             return;
         }
 
@@ -85,4 +87,3 @@ class Show extends Component
         ]);
     }
 }
-

@@ -4,18 +4,18 @@ namespace App\Models;
 
 use App\Enums\PostStatus;
 use App\Enums\PostType;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends BaseModel
 {
     protected $casts = [
-        'type'          => PostType::class,
-        'status'        => PostStatus::class,
-        'is_featured'   => 'boolean',
-        'is_indexable'  => 'boolean',
-        'published_at'  => 'datetime',
-        'view_count'    => 'integer',
+        'type' => PostType::class,
+        'status' => PostStatus::class,
+        'is_featured' => 'boolean',
+        'is_indexable' => 'boolean',
+        'published_at' => 'datetime',
+        'view_count' => 'integer',
     ];
 
     public function category(): BelongsTo
