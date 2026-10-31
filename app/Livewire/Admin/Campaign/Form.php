@@ -361,16 +361,12 @@ class Form extends Component
         $this->validate();
 
         // Validasi kuota batas pengiriman email harian dari System Setting
-        $dailyLimit = (int) system_setting('max_daily_email_limit', 0);
-        if ($dailyLimit > 0) {
-            $todaySent = EmailCampaignRecipient::whereDate('sent_at', today())
-                ->where('status', RecipientStatus::Sent)
-                ->count();
+        $quotaStats = EmailCampaign::getDailyQuotaStats();
+        if (! $quotaStats['is_unlimited']) {
             $requestedCount = count($this->selectedContacts);
 
-            if (($todaySent + $requestedCount) > $dailyLimit) {
-                $remainingQuota = max(0, $dailyLimit - $todaySent);
-                session()->flash('error', "Pengiriman blast dibatalkan: Jumlah ({$requestedCount} email) melebihi batas kuota harian ({$dailyLimit} email/hari). Sisa kuota email yang dapat dikirim hari ini: {$remainingQuota} email.");
+            if (($quotaStats['sent'] + $requestedCount) > $quotaStats['limit']) {
+                session()->flash('error', "Pengiriman blast dibatalkan: Jumlah ({$requestedCount} email) melebihi batas kuota harian ({$quotaStats['limit']} email/hari). Sisa kuota email yang dapat dikirim hari ini: {$quotaStats['remaining']} email.");
 
                 return;
             }
@@ -466,6 +462,7 @@ class Form extends Component
             'sampleContact' => $sampleContact,
             'emailTemplates' => $emailTemplates,
             'templateCategories' => $templateCategories,
+            'quotaStats' => EmailCampaign::getDailyQuotaStats(),
         ]);
     }
 }

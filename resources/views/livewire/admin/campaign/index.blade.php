@@ -30,6 +30,113 @@
         </div>
     @endif
 
+    <!-- Widget Ringkasan Kuota Pengiriman Email Harian -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm mb-0">
+                <div class="card-body p-3">
+                    <div class="row align-items-center g-3">
+                        <div class="col-lg-3 col-md-6 border-end-md">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
+                                    style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="mdi mdi-email-fast-outline fs-22"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block fs-11 text-uppercase fw-semibold">Batas Kuota Harian</small>
+                                    <h4 class="mb-0 fw-bold text-dark">
+                                        @if ($quotaStats['is_unlimited'])
+                                            <span class="badge bg-success-subtle text-success fs-13">Tidak Terbatas</span>
+                                        @else
+                                            {{ number_format($quotaStats['limit']) }} <span class="fs-12 fw-normal text-muted">email/hari</span>
+                                        @endif
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 border-end-md">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center"
+                                    style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="mdi mdi-email-check-outline fs-22"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block fs-11 text-uppercase fw-semibold">Terkirim Hari Ini</small>
+                                    <h4 class="mb-0 fw-bold text-info">
+                                        {{ number_format($quotaStats['sent']) }} <span class="fs-12 fw-normal text-muted">email</span>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 border-end-md">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle {{ $quotaStats['is_unlimited'] ? 'bg-success-subtle text-success' : ($quotaStats['remaining'] === 0 ? 'bg-danger-subtle text-danger' : ($quotaStats['remaining'] < 20 ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success')) }} d-flex align-items-center justify-content-center"
+                                    style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="mdi mdi-speedometer fs-22"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block fs-11 text-uppercase fw-semibold">Sisa Kuota Hari Ini</small>
+                                    <h4 class="mb-0 fw-bold {{ $quotaStats['is_unlimited'] ? 'text-success' : ($quotaStats['remaining'] === 0 ? 'text-danger' : ($quotaStats['remaining'] < 20 ? 'text-warning' : 'text-success')) }}">
+                                        @if ($quotaStats['is_unlimited'])
+                                            &infin; <span class="fs-12 fw-normal text-muted">(Bebas)</span>
+                                        @else
+                                            {{ number_format($quotaStats['remaining']) }} <span class="fs-12 fw-normal text-muted">tersisa</span>
+                                        @endif
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fs-12 text-muted fw-medium">Penggunaan Kuota</span>
+                                    <span class="fs-12 fw-bold text-dark">
+                                        @if ($quotaStats['is_unlimited'])
+                                            Aktif
+                                        @else
+                                            {{ $quotaStats['percentage'] }}%
+                                        @endif
+                                    </span>
+                                </div>
+                                @php
+                                    $progressColor = 'bg-primary';
+                                    if (! $quotaStats['is_unlimited']) {
+                                        if ($quotaStats['percentage'] >= 90) {
+                                            $progressColor = 'bg-danger';
+                                        } elseif ($quotaStats['percentage'] >= 75) {
+                                            $progressColor = 'bg-warning';
+                                        } elseif ($quotaStats['percentage'] > 0) {
+                                            $progressColor = 'bg-success';
+                                        }
+                                    }
+                                @endphp
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {{ $progressColor }}" role="progressbar"
+                                        style="width: {{ $quotaStats['is_unlimited'] ? '100' : $quotaStats['percentage'] }}%;"
+                                        aria-valuenow="{{ $quotaStats['percentage'] }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <div class="mt-1 d-flex justify-content-between align-items-center">
+                                    <small class="text-muted fs-11">
+                                        Reset tiap 00:00 WIB
+                                    </small>
+                                    @can('view-settings')
+                                        <a href="{{ route('admin.system-setting.index') }}" wire:navigate class="fs-11 text-decoration-none">
+                                            <i class="mdi mdi-cog-outline me-1"></i>Pengaturan Sistem
+                                        </a>
+                                    @endcan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">

@@ -235,6 +235,46 @@
 
             <div class="card-body">
 
+                <!-- Info Status Kuota Harian -->
+                <div class="p-2 px-3 rounded mb-3 border d-flex flex-wrap align-items-center justify-content-between gap-2 {{ ! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'] ? 'bg-danger-subtle border-danger' : 'bg-light' }}">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="mdi {{ ! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'] ? 'mdi-alert-circle text-danger' : 'mdi-gauge text-primary' }} fs-18"></i>
+                        <span class="fs-13">
+                            <strong>Kuota Harian:</strong>
+                            @if ($quotaStats['is_unlimited'])
+                                <span class="badge bg-success-subtle text-success ms-1">Tidak Terbatas</span>
+                            @else
+                                Terkirim hari ini: <strong>{{ number_format($quotaStats['sent']) }}</strong> / {{ number_format($quotaStats['limit']) }} email
+                                • Sisa kuota: <strong class="{{ $quotaStats['remaining'] === 0 ? 'text-danger' : 'text-success' }}">{{ number_format($quotaStats['remaining']) }} email</strong>
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="fs-13">
+                        @if (! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'])
+                            <span class="text-danger fw-bold">
+                                <i class="mdi mdi-alert me-1"></i>Pilihan ({{ count($selectedContacts) }}) melebihi sisa kuota ({{ $quotaStats['remaining'] }})
+                            </span>
+                        @else
+                            <span class="text-muted">
+                                Terpilih: <strong class="text-primary">{{ count($selectedContacts) }} kontak</strong>
+                                @if (! $quotaStats['is_unlimited'])
+                                    (Estimasi sisa setelah blast: {{ max(0, $quotaStats['remaining'] - count($selectedContacts)) }})
+                                @endif
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                @if (! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'])
+                    <div class="alert alert-danger py-2 px-3 d-flex align-items-center mb-3 fs-13" role="alert">
+                        <i class="mdi mdi-alert-decagram fs-18 me-2"></i>
+                        <div>
+                            <strong>Peringatan Kuota Terlampaui:</strong> Jumlah target penerima yang dipilih (<strong>{{ count($selectedContacts) }}</strong> kontak) melebihi sisa kuota pengiriman hari ini (<strong>{{ number_format($quotaStats['remaining']) }}</strong> email). Silakan kurangi pilihan kontak atau hubungi Administrator untuk menyesuaikan limit di Pengaturan Sistem.
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Filter & Bulk Actions Toolbar -->
                 <div class="row g-2 align-items-center mb-3">
                     <div class="col-md-4">
@@ -409,29 +449,52 @@
             <div class="card-body">
                 <!-- Ringkasan Singkat -->
                 <div class="row g-2 mb-3">
-                    <div class="col-md-4">
-                        <div class="p-2 px-3 bg-light rounded border">
+                    <div class="col-md-3">
+                        <div class="p-2 px-3 bg-light rounded border h-100">
                             <small class="text-muted d-block fs-11">Judul Campaign</small>
-                            <span class="fw-bold text-dark text-truncate d-block">{{ $title }}</span>
+                            <span class="fw-bold text-dark text-truncate d-block" title="{{ $title }}">{{ $title }}</span>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-2 px-3 bg-light rounded border">
+                    <div class="col-md-3">
+                        <div class="p-2 px-3 bg-light rounded border h-100">
                             <small class="text-muted d-block fs-11">Subjek Email</small>
-                            <span class="fw-bold text-dark text-truncate d-block">{{ $subject }}</span>
+                            <span class="fw-bold text-dark text-truncate d-block" title="{{ $subject }}">{{ $subject }}</span>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-2 px-3 bg-light rounded border">
-                            <small class="text-muted d-block fs-11">Penerima</small>
+                    <div class="col-md-3">
+                        <div class="p-2 px-3 bg-light rounded border h-100">
+                            <small class="text-muted d-block fs-11">Target Penerima</small>
                             <span class="fw-bold text-primary d-block">
                                 {{ count($selectedContacts) }} Kontak
-                                <span class="text-muted fw-normal fs-11">({{ $selectedPemerintahCount }} Pemerintah,
-                                    {{ $selectedSwastaCount }} Swasta)</span>
                             </span>
+                            <small class="text-muted fs-11 d-block">{{ $selectedPemerintahCount }} Pemda, {{ $selectedSwastaCount }} Swasta</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-2 px-3 rounded border h-100 {{ ! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'] ? 'bg-danger-subtle border-danger' : 'bg-light' }}">
+                            <small class="text-muted d-block fs-11">Status Kuota Hari Ini</small>
+                            @if ($quotaStats['is_unlimited'])
+                                <span class="fw-bold text-success d-block"><i class="mdi mdi-check-circle me-1"></i>Tanpa Batas</span>
+                                <small class="text-muted fs-11 d-block">Terkirim: {{ number_format($quotaStats['sent']) }} email</small>
+                            @elseif (count($selectedContacts) > $quotaStats['remaining'])
+                                <span class="fw-bold text-danger d-block"><i class="mdi mdi-alert-circle me-1"></i>Melebihi Kuota</span>
+                                <small class="text-danger fs-11 d-block">Sisa: {{ number_format($quotaStats['remaining']) }} / {{ number_format($quotaStats['limit']) }} email</small>
+                            @else
+                                <span class="fw-bold text-success d-block"><i class="mdi mdi-check-circle me-1"></i>Aman Dikirim</span>
+                                <small class="text-muted fs-11 d-block">Sisa setelah kirim: {{ number_format($quotaStats['remaining'] - count($selectedContacts)) }} email</small>
+                            @endif
                         </div>
                     </div>
                 </div>
+
+                @if (! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining'])
+                    <div class="alert alert-danger py-2 px-3 d-flex align-items-center mb-3 fs-13" role="alert">
+                        <i class="mdi mdi-alert-decagram fs-18 me-2"></i>
+                        <div>
+                            <strong>Pengiriman Tidak Dapat Diproses:</strong> Total penerima (<strong>{{ count($selectedContacts) }}</strong> email) melebihi kuota tersisa hari ini (<strong>{{ number_format($quotaStats['remaining']) }}</strong> email). Silakan kembali ke Langkah 2 untuk mengurangi penerima atau sesuaikan limit di Pengaturan Sistem.
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Preview Email Mockup -->
                 <div class="border rounded overflow-hidden">
@@ -480,7 +543,7 @@
                             Simpan Draft
                         </button>
                         <button type="button" class="btn btn-success px-4"
-                            wire:confirm="Kirim email blast ke {{ count($selectedContacts) }} kontak terpilih sekarang?"
+                            @if (! $quotaStats['is_unlimited'] && count($selectedContacts) > $quotaStats['remaining']) disabled title="Penerima melebihi sisa kuota hari ini" @else wire:confirm="Kirim email blast ke {{ count($selectedContacts) }} kontak terpilih sekarang?" @endif
                             wire:click="sendBlast" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="sendBlast">
                                 <i class="mdi mdi-send me-1"></i> Kirim Sekarang ({{ count($selectedContacts) }})

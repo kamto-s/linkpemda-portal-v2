@@ -123,4 +123,27 @@ class EmailCampaign extends BaseModel
 
         return $duration;
     }
+
+    /**
+     * Mengambil statistik kuota pengiriman email harian sistem.
+     *
+     * @return array{limit: int, sent: int, remaining: ?int, percentage: int, is_unlimited: bool}
+     */
+    public static function getDailyQuotaStats(): array
+    {
+        $dailyLimit = (int) system_setting('max_daily_email_limit', 0);
+        $todaySent = EmailCampaignRecipient::whereDate('sent_at', today())
+            ->where('status', \App\Enums\RecipientStatus::Sent)
+            ->count();
+        $remaining = $dailyLimit > 0 ? max(0, $dailyLimit - $todaySent) : null;
+        $percentage = $dailyLimit > 0 ? min(100, (int) round(($todaySent / $dailyLimit) * 100)) : 0;
+
+        return [
+            'limit' => $dailyLimit,
+            'sent' => $todaySent,
+            'remaining' => $remaining,
+            'percentage' => $percentage,
+            'is_unlimited' => $dailyLimit === 0,
+        ];
+    }
 }

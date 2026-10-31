@@ -59,6 +59,28 @@ class SendCampaignEmailJob implements ShouldQueue
             $campaign->update(['status' => CampaignStatus::Processing]);
         }
 
+        // Periksa batas kuota harian sistem sebelum mengirim
+        $dailyLimit = (int) system_setting('max_daily_email_limit', 0);
+        if ($dailyLimit > 0) {
+            $todaySent = EmailCampaignRecipient::whereDate('sent_at', today())
+                ->where('status', RecipientStatus::Sent)
+                ->count();
+
+            if ($todaySent >= $dailyLimit) {
+                $this->recipient->update([
+                    'status' => RecipientStatus::Failed,
+                    'sent_at' => now(),
+                    'error_message' => "Pengiriman dibatalkan: Batas kuota harian ({$dailyLimit} email) telah tercapai hari ini.",
+                ]);
+
+                $campaign->increment('failed_count');
+
+                $this->checkCampaignCompletion($campaign);
+
+                return;
+            }
+        }
+
         try {
             // Kirim email
             Mail::to($contact->email)->send(new CampaignEmail($campaign, $contact));
@@ -88,7 +110,14 @@ class SendCampaignEmailJob implements ShouldQueue
         // Shared hosting throttling: beri jeda 1 detik per pengiriman agar tidak terblokir limit SMTP
         sleep(1);
 
-        // Periksa apakah semua email dalam campaign ini sudah selesai diproses
+        $this->checkCampaignCompletion($campaign);
+    }
+
+    /**
+     * Periksa apakah seluruh recipient dalam campaign sudah selesai diproses.
+     */
+    protected function checkCampaignCompletion($campaign): void
+    {
         $remaining = $campaign->recipients()->where('status', RecipientStatus::Pending->value)->count();
         if ($remaining === 0) {
             $campaign->refresh();
