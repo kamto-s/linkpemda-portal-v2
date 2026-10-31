@@ -1,6 +1,7 @@
 <!-- App js -->
 <script src="{{ asset('assets/admin/js/vendor.min.js') }}" data-navigate-once></script>
 <script src="{{ asset('assets/admin/js/app.js') }}" data-navigate-once></script>
+<script src="{{ asset('assets/admin/libs/tinymce/tinymce.min.js') }}" data-navigate-once></script>
 
 <script data-navigate-once>
     // 1. Sidebar Toggle (Mendukung Desktop Collapse & Mobile Off-canvas Drawer)
@@ -176,6 +177,20 @@
                 }
             } else {
                 document.documentElement.classList.remove('sidebar-enable');
+            }
+        });
+
+        // Clean up all TinyMCE editors before Livewire navigates away to prevent stale DOM node errors
+        document.addEventListener('livewire:navigating', function() {
+            if (typeof tinymce !== 'undefined' && tinymce.editors && tinymce.editors.length > 0) {
+                const activeEditors = [...tinymce.editors];
+                activeEditors.forEach(function(editor) {
+                    try {
+                        editor.destroy();
+                    } catch (e) {
+                        console.warn('Error destroying TinyMCE instance:', e);
+                    }
+                });
             }
         });
 

@@ -18,215 +18,261 @@
     <!--- Menu -->
     <div data-simplebar>
         <ul class="app-menu">
-            <li class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <a wire:navigate class='menu-link waves-effect waves-light' href='{{ route('admin.dashboard') }}'>
-                    <span class="menu-icon"><i class="bx bx-home-smile"></i></span>
-                    <span class="menu-text"> Dashboards </span>
-                </a>
-            </li>
-
-            <li class="menu-title">CMS</li>
-
-            @php
-                $isPostActive = request()->routeIs(['admin.artikel.*', 'admin.materi.*', 'admin.category.*']);
-            @endphp
-
-            <li class="menu-item {{ $isPostActive ? 'active' : '' }}">
-                <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#menuPosts"
-                    aria-expanded="{{ $isPostActive ? 'true' : 'false' }}" aria-controls="menuPosts"
-                    class="menu-link waves-effect waves-light {{ $isPostActive ? 'active' : '' }}">
-                    <span class="menu-icon"><i class="bx bx-file"></i></span>
-                    <span class="menu-text"> Posts </span>
-                    <span class="menu-arrow"></span>
-                </a>
-
-                <div class="collapse {{ $isPostActive ? 'show' : '' }}" id="menuPosts">
-                    <ul class="sub-menu">
-                        <li class="menu-item {{ request()->routeIs('artikel.*') ? 'active' : '' }}">
-                            <a class='menu-link' href='#'>
-                                <span class="menu-text">Artikel</span>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ request()->routeIs('materi.*') ? 'active' : '' }}">
-                            <a class='menu-link' href='#'>
-                                <span class="menu-text">Materi</span>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ request()->routeIs('admin.category.*') ? 'active' : '' }}">
-                            <a wire:navigate
-                                class="menu-link {{ request()->routeIs('admin.category.*') ? 'active' : '' }}"
-                                href="{{ route('admin.category.index') }}">
-                                <span class="menu-text">Kategori</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-calendar"></i></span>
-                    <span class="menu-text"> Jadwal </span>
-                </a>
-            </li>
-
-
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-image"></i></span>
-                    <span class="menu-text"> Galeri </span>
-                </a>
-            </li>
-
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-layout"></i></span>
-                    <span class="menu-text"> Pages </span>
-                </a>
-            </li>
-
-            <!-- ============================================== -->
-            <!-- PROMOSI & EMAIL BLAST -->
-            <!-- ============================================== -->
-            <li class="menu-title">Email Marketing</li>
-
-            <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
-                <a wire:navigate
-                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
-                    href='{{ route('admin.campaign.create') }}'>
-                    <span class="menu-icon"><i class="bx bx-send"></i></span>
-                    <span class="menu-text"> Kirim Email </span>
-                </a>
-            </li>
-
-            <li
-                class="menu-item {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
-                <a wire:navigate
-                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
-                    href='{{ route('admin.campaign.index') }}'>
-                    <span class="menu-icon"><i class="bx bx-broadcast"></i></span>
-                    <span class="menu-text"> Campaign </span>
-                </a>
-            </li>
-
-            <li class="menu-item {{ request()->routeIs('admin.template.*') ? 'active' : '' }}">
-                <a wire:navigate
-                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.template.*') ? 'active' : '' }}'
-                    href='{{ route('admin.template.index') }}'>
-                    <span class="menu-icon"><i class="bx bx-layer"></i></span>
-                    <span class="menu-text"> Template </span>
-                </a>
-            </li>
-
-            <li class="menu-item {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
-                <a wire:navigate
-                    class='menu-link waves-effect waves-light {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}'
-                    href='{{ route('admin.contact.index') }}'>
-                    <span class="menu-icon"><i class="bx bx-book-content"></i></span>
-                    <span class="menu-text"> Kontak </span>
-                </a>
-            </li>
-
-            <li class="menu-title">Administrasi</li>
-
-            <!-- 1. Sertifikat (Sudah Anda buat) -->
-            <li class="menu-item">
-                <a href="#menuSertifikat" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                    <span class="menu-icon"><i class="bx bx-medal"></i></span>
-                    <span class="menu-text"> Sertifikat </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="menuSertifikat">
-                    <ul class="sub-menu">
-                        <li class="menu-item">
-                            <a class='menu-link' href='#'>
-                                <span class="menu-text">Linkpemda</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='#'>
-                                <span class="menu-text">Tren Media Diklat</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <!-- 2. Data Peserta / OPD -->
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-group"></i></span>
-                    <span class="menu-text"> Data Peserta </span>
-                </a>
-            </li>
-
-            <!-- 3. Pendaftaran Masuk -->
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-clipboard"></i></span>
-                    <span class="menu-text"> Pendaftaran Kegiatan </span>
-                </a>
-            </li>
-
-            <!-- 4. Dokumen & Regulasi -->
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-folder"></i></span>
-                    <span class="menu-text"> Dokumen </span>
-                </a>
-            </li>
-
-            <!-- 5. Pesan / Surat Masuk -->
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-envelope"></i></span>
-                    <span class="menu-text"> Pesan Masuk </span>
-                </a>
-            </li>
-
-
-            <li class="menu-title">Pengaturan</li>
-
-            @can('manage-users')
-                <li class="menu-item {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
-                    <a wire:navigate
-                        class='menu-link waves-effect waves-light {{ request()->routeIs('admin.user.*') ? 'active' : '' }}'
-                        href='{{ route('admin.user.index') }}'>
-                        <span class="menu-icon"><i class="bx bx-user-check"></i></span>
-                        <span class="menu-text"> User </span>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->routeIs('admin.role.*') ? 'active' : '' }}">
-                    <a wire:navigate
-                        class='menu-link waves-effect waves-light {{ request()->routeIs('admin.role.*') ? 'active' : '' }}'
-                        href='{{ route('admin.role.index') }}'>
-                        <span class="menu-icon"><i class="bx bx-shield-quarter"></i></span>
-                        <span class="menu-text"> Role & Hak Akses </span>
+            @can('view-dashboard')
+                <li class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <a wire:navigate class='menu-link waves-effect waves-light' href='{{ route('admin.dashboard') }}'>
+                        <span class="menu-icon"><i class="bx bx-home-smile"></i></span>
+                        <span class="menu-text"> Dashboards </span>
                     </a>
                 </li>
             @endcan
 
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-cog"></i></span>
-                    <span class="menu-text"> Identitas Portal </span>
-                </a>
-            </li>
+            @canany(['view-posts', 'view-categories', 'view-schedules', 'view-galleries', 'view-pages'])
+                <li class="menu-title">CMS</li>
 
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-id-card"></i></span>
-                    <span class="menu-text"> Konfigurasi Sertifikat </span>
-                </a>
-            </li>
+                @php
+                    $isPostActive = request()->routeIs(['admin.artikel.*', 'admin.materi.*', 'admin.category.*']);
+                @endphp
 
-            <li class="menu-item">
-                <a class='menu-link waves-effect waves-light' href='#'>
-                    <span class="menu-icon"><i class="bx bx-history"></i></span>
-                    <span class="menu-text"> Log Aktivitas </span>
-                </a>
-            </li>
+                @canany(['view-posts', 'view-categories'])
+                    <li class="menu-item {{ $isPostActive ? 'active' : '' }}">
+                        <a href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#menuPosts"
+                            aria-expanded="{{ $isPostActive ? 'true' : 'false' }}" aria-controls="menuPosts"
+                            class="menu-link waves-effect waves-light {{ $isPostActive ? 'active' : '' }}">
+                            <span class="menu-icon"><i class="bx bx-file"></i></span>
+                            <span class="menu-text"> Posts </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+
+                        <div class="collapse {{ $isPostActive ? 'show' : '' }}" id="menuPosts">
+                            <ul class="sub-menu">
+                                @can('view-posts')
+                                    <li class="menu-item {{ request()->routeIs('artikel.*') ? 'active' : '' }}">
+                                        <a class='menu-link' href='#'>
+                                            <span class="menu-text">Artikel</span>
+                                        </a>
+                                    </li>
+                                    <li class="menu-item {{ request()->routeIs('materi.*') ? 'active' : '' }}">
+                                        <a class='menu-link' href='#'>
+                                            <span class="menu-text">Materi</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view-categories')
+                                    <li class="menu-item {{ request()->routeIs('admin.category.*') ? 'active' : '' }}">
+                                        <a wire:navigate
+                                            class="menu-link {{ request()->routeIs('admin.category.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.category.index') }}">
+                                            <span class="menu-text">Kategori</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+                @endcanany
+
+                @can('view-schedules')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-calendar"></i></span>
+                            <span class="menu-text"> Jadwal </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-galleries')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-image"></i></span>
+                            <span class="menu-text"> Galeri </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-pages')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-layout"></i></span>
+                            <span class="menu-text"> Halaman </span>
+                        </a>
+                    </li>
+                @endcan
+            @endcanany
+
+            <!-- ============================================== -->
+            <!-- PROMOSI & EMAIL BLAST -->
+            <!-- ============================================== -->
+            @canany(['create-campaigns', 'view-campaigns', 'view-templates', 'view-contacts'])
+                <li class="menu-title">Email Marketing</li>
+
+                @can('create-campaigns')
+                    <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
+                            href='{{ route('admin.campaign.create') }}'>
+                            <span class="menu-icon"><i class="bx bx-send"></i></span>
+                            <span class="menu-text"> Kirim Email </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-campaigns')
+                    <li
+                        class="menu-item {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.campaign.*') && !request()->routeIs('admin.campaign.create') ? 'active' : '' }}'
+                            href='{{ route('admin.campaign.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-broadcast"></i></span>
+                            <span class="menu-text"> Campaign </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-templates')
+                    <li class="menu-item {{ request()->routeIs('admin.template.*') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.template.*') ? 'active' : '' }}'
+                            href='{{ route('admin.template.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-layer"></i></span>
+                            <span class="menu-text"> Template </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-contacts')
+                    <li class="menu-item {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}'
+                            href='{{ route('admin.contact.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-book-content"></i></span>
+                            <span class="menu-text"> Kontak </span>
+                        </a>
+                    </li>
+                @endcan
+            @endcanany
+
+            @canany(['view-certificates', 'view-participants', 'view-registrations', 'view-documents', 'view-messages'])
+                <li class="menu-title">Administrasi</li>
+
+                <!-- 1. Sertifikat -->
+                @can('view-certificates')
+                    <li class="menu-item">
+                        <a href="#menuSertifikat" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                            <span class="menu-icon"><i class="bx bx-medal"></i></span>
+                            <span class="menu-text"> Sertifikat </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="menuSertifikat">
+                            <ul class="sub-menu">
+                                <li class="menu-item">
+                                    <a class='menu-link' href='#'>
+                                        <span class="menu-text">Linkpemda</span>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a class='menu-link' href='#'>
+                                        <span class="menu-text">Tren Media Diklat</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endcan
+
+                <!-- 2. Data Peserta / OPD -->
+                @can('view-participants')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-group"></i></span>
+                            <span class="menu-text"> Data Peserta </span>
+                        </a>
+                    </li>
+                @endcan
+
+                <!-- 3. Pendaftaran Masuk -->
+                @can('view-registrations')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-clipboard"></i></span>
+                            <span class="menu-text"> Pendaftaran Kegiatan </span>
+                        </a>
+                    </li>
+                @endcan
+
+                <!-- 4. Dokumen & Regulasi -->
+                @can('view-documents')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-folder"></i></span>
+                            <span class="menu-text"> Dokumen </span>
+                        </a>
+                    </li>
+                @endcan
+
+                <!-- 5. Pesan / Surat Masuk -->
+                @can('view-messages')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-envelope"></i></span>
+                            <span class="menu-text"> Pesan Masuk </span>
+                        </a>
+                    </li>
+                @endcan
+            @endcanany
+
+            @canany(['view-users', 'view-roles', 'view-settings', 'view-certificate-settings', 'manage-system'])
+                <li class="menu-title">Pengaturan</li>
+
+                @can('view-users')
+                    <li class="menu-item {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.user.*') ? 'active' : '' }}'
+                            href='{{ route('admin.user.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-user-check"></i></span>
+                            <span class="menu-text"> User </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-roles')
+                    <li class="menu-item {{ request()->routeIs('admin.role.*') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.role.*') ? 'active' : '' }}'
+                            href='{{ route('admin.role.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-shield-quarter"></i></span>
+                            <span class="menu-text"> Role & Hak Akses </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-settings')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-cog"></i></span>
+                            <span class="menu-text"> Identitas Portal </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('view-certificate-settings')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-id-card"></i></span>
+                            <span class="menu-text"> Konfigurasi Sertifikat </span>
+                        </a>
+                    </li>
+                @endcan
+
+                @can('manage-system')
+                    <li class="menu-item">
+                        <a class='menu-link waves-effect waves-light' href='#'>
+                            <span class="menu-icon"><i class="bx bx-history"></i></span>
+                            <span class="menu-text"> Log Aktivitas </span>
+                        </a>
+                    </li>
+                @endcan
+            @endcanany
 
         </ul>
     </div>

@@ -71,6 +71,8 @@ class Form extends Component
     public function mount(?EmailCampaign $campaign = null): void
     {
         if ($campaign && $campaign->exists) {
+            abort_unless(auth()->user()?->can('edit-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengubah campaign.');
+
             $this->campaign = $campaign;
             $this->isEditing = true;
             $this->title = $campaign->title;
@@ -78,6 +80,8 @@ class Form extends Component
             $this->body_content = $campaign->body_content;
             $this->selectedContacts = $campaign->recipients()->pluck('contact_id')->toArray();
         } else {
+            abort_unless(auth()->user()?->can('create-campaigns'), 403, 'Anda tidak memiliki hak akses untuk membuat campaign baru.');
+
             $templateId = request()->query('template');
             $customTemplate = $templateId ? EmailTemplate::find($templateId) : null;
 
@@ -312,6 +316,12 @@ class Form extends Component
 
     public function saveDraft(?string $content = null)
     {
+        if ($this->campaign && $this->campaign->exists) {
+            abort_unless(auth()->user()?->can('edit-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengubah draft campaign.');
+        } else {
+            abort_unless(auth()->user()?->can('create-campaigns'), 403, 'Anda tidak memiliki hak akses untuk membuat campaign.');
+        }
+
         if ($content !== null) {
             $this->body_content = $content;
         }
@@ -341,6 +351,8 @@ class Form extends Component
 
     public function sendBlast()
     {
+        abort_unless(auth()->user()?->can('send-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengirim blast campaign email.');
+
         $this->validate();
 
         $campaign = $this->campaign ?? new EmailCampaign;

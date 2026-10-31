@@ -42,9 +42,11 @@
                             </p>
                         </div>
                         <div>
-                            <a href="{{ route('admin.user.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus"></i> Tambah
-                            </a>
+                            @canany(['create-users', 'manage-users'])
+                                <a href="{{ route('admin.user.create') }}" wire:navigate class="btn btn-primary">
+                                    <i class="mdi mdi-plus"></i> Tambah
+                                </a>
+                            @endcanany
                         </div>
                     </div>
                 </div>
@@ -198,35 +200,41 @@
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
                                                     @if ($canManageThisUser)
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('admin.user.edit', $user->id) }}"
-                                                            wire:navigate>
-                                                            <i class="mdi mdi-pencil me-1"></i> Edit
-                                                        </a>
-                                                        <a class="dropdown-item" href="javascript:void(0);"
-                                                            wire:click="sendPasswordResetLink('{{ $user->id }}')">
-                                                            <i class="mdi {{ $user->email_verified_at ? 'mdi-email-send text-info' : 'mdi-email-sync text-warning' }} me-1"></i>
-                                                            {{ $user->email_verified_at ? 'Kirim Link Password' : 'Kirim Ulang Undangan' }}
-                                                        </a>
-                                                        @if ($user->id !== auth()->id())
+                                                        @canany(['edit-users', 'manage-users'])
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('admin.user.edit', $user->id) }}"
+                                                                wire:navigate>
+                                                                <i class="mdi mdi-pencil me-1"></i> Edit
+                                                            </a>
                                                             <a class="dropdown-item" href="javascript:void(0);"
-                                                                wire:click="toggleStatus('{{ $user->id }}')">
-                                                                <i
-                                                                    class="mdi {{ $user->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
-                                                                {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                                wire:click="sendPasswordResetLink('{{ $user->id }}')">
+                                                                <i class="mdi {{ $user->email_verified_at ? 'mdi-email-send text-info' : 'mdi-email-sync text-warning' }} me-1"></i>
+                                                                {{ $user->email_verified_at ? 'Kirim Link Password' : 'Kirim Ulang Undangan' }}
                                                             </a>
-                                                            <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item text-danger"
-                                                                href="javascript:void(0);"
-                                                                wire:click="confirmDelete('{{ $user->id }}')">
-                                                                <i class="mdi mdi-trash-can me-1"></i> Hapus
-                                                            </a>
+                                                        @endcanany
+                                                        @if ($user->id !== auth()->id())
+                                                            @canany(['edit-users', 'manage-users'])
+                                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                                    wire:click="toggleStatus('{{ $user->id }}')">
+                                                                    <i
+                                                                        class="mdi {{ $user->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
+                                                                    {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                                </a>
+                                                            @endcanany
+                                                            @canany(['delete-users', 'manage-users'])
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item text-danger"
+                                                                    href="javascript:void(0);"
+                                                                    wire:click="confirmDelete('{{ $user->id }}')">
+                                                                    <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                                </a>
+                                                            @endcanany
                                                         @endif
                                                     @else
                                                         <span class="dropdown-item text-muted disabled py-1 fs-12">
-                                                            <i class="mdi mdi-shield-lock me-1 text-danger"></i>
-                                                            Terproteksi (Superadmin)
-                                                        </span>
+                                                             <i class="mdi mdi-shield-lock me-1 text-danger"></i>
+                                                             Terproteksi (Superadmin)
+                                                         </span>
                                                     @endif
                                                 </div>
                                             </div>

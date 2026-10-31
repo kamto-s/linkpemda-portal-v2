@@ -42,6 +42,11 @@ class Index extends Component
 
     public ?array $importSummary = null;
 
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('view-contacts'), 403, 'Anda tidak memiliki hak akses untuk melihat kontak.');
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -87,6 +92,8 @@ class Index extends Component
 
     public function importExcel(ContactImportService $service): void
     {
+        abort_unless(auth()->user()?->can('import-contacts') || auth()->user()?->can('create-contacts'), 403, 'Anda tidak memiliki hak akses untuk mengimpor kontak.');
+
         $this->validate([
             'importFile' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
         ], [
@@ -118,6 +125,8 @@ class Index extends Component
 
     public function toggleStatus(string $id): void
     {
+        abort_unless(auth()->user()?->can('edit-contacts'), 403, 'Anda tidak memiliki hak akses untuk mengubah data kontak.');
+
         $contact = Contact::findOrFail($id);
         $contact->update(['is_active' => ! $contact->is_active]);
         $statusText = $contact->is_active ? 'diaktifkan' : 'dinonaktifkan';
@@ -131,6 +140,8 @@ class Index extends Component
 
     public function confirmDelete(string $id): void
     {
+        abort_unless(auth()->user()?->can('delete-contacts'), 403, 'Anda tidak memiliki hak akses untuk menghapus kontak.');
+
         $contact = Contact::findOrFail($id);
         $this->contactToDeleteId = $contact->id;
         $this->contactToDeleteName = $contact->name;
@@ -140,6 +151,8 @@ class Index extends Component
 
     public function delete(?string $id = null): void
     {
+        abort_unless(auth()->user()?->can('delete-contacts'), 403, 'Anda tidak memiliki hak akses untuk menghapus kontak.');
+
         $targetId = $id ?: $this->contactToDeleteId;
 
         if (! $targetId) {

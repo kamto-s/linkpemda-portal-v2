@@ -23,8 +23,11 @@ class RolePermissionSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => UserRole::Admin->value, 'guard_name' => 'web']);
         $staffRole = Role::firstOrCreate(['name' => UserRole::Staff->value, 'guard_name' => 'web']);
 
-        // 3. Buat Permissions Dasar (Format CRUD Murni)
+        // 3. Buat Permissions Lengkap Sesuai Seluruh Modul & Menu
         $permissions = [
+            // Dashboard
+            'view-dashboard',
+
             // CMS - Artikel & Materi
             'view-posts',
             'create-posts',
@@ -32,26 +35,102 @@ class RolePermissionSeeder extends Seeder
             'delete-posts',
             'publish-posts',
 
-            // CMS - Kategori
+            // CMS - Kategori Konten
             'view-categories',
             'create-categories',
             'edit-categories',
             'delete-categories',
-            'manage-categories',
 
-            // Pengguna & Staff
+            // CMS - Jadwal Kegiatan
+            'view-schedules',
+            'create-schedules',
+            'edit-schedules',
+            'delete-schedules',
+
+            // CMS - Galeri & Media
+            'view-galleries',
+            'create-galleries',
+            'edit-galleries',
+            'delete-galleries',
+
+            // CMS - Halaman Statis (Pages)
+            'view-pages',
+            'create-pages',
+            'edit-pages',
+            'delete-pages',
+
+            // Email Marketing - Campaign
+            'view-campaigns',
+            'create-campaigns',
+            'edit-campaigns',
+            'delete-campaigns',
+            'send-campaigns',
+
+            // Email Marketing - Template Pesan
+            'view-templates',
+            'create-templates',
+            'edit-templates',
+            'delete-templates',
+
+            // Email Marketing - Kontak Penerima
+            'view-contacts',
+            'create-contacts',
+            'edit-contacts',
+            'delete-contacts',
+            'import-contacts',
+            'export-contacts',
+
+            // Administrasi - Sertifikat Digital
+            'view-certificates',
+            'create-certificates',
+            'edit-certificates',
+            'delete-certificates',
+
+            // Administrasi - Data Peserta / OPD
+            'view-participants',
+            'create-participants',
+            'edit-participants',
+            'delete-participants',
+
+            // Administrasi - Pendaftaran Masuk
+            'view-registrations',
+            'create-registrations',
+            'edit-registrations',
+            'delete-registrations',
+
+            // Administrasi - Dokumen & Regulasi
+            'view-documents',
+            'create-documents',
+            'edit-documents',
+            'delete-documents',
+
+            // Administrasi - Pesan Masuk (Kontak Kami)
+            'view-messages',
+            'reply-messages',
+            'delete-messages',
+
+            // Pengaturan - Pengguna & Staff
             'view-users',
             'create-users',
             'edit-users',
             'delete-users',
             'manage-users',
 
-            // Pengaturan Portal
+            // Pengaturan - Role & Hak Akses
+            'view-roles',
+            'create-roles',
+            'edit-roles',
+            'delete-roles',
+
+            // Pengaturan - Identitas Portal
             'view-settings',
             'edit-settings',
-            'manage-settings',
 
-            // Sistem & Role
+            // Pengaturan - Konfigurasi Sertifikat
+            'view-certificate-settings',
+            'edit-certificate-settings',
+
+            // Sistem & Developer
             'manage-system',
         ];
 
@@ -59,23 +138,14 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
 
-        // 4. Pembagian Izin ke Role:
-        // Superadmin -> Dapat SEMUA izin teknis & sistem
         $superadminRole->syncPermissions(Permission::all());
 
-        // Admin -> Dapat semua kecuali manage-system
-        $adminRole->syncPermissions(
-            Permission::where('name', '!=', 'manage-system')->get()
-        );
+        $adminRole->syncPermissions([
+            'view-dashboard',
+        ]);
 
-        // Staff -> Hanya buat/edit konten & kategori
         $staffRole->syncPermissions([
-            'view-posts',
-            'create-posts',
-            'edit-posts',
-            'view-categories',
-            'create-categories',
-            'edit-categories',
+            'view-dashboard',
         ]);
     }
 }

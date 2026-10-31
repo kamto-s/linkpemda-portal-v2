@@ -42,9 +42,11 @@
                             </p>
                         </div>
                         <div>
-                            <a href="{{ route('admin.role.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus"></i> Tambah Role
-                            </a>
+                            @canany(['create-roles', 'manage-system'])
+                                <a href="{{ route('admin.role.create') }}" wire:navigate class="btn btn-primary">
+                                    <i class="mdi mdi-plus"></i> Tambah Role
+                                </a>
+                            @endcanany
                         </div>
                     </div>
                 </div>
@@ -136,17 +138,21 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('admin.role.edit', $roleItem->id) }}"
-                                                        wire:navigate>
-                                                        <i class="mdi mdi-pencil me-1"></i> Edit
-                                                    </a>
-                                                    @if (!in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                            wire:click="confirmDelete({{ $roleItem->id }})">
-                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                    @canany(['edit-roles', 'manage-system'])
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('admin.role.edit', $roleItem->id) }}"
+                                                            wire:navigate>
+                                                            <i class="mdi mdi-pencil me-1"></i> Edit
                                                         </a>
+                                                    @endcanany
+                                                    @if (!in_array(strtolower($roleItem->name), ['superadmin', 'admin', 'staff']))
+                                                        @canany(['delete-roles', 'manage-system'])
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                                wire:click="confirmDelete({{ $roleItem->id }})">
+                                                                <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                            </a>
+                                                        @endcanany
                                                     @endif
                                                 </div>
                                             </div>

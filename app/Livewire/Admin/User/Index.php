@@ -39,7 +39,11 @@ class Index extends Component
 
     public function mount(): void
     {
-        abort_unless(Auth::user()->can('manage-users'), 403, 'Anda tidak memiliki hak akses untuk mengelola pengguna.');
+        abort_unless(
+            Auth::user()?->can('manage-users') || Auth::user()?->can('view-users'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengelola pengguna.'
+        );
     }
 
     public function updatedSearch(): void
@@ -70,7 +74,7 @@ class Index extends Component
 
     public function confirmDelete(string $id): void
     {
-        abort_unless(Auth::user()->can('manage-users'), 403);
+        abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('delete-users'), 403);
 
         if ($id === Auth::id()) {
             session()->flash('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
@@ -102,7 +106,7 @@ class Index extends Component
 
     public function delete(): void
     {
-        abort_unless(Auth::user()->can('manage-users'), 403);
+        abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('delete-users'), 403);
 
         if (! $this->userToDeleteId) {
             return;
@@ -136,7 +140,7 @@ class Index extends Component
 
     public function toggleStatus(string $id): void
     {
-        abort_unless(Auth::user()->can('manage-users'), 403);
+        abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('edit-users'), 403);
 
         if ($id === Auth::id()) {
             session()->flash('error', 'Anda tidak dapat mengubah status akun Anda sendiri.');
@@ -169,7 +173,7 @@ class Index extends Component
 
     public function sendPasswordResetLink(string $id): void
     {
-        abort_unless(Auth::user()->can('manage-users'), 403);
+        abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('edit-users'), 403);
 
         $user = User::with('roles')->findOrFail($id);
 

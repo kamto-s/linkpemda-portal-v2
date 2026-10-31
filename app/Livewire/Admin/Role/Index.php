@@ -30,7 +30,7 @@ class Index extends Component
     public function mount(): void
     {
         abort_unless(
-            Auth::user()?->hasRole('superadmin') || Auth::user()?->can('manage-system'),
+            Auth::user()?->hasRole('superadmin') || Auth::user()?->can('manage-system') || Auth::user()?->can('view-roles'),
             403,
             'Anda tidak memiliki wewenang untuk mengelola Role & Hak Akses.'
         );
@@ -49,7 +49,20 @@ class Index extends Component
 
     public function confirmDelete(int $id): void
     {
+        abort_unless(
+            Auth::user()?->hasRole('superadmin') || Auth::user()?->can('manage-system') || Auth::user()?->can('delete-roles'),
+            403,
+            'Anda tidak memiliki wewenang untuk menghapus Role.'
+        );
+
         $role = Role::withCount('users')->findOrFail($id);
+
+        // Hierarki: Non-superadmin tidak boleh mengelola role Superadmin
+        if (strtolower($role->name) === 'superadmin' && ! Auth::user()?->hasRole('superadmin')) {
+            session()->flash('error', 'Hanya Superadmin yang berwenang mengelola role Superadmin.');
+
+            return;
+        }
 
         // Lindungi 3 role bawaan sistem
         if (in_array(strtolower($role->name), ['superadmin', 'admin', 'staff'])) {
@@ -73,11 +86,25 @@ class Index extends Component
 
     public function delete(): void
     {
+        abort_unless(
+            Auth::user()?->hasRole('superadmin') || Auth::user()?->can('manage-system') || Auth::user()?->can('delete-roles'),
+            403,
+            'Anda tidak memiliki wewenang untuk menghapus Role.'
+        );
+
         if (! $this->roleToDeleteId) {
             return;
         }
 
         $role = Role::withCount('users')->findOrFail($this->roleToDeleteId);
+
+        // Hierarki: Non-superadmin tidak boleh mengelola role Superadmin
+        if (strtolower($role->name) === 'superadmin' && ! Auth::user()?->hasRole('superadmin')) {
+            session()->flash('error', 'Hanya Superadmin yang berwenang mengelola role Superadmin.');
+            $this->dispatch('close-delete-role-modal');
+
+            return;
+        }
 
         if (in_array(strtolower($role->name), ['superadmin', 'admin', 'staff']) || $role->users_count > 0) {
             session()->flash('error', 'Role tidak dapat dihapus.');
@@ -100,9 +127,14 @@ class Index extends Component
 
     public function render()
     {
+        $isSuperadmin = (bool) Auth::user()?->hasRole('superadmin');
+
         $roles = Role::query()
             ->withCount('users')
             ->with('permissions')
+            ->when(! $isSuperadmin, function ($query) {
+                $query->where('name', '!=', 'superadmin');
+            })
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%');
             })

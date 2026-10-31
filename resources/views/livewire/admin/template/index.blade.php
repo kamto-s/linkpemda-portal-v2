@@ -42,9 +42,11 @@
                             </p>
                         </div>
                         <div>
-                            <a href="{{ route('admin.template.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus"></i> Tambah
-                            </a>
+                            @can('create-templates')
+                                <a href="{{ route('admin.template.create') }}" wire:navigate class="btn btn-primary">
+                                    <i class="mdi mdi-plus"></i> Tambah
+                                </a>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -173,30 +175,38 @@
                                                         wire:navigate>
                                                         <i class="mdi mdi-eye me-1"></i> Pratinjau
                                                     </a>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('admin.template.edit', $item->id) }}"
-                                                        wire:navigate>
-                                                        <i class="mdi mdi-pencil me-1"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('admin.campaign.create', ['template' => $item->id]) }}"
-                                                        wire:navigate>
-                                                        <i class="mdi mdi-send me-1"></i> Buat Campaign
-                                                    </a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        wire:click="toggleStatus('{{ $item->id }}')">
-                                                        <i class="mdi {{ $item->is_active ? 'mdi-close-circle text-warning' : 'mdi-check-circle text-success' }} me-1"></i>
-                                                        {{ $item->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                                    </a>
-                                                    @if (!$item->is_system)
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-danger"
-                                                            href="javascript:void(0);"
-                                                            wire:click="confirmDelete('{{ $item->id }}')">
-                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                    @can('edit-templates')
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('admin.template.edit', $item->id) }}"
+                                                            wire:navigate>
+                                                            <i class="mdi mdi-pencil me-1"></i> Edit
                                                         </a>
-                                                    @endif
+                                                    @endcan
+                                                    @can('create-campaigns')
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('admin.campaign.create', ['template' => $item->id]) }}"
+                                                            wire:navigate>
+                                                            <i class="mdi mdi-send me-1"></i> Buat Campaign
+                                                        </a>
+                                                    @endcan
+                                                    @can('edit-templates')
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="toggleStatus('{{ $item->id }}')">
+                                                            <i class="mdi {{ $item->is_active ? 'mdi-close-circle text-warning' : 'mdi-check-circle text-success' }} me-1"></i>
+                                                            {{ $item->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete-templates')
+                                                        @if (!$item->is_system)
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item text-danger"
+                                                                href="javascript:void(0);"
+                                                                wire:click="confirmDelete('{{ $item->id }}')">
+                                                                <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                            </a>
+                                                        @endif
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </td>

@@ -27,7 +27,9 @@
                             </p>
                         </div>
                         <div>
-                            <a href="" class="btn btn-primary"><i class="mdi mdi-plus"></i> Tambah</a>
+                            @can('create-categories')
+                                <a href="" class="btn btn-primary"><i class="mdi mdi-plus"></i> Tambah</a>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -62,11 +64,15 @@
                                                 <i class="mdi mdi-dots-vertical"></i>
                                             </button>
                                             <div class="dropdown-menu shadow-sm" style="z-index: 9999;">
-                                                <a class="dropdown-item" href="#"><i
-                                                        class="mdi mdi-pencil me-1"></i> Edit</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item text-danger" href="#"><i
-                                                        class="mdi mdi-trash-can me-1"></i> Delete</a>
+                                                @can('edit-categories')
+                                                    <a class="dropdown-item" href="#"><i
+                                                            class="mdi mdi-pencil me-1"></i> Edit</a>
+                                                @endcan
+                                                @can('delete-categories')
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="#"><i
+                                                            class="mdi mdi-trash-can me-1"></i> Delete</a>
+                                                @endcan
                                             </div>
                                         </div>
                                     </td>

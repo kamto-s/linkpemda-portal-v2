@@ -40,17 +40,23 @@
                             <p class="mb-0"> Kelola data kontak sasaran promosi dan pengiriman email.</p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
-                            <button type="button" class="btn btn-soft-success waves-effect waves-light"
-                                wire:click="openImportModal">
-                                <i class="mdi mdi-file-excel"></i> Import Excel
-                            </button>
-                            <a href="{{ route('admin.campaign.create') }}" wire:navigate
-                                class="btn btn-soft-primary waves-effect waves-light">
-                                <i class="mdi mdi-email-send-outline"></i> Kirim Email
-                            </a>
-                            <a href="{{ route('admin.contact.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus"></i> Tambah
-                            </a>
+                            @canany(['import-contacts', 'create-contacts'])
+                                <button type="button" class="btn btn-soft-success waves-effect waves-light"
+                                    wire:click="openImportModal">
+                                    <i class="mdi mdi-file-excel"></i> Import Excel
+                                </button>
+                            @endcanany
+                            @can('create-campaigns')
+                                <a href="{{ route('admin.campaign.create') }}" wire:navigate
+                                    class="btn btn-soft-primary waves-effect waves-light">
+                                    <i class="mdi mdi-email-send-outline"></i> Kirim Email
+                                </a>
+                            @endcan
+                            @can('create-contacts')
+                                <a href="{{ route('admin.contact.create') }}" wire:navigate class="btn btn-primary">
+                                    <i class="mdi mdi-plus"></i> Tambah
+                                </a>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -179,22 +185,26 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('admin.contact.edit', $contact->id) }}"
-                                                        wire:navigate>
-                                                        <i class="mdi mdi-pencil me-1"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item" href="javascript:void(0);"
-                                                        wire:click="toggleStatus('{{ $contact->id }}')">
-                                                        <i
-                                                            class="mdi {{ $contact->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
-                                                        {{ $contact->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                                    </a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                        wire:click="confirmDelete('{{ $contact->id }}')">
-                                                        <i class="mdi mdi-trash-can me-1"></i> Hapus
-                                                    </a>
+                                                    @can('edit-contacts')
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('admin.contact.edit', $contact->id) }}"
+                                                            wire:navigate>
+                                                            <i class="mdi mdi-pencil me-1"></i> Edit
+                                                        </a>
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="toggleStatus('{{ $contact->id }}')">
+                                                            <i
+                                                                class="mdi {{ $contact->is_active ? 'mdi-account-off text-warning' : 'mdi-account-check text-success' }} me-1"></i>
+                                                            {{ $contact->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete-contacts')
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                            wire:click="confirmDelete('{{ $contact->id }}')">
+                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                        </a>
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </td>

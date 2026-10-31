@@ -190,13 +190,6 @@
                 <div class="alert-box">
                     <strong>Perhatian:</strong> Tautan pengaturan password ini hanya berlaku selama <strong>60 menit</strong>. Jika Anda tidak merasa didaftarkan, silakan abaikan email ini.
                 </div>
-
-                <div class="divider"></div>
-
-                <div class="fallback">
-                    Jika tombol di atas tidak berfungsi, salin dan tempel URL berikut ke browser Anda:<br>
-                    <a href="{{ $resetUrl }}">{{ $resetUrl }}</a>
-                </div>
             </div>
 
             <div class="footer">

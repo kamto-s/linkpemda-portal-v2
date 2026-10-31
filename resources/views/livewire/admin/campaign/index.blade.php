@@ -42,9 +42,11 @@
                             </p>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-primary">
-                                <i class="mdi mdi-plus"></i> Tambah
-                            </a>
+                            @can('create-campaigns')
+                                <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-primary">
+                                    <i class="mdi mdi-plus"></i> Tambah
+                                </a>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -161,15 +163,19 @@
                                                         <i class="mdi mdi-eye-outline me-1"></i> Detail & Monitoring
                                                     </a>
                                                     @if ($campaign->status->value === 'draft')
-                                                        <a class="dropdown-item" wire:navigate href="{{ route('admin.campaign.edit', $campaign->id) }}">
-                                                            <i class="mdi mdi-pencil me-1"></i> Edit Draft
-                                                        </a>
+                                                        @can('edit-campaigns')
+                                                            <a class="dropdown-item" wire:navigate href="{{ route('admin.campaign.edit', $campaign->id) }}">
+                                                                <i class="mdi mdi-pencil me-1"></i> Edit Draft
+                                                            </a>
+                                                        @endcan
                                                     @endif
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                        wire:click="confirmDelete('{{ $campaign->id }}')">
-                                                        <i class="mdi mdi-trash-can me-1"></i> Hapus
-                                                    </a>
+                                                    @can('delete-campaigns')
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                            wire:click="confirmDelete('{{ $campaign->id }}')">
+                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
+                                                        </a>
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </td>

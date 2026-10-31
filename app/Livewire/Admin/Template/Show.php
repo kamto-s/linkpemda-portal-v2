@@ -17,6 +17,8 @@ class Show extends Component
 
     public function mount(EmailTemplate|string $template): void
     {
+        abort_unless(auth()->user()?->can('view-templates'), 403, 'Anda tidak memiliki hak akses untuk melihat template email.');
+
         $this->template = $template instanceof EmailTemplate ? $template : EmailTemplate::findOrFail($template);
     }
 
@@ -27,6 +29,8 @@ class Show extends Component
 
     public function toggleActive(): void
     {
+        abort_unless(auth()->user()?->can('edit-templates'), 403, 'Anda tidak memiliki hak akses untuk mengubah template email.');
+
         $this->template->update(['is_active' => ! $this->template->is_active]);
         $this->template->refresh();
         session()->flash('success', 'Status keaktifan template berhasil diubah.');
@@ -34,6 +38,8 @@ class Show extends Component
 
     public function delete(): mixed
     {
+        abort_unless(auth()->user()?->can('delete-templates'), 403, 'Anda tidak memiliki hak akses untuk menghapus template email.');
+
         if ($this->template->is_system) {
             session()->flash('error', 'Template bawaan sistem tidak dapat dihapus.');
 

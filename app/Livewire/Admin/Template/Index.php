@@ -30,6 +30,11 @@ class Index extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('view-templates'), 403, 'Anda tidak memiliki hak akses untuk melihat template email.');
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -53,6 +58,8 @@ class Index extends Component
 
     public function toggleStatus(string $id): void
     {
+        abort_unless(auth()->user()?->can('edit-templates'), 403, 'Anda tidak memiliki hak akses untuk mengubah template email.');
+
         $tpl = EmailTemplate::findOrFail($id);
         $tpl->update(['is_active' => ! $tpl->is_active]);
         $statusText = $tpl->is_active ? 'diaktifkan' : 'dinonaktifkan';
@@ -66,6 +73,8 @@ class Index extends Component
 
     public function confirmDelete(string $id): void
     {
+        abort_unless(auth()->user()?->can('delete-templates'), 403, 'Anda tidak memiliki hak akses untuk menghapus template email.');
+
         $tpl = EmailTemplate::findOrFail($id);
 
         if ($tpl->is_system) {
@@ -82,6 +91,8 @@ class Index extends Component
 
     public function delete(?string $id = null): void
     {
+        abort_unless(auth()->user()?->can('delete-templates'), 403, 'Anda tidak memiliki hak akses untuk menghapus template email.');
+
         $targetId = $id ?: $this->templateToDeleteId;
 
         if (! $targetId) {

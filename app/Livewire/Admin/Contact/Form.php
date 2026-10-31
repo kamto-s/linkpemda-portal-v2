@@ -31,6 +31,8 @@ class Form extends Component
     public function mount(Contact|string|null $contact = null): void
     {
         if ($contact) {
+            abort_unless(auth()->user()?->can('edit-contacts'), 403, 'Anda tidak memiliki hak akses untuk mengubah data kontak.');
+
             $this->contact = $contact instanceof Contact ? $contact : Contact::findOrFail($contact);
             $this->isEditing = true;
 
@@ -42,6 +44,8 @@ class Form extends Component
             $this->category = $this->contact->category->value;
             $this->is_active = (bool) $this->contact->is_active;
         } else {
+            abort_unless(auth()->user()?->can('create-contacts'), 403, 'Anda tidak memiliki hak akses untuk menambah kontak baru.');
+
             $this->isEditing = false;
             $this->category = 'pemerintah';
             $this->is_active = true;
@@ -74,6 +78,12 @@ class Form extends Component
 
     public function save(): mixed
     {
+        if ($this->isEditing && $this->contact) {
+            abort_unless(auth()->user()?->can('edit-contacts'), 403, 'Anda tidak memiliki hak akses untuk mengubah data kontak.');
+        } else {
+            abort_unless(auth()->user()?->can('create-contacts'), 403, 'Anda tidak memiliki hak akses untuk menambah kontak baru.');
+        }
+
         $validated = $this->validate();
 
         if ($this->isEditing && $this->contact) {

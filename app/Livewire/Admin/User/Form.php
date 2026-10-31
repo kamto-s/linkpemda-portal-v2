@@ -35,9 +35,9 @@ class Form extends Component
 
     public function mount(User|string|null $user = null): void
     {
-        abort_unless(Auth::user()?->can('manage-users'), 403, 'Anda tidak memiliki hak akses untuk mengelola pengguna.');
-
         if ($user) {
+            abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('edit-users'), 403, 'Anda tidak memiliki hak akses untuk mengubah pengguna.');
+
             $this->user = $user instanceof User ? $user : User::findOrFail($user);
 
             // Hierarki: Admin biasa tidak boleh membuka form edit Superadmin
@@ -51,6 +51,8 @@ class Form extends Component
             $this->isActive = (bool) $this->user->is_active;
             $this->isEditing = true;
         } else {
+            abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('create-users'), 403, 'Anda tidak memiliki hak akses untuk menambah pengguna baru.');
+
             $this->role = UserRole::Staff->value;
             $this->isActive = true;
             $this->isEditing = false;
@@ -59,7 +61,11 @@ class Form extends Component
 
     public function save(): mixed
     {
-        abort_unless(Auth::user()?->can('manage-users'), 403);
+        if ($this->isEditing) {
+            abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('edit-users'), 403);
+        } else {
+            abort_unless(Auth::user()?->can('manage-users') || Auth::user()?->can('create-users'), 403);
+        }
 
         $assignableRoles = $this->getAssignableRoles();
         $roleValues = implode(',', array_map(fn ($r) => $r->value, $assignableRoles));

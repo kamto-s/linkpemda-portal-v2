@@ -112,13 +112,6 @@
                                     <textarea id="tinymce-template-editor">{!! $body_content !!}</textarea>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-2">
-                                    <small class="text-muted fs-11">
-                                        <i class="mdi mdi-information-outline me-1"></i> Variabel <code>{nama}</code>,
-                                        <code>{instansi}</code>, <code>{jabatan}</code>, dan <code>{email}</code> akan
-                                        otomatis digantikan sesuai data kontak penerima saat campaign dikirim.
-                                    </small>
-                                </div>
                                 @error('body_content')
                                     <div class="text-danger fs-12 mt-1">{{ $message }}</div>
                                 @enderror
@@ -175,6 +168,11 @@
             border-radius: 8px !important;
         }
 
+        .tox .tox-throbber,
+        .tox-throbber {
+            display: none !important;
+        }
+
         .tox .tox-toolbar-overlord,
         .tox .tox-toolbar,
         .tox .tox-toolbar__primary {
@@ -196,14 +194,15 @@
 @endpush
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/libs/tinymce/tinymce.min.js') }}"></script>
     <script>
         let templateEditor = null;
+        let isInitializingTemplate = false;
 
         function initTemplateTinyMCE() {
             const textareaEl = document.getElementById('tinymce-template-editor');
             if (!textareaEl) {
                 templateEditor = null;
+                isInitializingTemplate = false;
                 return;
             }
 
@@ -212,9 +211,25 @@
                 return;
             }
 
-            if (tinymce.get('tinymce-template-editor')) {
-                tinymce.get('tinymce-template-editor').remove();
+            // Gunakan instance yang masih aktif dan valid di DOM jika sudah terpasang
+            const existing = tinymce.get('tinymce-template-editor');
+            if (existing) {
+                if (existing.initialized && existing.getContainer() && document.body.contains(existing.getContainer())) {
+                    templateEditor = existing;
+                    return;
+                }
+                // Jika sedang dalam proses inisialisasi asinkron, jangan ganggu
+                if (isInitializingTemplate || !existing.initialized) {
+                    return;
+                }
+                try {
+                    existing.destroy();
+                } catch (e) {
+                    console.warn('TinyMCE cleanup warning:', e);
+                }
             }
+
+            isInitializingTemplate = true;
 
             tinymce.init({
                 selector: '#tinymce-template-editor',
@@ -222,6 +237,8 @@
                 height: 550,
                 base_url: '{{ asset('assets/admin/libs/tinymce') }}',
                 suffix: '.min',
+                skin: false,
+                content_css: '{{ asset('assets/admin/libs/tinymce/skins/content/default/content.min.css') }}',
                 menubar: 'file edit view insert format tools table',
                 menu: {
                     file: {
@@ -234,11 +251,11 @@
                     },
                     view: {
                         title: 'View',
-                        items: 'code visualaid visualchars visualblocks | preview fullscreen'
+                        items: 'code visualaid | preview fullscreen'
                     },
                     insert: {
                         title: 'Insert',
-                        items: 'image link media inserttable | charmap emoticons hr | pagebreak nonbreaking anchor'
+                        items: 'image link inserttable | charmap emoticons hr'
                     },
                     format: {
                         title: 'Format',
@@ -253,7 +270,7 @@
                         items: 'inserttable | cell row column | tableprops deletetable'
                     }
                 },
-                plugins: 'accordion advlist anchor autolink autosave charmap code directionality emoticons fullscreen image insertdatetime link lists media nonbreaking pagebreak preview quickbars searchreplace table visualblocks visualchars wordcount',
+                plugins: 'advlist anchor autolink charmap code emoticons fullscreen image link lists preview quickbars searchreplace table wordcount',
                 toolbar: [
                     'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | removeformat',
                     'alignleft aligncenter alignright alignjustify | lineheight | bullist numlist | outdent indent | table link image imgfullwidth components | hr emoticons | code fullscreen'
@@ -810,6 +827,21 @@
                         scope: 'node'
                     });
 
+                    editor.on('init', function() {
+                        isInitializingTemplate = false;
+                        templateEditor = editor;
+                        try {
+                            editor.setProgressState(false);
+                        } catch (e) {}
+                    });
+
+                    editor.on('remove', function() {
+                        if (templateEditor === editor) {
+                            templateEditor = null;
+                        }
+                        isInitializingTemplate = false;
+                    });
+
                     editor.on('change keyup NodeChange', function() {
                         if (window.Livewire) {
                             @this.set('body_content', editor.getContent(), false);
@@ -819,7 +851,23 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initTemplateTinyMCE);
+        // Cleanup instance saat berpindah halaman via wire:navigate
+        document.addEventListener('livewire:navigating', function cleanupTemplateEditor() {
+            isInitializingTemplate = false;
+            if (templateEditor) {
+                try {
+                    templateEditor.destroy();
+                } catch (e) {}
+                templateEditor = null;
+            }
+        }, { once: true });
+
+        // Inisialisasi aman
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTemplateTinyMCE);
+        } else {
+            initTemplateTinyMCE();
+        }
         document.addEventListener('livewire:navigated', initTemplateTinyMCE);
 
         window.insertVariable = function(tag) {

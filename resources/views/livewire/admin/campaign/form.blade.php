@@ -795,9 +795,25 @@
             border-radius: 0.2rem;
         }
 
+        .tinymce-wrapper {
+            position: relative;
+            background: #fff;
+            min-height: 550px;
+        }
+
+        .tinymce-wrapper textarea {
+            visibility: hidden;
+            height: 550px;
+        }
+
         .tox-tinymce {
             border-color: #dee2e6 !important;
             border-radius: 6px !important;
+        }
+
+        .tox .tox-throbber,
+        .tox-throbber {
+            display: none !important;
         }
 
         .tox .tox-menubar {
@@ -838,14 +854,15 @@
 @endpush
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/libs/tinymce/tinymce.min.js') }}"></script>
     <script>
         let campaignEditor = null;
+        let isInitializingCampaign = false;
 
         function initTinyMCE() {
             const textareaEl = document.getElementById('tinymce-editor');
             if (!textareaEl) {
                 campaignEditor = null;
+                isInitializingCampaign = false;
                 return;
             }
 
@@ -854,9 +871,25 @@
                 return;
             }
 
-            if (tinymce.get('tinymce-editor')) {
-                tinymce.get('tinymce-editor').remove();
+            // Gunakan instance yang masih aktif dan valid di DOM jika sudah terpasang
+            const existing = tinymce.get('tinymce-editor');
+            if (existing) {
+                if (existing.initialized && existing.getContainer() && document.body.contains(existing.getContainer())) {
+                    campaignEditor = existing;
+                    return;
+                }
+                // Jika sedang dalam proses inisialisasi asinkron, jangan ganggu
+                if (isInitializingCampaign || !existing.initialized) {
+                    return;
+                }
+                try {
+                    existing.destroy();
+                } catch (e) {
+                    console.warn('TinyMCE cleanup warning:', e);
+                }
             }
+
+            isInitializingCampaign = true;
 
             tinymce.init({
                 selector: '#tinymce-editor',
@@ -865,6 +898,8 @@
                 height: 550,
                 base_url: '{{ asset('assets/admin/libs/tinymce') }}',
                 suffix: '.min',
+                skin: false,
+                content_css: '{{ asset('assets/admin/libs/tinymce/skins/content/default/content.min.css') }}',
                 menubar: 'file edit view insert format tools table',
                 menu: {
                     file: {
@@ -877,11 +912,11 @@
                     },
                     view: {
                         title: 'View',
-                        items: 'code visualaid visualchars visualblocks | preview fullscreen'
+                        items: 'code visualaid | preview fullscreen'
                     },
                     insert: {
                         title: 'Insert',
-                        items: 'image link media inserttable | charmap emoticons hr | pagebreak nonbreaking anchor'
+                        items: 'image link inserttable | charmap emoticons hr'
                     },
                     format: {
                         title: 'Format',
@@ -896,7 +931,7 @@
                         items: 'inserttable | cell row column | tableprops deletetable'
                     }
                 },
-                plugins: 'accordion advlist anchor autolink autosave charmap code directionality emoticons fullscreen image insertdatetime link lists media nonbreaking pagebreak preview quickbars searchreplace table visualblocks visualchars wordcount',
+                plugins: 'advlist anchor autolink charmap code emoticons fullscreen image link lists preview quickbars searchreplace table wordcount',
                 toolbar: [
                     'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | removeformat',
                     'alignleft aligncenter alignright alignjustify | lineheight | bullist numlist | outdent indent | table link image imgfullwidth components | hr emoticons | code fullscreen'
@@ -1482,6 +1517,21 @@
                         scope: 'node'
                     });
 
+                    editor.on('init', function() {
+                        isInitializingCampaign = false;
+                        campaignEditor = editor;
+                        try {
+                            editor.setProgressState(false);
+                        } catch (e) {}
+                    });
+
+                    editor.on('remove', function() {
+                        if (campaignEditor === editor) {
+                            campaignEditor = null;
+                        }
+                        isInitializingCampaign = false;
+                    });
+
                     editor.on('change keyup NodeChange', function() {
                         if (window.Livewire) {
                             @this.set('body_content', editor.getContent(), false);
@@ -1491,7 +1541,23 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initTinyMCE);
+        // Cleanup instance saat berpindah halaman via wire:navigate
+        document.addEventListener('livewire:navigating', function cleanupCampaignEditor() {
+            isInitializingCampaign = false;
+            if (campaignEditor) {
+                try {
+                    campaignEditor.destroy();
+                } catch (e) {}
+                campaignEditor = null;
+            }
+        }, { once: true });
+
+        // Inisialisasi aman
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTinyMCE);
+        } else {
+            initTinyMCE();
+        }
         document.addEventListener('livewire:navigated', initTinyMCE);
 
         window.getEditorContent = function() {
@@ -1510,6 +1576,15 @@
         window.handleStepClick = function(step) {
             const content = getEditorContent();
             @this.call('goToStep', step, content);
+            if (step === 1 && campaignEditor) {
+                setTimeout(function() {
+                    try {
+                        if (campaignEditor.iframeElement) {
+                            campaignEditor.fire('resize');
+                        }
+                    } catch (e) {}
+                }, 100);
+            }
         };
 
         window.handleSaveDraft = function() {

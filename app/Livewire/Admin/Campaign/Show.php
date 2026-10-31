@@ -22,6 +22,8 @@ class Show extends Component
 
     public function mount(EmailCampaign $campaign): void
     {
+        abort_unless(auth()->user()?->can('view-campaigns'), 403, 'Anda tidak memiliki hak akses untuk melihat detail campaign email.');
+
         $this->campaign = $campaign;
     }
 
@@ -33,6 +35,8 @@ class Show extends Component
 
     public function retryFailed(): void
     {
+        abort_unless(auth()->user()?->can('send-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengirim ulang email blast.');
+
         $failedRecipients = $this->campaign->recipients()
             ->where('status', RecipientStatus::Failed->value)
             ->get();

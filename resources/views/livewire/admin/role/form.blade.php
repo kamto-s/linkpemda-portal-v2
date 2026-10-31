@@ -72,18 +72,45 @@
                         <!-- Tabel Matriks CRUD Murni Sederhana -->
                         <div class="table-responsive" style="overflow: visible;">
                             <table class="table table-hover align-middle mb-0 text-center">
-                                <thead class="table-light">
+                                <thead class="table-light sticky-top" style="top: var(--bs-topbar-height, 70px); z-index: 95;">
                                     <tr>
-                                        <th class="text-start ps-3" style="width: 30%;">Fitur / Modul</th>
-                                        <th style="width: 14%;">Lihat</th>
-                                        <th style="width: 14%;">Tambah</th>
-                                        <th style="width: 14%;">Ubah</th>
-                                        <th style="width: 14%;">Hapus</th>
-                                        <th style="width: 14%;">Semua</th>
+                                        <th class="text-start ps-3 py-3 bg-light sticky-matrix-th"
+                                            style="width: 30%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Fitur / Modul
+                                        </th>
+                                        <th class="py-3 bg-light sticky-matrix-th"
+                                            style="width: 14%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Lihat
+                                        </th>
+                                        <th class="py-3 bg-light sticky-matrix-th"
+                                            style="width: 14%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Tambah
+                                        </th>
+                                        <th class="py-3 bg-light sticky-matrix-th"
+                                            style="width: 14%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Ubah
+                                        </th>
+                                        <th class="py-3 bg-light sticky-matrix-th"
+                                            style="width: 14%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Hapus
+                                        </th>
+                                        <th class="py-3 bg-light sticky-matrix-th"
+                                            style="width: 14%; position: sticky; top: var(--bs-topbar-height, 70px); z-index: 95; background-color: var(--bs-light, #f8f9fa) !important; box-shadow: inset 0 -1px 0 var(--bs-border-color), 0 2px 4px rgba(0,0,0,0.05);">
+                                            Semua
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $currentGroup = null; @endphp
                                     @foreach ($matrixFeatures as $feat)
+                                        @if (!empty($feat['group']) && $feat['group'] !== $currentGroup)
+                                            @php $currentGroup = $feat['group']; @endphp
+                                            <tr class="table-light">
+                                                <td colspan="6" class="text-start ps-3 py-2 fw-bold text-uppercase fs-11 text-primary bg-light border-top border-bottom">
+                                                    <i class="bx bx-folder-open me-1"></i> {{ $currentGroup }}
+                                                </td>
+                                            </tr>
+                                        @endif
                                         @php
                                             $rowKeys = array_values(
                                                 array_filter([

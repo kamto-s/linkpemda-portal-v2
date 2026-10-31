@@ -22,6 +22,11 @@ class Index extends Component
 
     public int $perPage = 10;
 
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('view-categories'), 403, 'Anda tidak memiliki hak akses untuk melihat kategori.');
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();

@@ -27,6 +27,8 @@ class Form extends Component
     public function mount(EmailTemplate|string|null $template = null): void
     {
         if ($template) {
+            abort_unless(auth()->user()?->can('edit-templates'), 403, 'Anda tidak memiliki hak akses untuk mengubah template email.');
+
             $this->template = $template instanceof EmailTemplate ? $template : EmailTemplate::findOrFail($template);
             $this->isEditing = true;
 
@@ -36,6 +38,8 @@ class Form extends Component
             $this->body_content = $this->template->body_content;
             $this->is_active = (bool) $this->template->is_active;
         } else {
+            abort_unless(auth()->user()?->can('create-templates'), 403, 'Anda tidak memiliki hak akses untuk menambah template email baru.');
+
             $this->isEditing = false;
             $this->category = 'marketing';
             $this->is_active = true;
@@ -70,6 +74,12 @@ class Form extends Component
 
     public function save(?string $content = null): mixed
     {
+        if ($this->isEditing && $this->template) {
+            abort_unless(auth()->user()?->can('edit-templates'), 403, 'Anda tidak memiliki hak akses untuk mengubah template email.');
+        } else {
+            abort_unless(auth()->user()?->can('create-templates'), 403, 'Anda tidak memiliki hak akses untuk menambah template baru.');
+        }
+
         if ($content !== null && $content !== '') {
             $this->body_content = $content;
         }

@@ -30,6 +30,11 @@ class Index extends Component
 
     public string $campaignToDeleteTitle = '';
 
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->can('view-campaigns'), 403, 'Anda tidak memiliki hak akses untuk melihat campaign email.');
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -48,6 +53,8 @@ class Index extends Component
 
     public function confirmDelete(string $id): void
     {
+        abort_unless(auth()->user()?->can('delete-campaigns'), 403, 'Anda tidak memiliki hak akses untuk menghapus campaign email.');
+
         $campaign = EmailCampaign::findOrFail($id);
         $this->campaignToDeleteId = $campaign->id;
         $this->campaignToDeleteTitle = $campaign->title;
@@ -57,6 +64,8 @@ class Index extends Component
 
     public function delete(?string $id = null): void
     {
+        abort_unless(auth()->user()?->can('delete-campaigns'), 403, 'Anda tidak memiliki hak akses untuk menghapus campaign email.');
+
         $targetId = $id ?: $this->campaignToDeleteId;
 
         if (! $targetId) {
