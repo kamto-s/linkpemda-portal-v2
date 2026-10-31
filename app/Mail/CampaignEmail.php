@@ -16,6 +16,8 @@ class CampaignEmail extends Mailable
 
     public string $renderedContent;
 
+    public string $renderedSubject;
+
     /**
      * Create a new message instance.
      */
@@ -23,7 +25,8 @@ class CampaignEmail extends Mailable
         public EmailCampaign $campaign,
         public Contact $contact
     ) {
-        $this->renderedContent = $this->parseVariables($this->campaign->body_content, $this->contact);
+        $this->renderedContent = $this->parseVariables($this->campaign->body_content, $this->contact, true);
+        $this->renderedSubject = $this->parseVariables($this->campaign->subject, $this->contact, false);
     }
 
     /**
@@ -32,7 +35,7 @@ class CampaignEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->campaign->subject,
+            subject: $this->renderedSubject,
         );
     }
 
@@ -47,23 +50,27 @@ class CampaignEmail extends Mailable
                 'campaign' => $this->campaign,
                 'contact' => $this->contact,
                 'renderedContent' => $this->renderedContent,
-                'subject' => $this->campaign->subject,
+                'subject' => $this->renderedSubject,
             ],
         );
     }
 
     /**
-     * Parse template variables {nama}, {instansi}, {perusahaan}, {jabatan}, {email}
+     * Parse template variables {nama}, {instansi}, {perusahaan}, {jabatan}, {email}, {kategori}
      */
-    protected function parseVariables(string $content, Contact $contact): string
+    protected function parseVariables(string $content, Contact $contact, bool $escape = true): string
     {
+        $organization = $contact->organization_name ?? '-';
+        $position = $contact->position ?? '-';
+        $category = $contact->category ? (method_exists($contact->category, 'label') ? $contact->category->label() : (string) $contact->category) : 'Umum';
+
         $replacements = [
-            '{nama}' => e($contact->name),
-            '{instansi}' => e($contact->organization_name),
-            '{perusahaan}' => e($contact->organization_name),
-            '{jabatan}' => e($contact->position ?? '-'),
-            '{email}' => e($contact->email),
-            '{kategori}' => e($contact->category->label()),
+            '{nama}' => $escape ? e($contact->name) : $contact->name,
+            '{instansi}' => $escape ? e($organization) : $organization,
+            '{perusahaan}' => $escape ? e($organization) : $organization,
+            '{jabatan}' => $escape ? e($position) : $position,
+            '{email}' => $escape ? e($contact->email) : $contact->email,
+            '{kategori}' => $escape ? e($category) : $category,
         ];
 
         return str_ireplace(array_keys($replacements), array_values($replacements), $content);

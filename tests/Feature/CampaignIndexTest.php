@@ -5,6 +5,7 @@ use App\Enums\ContactCategory;
 use App\Enums\RecipientStatus;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
 use App\Livewire\Admin\Campaign\Show;
+use App\Mail\CampaignEmail;
 use App\Models\Contact;
 use App\Models\EmailCampaign;
 use App\Models\EmailCampaignRecipient;
@@ -105,4 +106,28 @@ test('authenticated user can view campaign show page with duration and recipient
         ->assertSee('Bpk. Hendra');
 
     expect($campaign->delivery_duration)->not->toBeNull();
+});
+
+test('campaign email parses template variables in both subject and body', function () {
+    $campaign = EmailCampaign::create([
+        'title' => 'Promo Bimtek',
+        'subject' => 'Khusus Rekan {instansi}: Halo {nama}!',
+        'body_content' => '<p>Halo {nama} dari {instansi}</p>',
+        'status' => CampaignStatus::Draft,
+        'total_recipients' => 1,
+    ]);
+
+    $contact = Contact::create([
+        'name' => 'Kamto Pratama',
+        'email' => 'kamto@example.com',
+        'organization_name' => 'PT Solusi Teknologi Nusantara',
+        'category' => ContactCategory::Swasta,
+        'is_active' => true,
+    ]);
+
+    $mailable = new CampaignEmail($campaign, $contact);
+
+    expect($mailable->renderedSubject)->toBe('Khusus Rekan PT Solusi Teknologi Nusantara: Halo Kamto Pratama!');
+    expect($mailable->renderedContent)->toContain('PT Solusi Teknologi Nusantara');
+    expect($mailable->renderedContent)->toContain('Kamto Pratama');
 });

@@ -1,0 +1,185 @@
+<?php
+
+namespace App\Livewire\Admin\SystemSetting;
+
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+#[Layout('layouts.admin.app')]
+#[Title('Pengaturan Sistem')]
+class Index extends Component
+{
+    use WithPagination;
+
+    public string $pageTitle = 'Pengaturan Sistem';
+
+    public string $search = '';
+
+    public int $perPage = 10;
+
+    // Form Modal State
+    public ?string $settingId = null;
+
+    public string $key = '';
+
+    public ?string $value = '';
+
+    public ?string $description = '';
+
+    public bool $isEditing = false;
+
+    // Delete Modal State
+    public ?string $settingToDeleteId = null;
+
+    public string $settingToDeleteKey = '';
+
+    protected string $paginationTheme = 'bootstrap';
+
+    public function mount(): void
+    {
+        abort_unless(
+            Auth::user()?->hasRole('superadmin'),
+            403,
+            'Hanya Superadmin yang memiliki hak akses untuk mengelola Pengaturan Sistem.'
+        );
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search']);
+        $this->resetPage();
+    }
+
+    public function openCreateModal(): void
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        $this->reset(['settingId', 'key', 'value', 'description']);
+        $this->isEditing = false;
+        $this->resetValidation();
+
+        $this->dispatch('open-setting-modal');
+    }
+
+    public function edit(string $id): void
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        $setting = SystemSetting::findOrFail($id);
+
+        $this->settingId = $setting->id;
+        $this->key = (string) ($setting->key ?? $setting->setting_key ?? '');
+        $this->value = (string) ($setting->value ?? $setting->setting_value ?? '');
+        $this->description = $setting->description ?? '';
+        $this->isEditing = true;
+        $this->resetValidation();
+
+        $this->dispatch('open-setting-modal');
+    }
+
+    public function save(): void
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        $keyColumn = Schema::hasColumn('system_settings', 'key') ? 'key' : 'setting_key';
+        $valColumn = Schema::hasColumn('system_settings', 'value') ? 'value' : 'setting_value';
+
+        $this->validate([
+            'key' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z0-9_\-\.]+$/',
+                Rule::unique('system_settings', $keyColumn)->ignore($this->settingId),
+            ],
+            'value' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'key.required' => 'Key pengaturan wajib diisi.',
+            'key.unique' => 'Key pengaturan ini sudah digunakan.',
+            'key.regex' => 'Key pengaturan hanya boleh berisi huruf, angka, garis bawah (_), titik (.), atau tanda hubung (-).',
+            'description.max' => 'Deskripsi tidak boleh melebihi 1000 karakter.',
+        ]);
+
+        $data = [
+            $keyColumn => $this->key,
+            $valColumn => $this->value,
+            'description' => $this->description,
+        ];
+
+        if ($this->isEditing && $this->settingId) {
+            $setting = SystemSetting::findOrFail($this->settingId);
+            $setting->update($data);
+
+            session()->flash('success', "Pengaturan \"{$this->key}\" berhasil diperbarui.");
+        } else {
+            SystemSetting::create($data);
+
+            session()->flash('success', "Pengaturan baru \"{$this->key}\" berhasil ditambahkan.");
+        }
+
+        $this->dispatch('close-setting-modal');
+        $this->reset(['settingId', 'key', 'value', 'description', 'isEditing']);
+    }
+
+    public function confirmDelete(string $id): void
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        $setting = SystemSetting::findOrFail($id);
+
+        $this->settingToDeleteId = $setting->id;
+        $this->settingToDeleteKey = (string) ($setting->key ?? $setting->setting_key ?? '');
+
+        $this->dispatch('open-delete-setting-modal');
+    }
+
+    public function delete(): void
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        if (! $this->settingToDeleteId) {
+            return;
+        }
+
+        $setting = SystemSetting::findOrFail($this->settingToDeleteId);
+        $keyName = $setting->key ?? $setting->setting_key ?? '';
+        $setting->delete();
+
+        session()->flash('success', "Pengaturan \"{$keyName}\" berhasil dihapus.");
+        $this->dispatch('close-delete-setting-modal');
+        $this->reset(['settingToDeleteId', 'settingToDeleteKey']);
+    }
+
+    public function render()
+    {
+        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
+
+        $keyColumn = Schema::hasColumn('system_settings', 'key') ? 'key' : 'setting_key';
+        $valColumn = Schema::hasColumn('system_settings', 'value') ? 'value' : 'setting_value';
+
+        $settings = SystemSetting::query()
+            ->when($this->search, function ($query) use ($keyColumn, $valColumn) {
+                $query->where($keyColumn, 'like', "%{$this->search}%")
+                    ->orWhere($valColumn, 'like', "%{$this->search}%")
+                    ->orWhere('description', 'like', "%{$this->search}%");
+            })
+            ->latest('updated_at')
+            ->paginate($this->perPage);
+
+        return view('livewire.admin.system-setting.index', [
+            'settings' => $settings,
+        ]);
+    }
+}

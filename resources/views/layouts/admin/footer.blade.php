@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div>
-                    {{ date('Y') }} © Linkpemda Portal
+                    {{ date('Y') }} © {{ system_setting('app_name', 'Linkpemda') }}
                 </div>
             </div>
             <div class="col-md-6">

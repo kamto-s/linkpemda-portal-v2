@@ -47,7 +47,7 @@
                             <div class="form-group mb-4">
                                 <label class="form-label fw-semibold" for="email">Alamat Email</label>
                                 <input class="form-control @error('email') is-invalid @enderror" type="email"
-                                    id="email" placeholder="contoh: nama@linkpemda.com" wire:model="email" autofocus>
+                                    id="email" wire:model="email" autofocus>
 
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>

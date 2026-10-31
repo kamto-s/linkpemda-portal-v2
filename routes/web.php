@@ -10,6 +10,7 @@ use App\Livewire\Admin\Contact\Index as ContactIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Role\Form as RoleForm;
 use App\Livewire\Admin\Role\Index as RoleIndex;
+use App\Livewire\Admin\SystemSetting\Index as SystemSettingIndex;
 use App\Livewire\Admin\Template\Form as TemplateForm;
 use App\Livewire\Admin\Template\Index as TemplateIndex;
 use App\Livewire\Admin\Template\Show as TemplateShow;
@@ -84,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/campaigns/upload-image', [CampaignImageUploadController::class, 'upload'])->name('campaign.upload-image');
 
         // Setting
+        Route::get('/system-settings', SystemSettingIndex::class)->name('system-setting.index');
         Route::get('/users', UserIndex::class)->name('user.index');
         Route::get('/users/create', UserForm::class)->name('user.create');
         Route::get('/users/{user}/edit', UserForm::class)->name('user.edit');

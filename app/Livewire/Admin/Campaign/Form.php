@@ -287,16 +287,17 @@ class Form extends Component
         ];
 
         $renderedContent = str_ireplace(array_keys($replacements), array_values($replacements), $this->body_content);
+        $renderedSubject = str_ireplace(array_keys($replacements), array_values($replacements), $this->subject ?: 'Preview Subjek');
 
         $this->previewHtml = view('emails.campaign', [
             'campaign' => new EmailCampaign([
                 'title' => $this->title ?: 'Preview',
-                'subject' => $this->subject ?: 'Preview Subjek',
+                'subject' => $renderedSubject,
                 'body_content' => $this->body_content,
             ]),
             'contact' => $sampleContact,
             'renderedContent' => $renderedContent,
-            'subject' => $this->subject ?: 'Preview Subjek',
+            'subject' => $renderedSubject,
         ])->render();
     }
 
@@ -358,6 +359,22 @@ class Form extends Component
         );
 
         $this->validate();
+
+        // Validasi kuota batas pengiriman email harian dari System Setting
+        $dailyLimit = (int) system_setting('max_daily_email_limit', 0);
+        if ($dailyLimit > 0) {
+            $todaySent = EmailCampaignRecipient::whereDate('sent_at', today())
+                ->where('status', RecipientStatus::Sent)
+                ->count();
+            $requestedCount = count($this->selectedContacts);
+
+            if (($todaySent + $requestedCount) > $dailyLimit) {
+                $remainingQuota = max(0, $dailyLimit - $todaySent);
+                session()->flash('error', "Pengiriman blast dibatalkan: Jumlah ({$requestedCount} email) melebihi batas kuota harian ({$dailyLimit} email/hari). Sisa kuota email yang dapat dikirim hari ini: {$remainingQuota} email.");
+
+                return;
+            }
+        }
 
         $campaign = $this->campaign ?? new EmailCampaign;
         $campaign->fill([

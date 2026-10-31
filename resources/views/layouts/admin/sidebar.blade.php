@@ -246,6 +246,17 @@
                     </li>
                 @endcan
 
+                @if (auth()->user()?->hasRole('superadmin'))
+                    <li class="menu-item {{ request()->routeIs('admin.system-setting.*') ? 'active' : '' }}">
+                        <a wire:navigate
+                            class='menu-link waves-effect waves-light {{ request()->routeIs('admin.system-setting.*') ? 'active' : '' }}'
+                            href='{{ route('admin.system-setting.index') }}'>
+                            <span class="menu-icon"><i class="bx bx-slider-alt"></i></span>
+                            <span class="menu-text"> Pengaturan Sistem </span>
+                        </a>
+                    </li>
+                @endif
+
                 @can('view-settings')
                     <li class="menu-item">
                         <a class='menu-link waves-effect waves-light' href='#'>
