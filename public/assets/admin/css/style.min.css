@@ -43,7 +43,8 @@
 }
 
 [data-menu-color=brand] {
-    --bs-menu-bg: rgb(12 74 110);
+    /* --bs-menu-bg: rgb(12 74 110); */
+    --bs-menu-bg: #008F83;
     --bs-menu-item-color: #cedce4;
     --bs-menu-item-hover-color: #ffffff;
     --bs-menu-item-active-color: #ffffff;
@@ -16666,6 +16667,10 @@ html[data-bs-theme=dark] #light-dark-mode .bx-moon::before {
     padding: var(--bs-menu-link-padding-y) calc(var(--bs-menu-link-padding-x) + var(--bs-menu-item-padding-x))
 }
 
+.app-menu .menu-title i {
+    display: none
+}
+
 .app-menu .menu-item .menu-link {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -16818,7 +16823,34 @@ html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .logo-box .logo-sm 
 }
 
 html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .app-menu .menu-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0 6px;
+    font-size: 0;
+    line-height: 1;
+    letter-spacing: normal
+}
+
+html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .app-menu .menu-title span {
     display: none
+}
+
+html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .app-menu .menu-title i {
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--bs-menu-item-color);
+    opacity: .6
+}
+
+html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .app-menu .menu-title:not(:has(i))::before {
+    content: "\f01d8";
+    font-family: "Material Design Icons";
+    font-size: 16px;
+    line-height: 1;
+    color: var(--bs-menu-item-color);
+    opacity: .6
 }
 
 html.sidebar-enable:not([data-sidebar-size=full]) .main-menu .app-menu .menu-item {

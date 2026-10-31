@@ -28,7 +28,7 @@
             @endcan
 
             @canany(['view-posts', 'view-categories', 'view-schedules', 'view-galleries', 'view-pages'])
-                <li class="menu-title">CMS</li>
+                <li class="menu-title" title="CMS"><i class="mdi mdi-dots-horizontal"></i> <span>CMS</span></li>
 
                 @php
                     $isPostActive = request()->routeIs(['admin.artikel.*', 'admin.materi.*', 'admin.category.*']);
@@ -104,7 +104,7 @@
             <!-- PROMOSI & EMAIL BLAST -->
             <!-- ============================================== -->
             @canany(['create-campaigns', 'view-campaigns', 'view-templates', 'view-contacts'])
-                <li class="menu-title">Email Marketing</li>
+                <li class="menu-title" title="Email Marketing"><i class="mdi mdi-dots-horizontal"></i> <span>Email Marketing</span></li>
 
                 @can('create-campaigns')
                     <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
@@ -153,7 +153,7 @@
             @endcanany
 
             @canany(['view-certificates', 'view-participants', 'view-registrations', 'view-documents', 'view-messages'])
-                <li class="menu-title">Administrasi</li>
+                <li class="menu-title" title="Administrasi"><i class="mdi mdi-dots-horizontal"></i> <span>Administrasi</span></li>
 
                 <!-- 1. Sertifikat -->
                 @can('view-certificates')
@@ -222,7 +222,7 @@
             @endcanany
 
             @canany(['view-users', 'view-roles', 'view-settings', 'view-certificate-settings', 'manage-system'])
-                <li class="menu-title">Pengaturan</li>
+                <li class="menu-title" title="Pengaturan"><i class="mdi mdi-dots-horizontal"></i> <span>Pengaturan</span></li>
 
                 @can('view-users')
                     <li class="menu-item {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
