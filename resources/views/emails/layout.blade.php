@@ -70,10 +70,10 @@
             margin: 0 auto !important;
             background-color: #ffffff !important;
             background-image: linear-gradient(#ffffff, #ffffff) !important;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #f1f5f9;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
         }
 
         /* Header Bersih */
@@ -92,7 +92,7 @@
             display: inline-block;
             border: 0;
             outline: none;
-            margin-bottom: 6px;
+            margin: 0 auto 6px auto;
         }
 
         .brand-title {
@@ -222,17 +222,17 @@
             }
 
             .email-header {
-                padding: 20px 14px 14px 14px !important;
+                padding: 22px 16px 16px 16px !important;
             }
 
             .email-body {
-                padding: 18px 14px !important;
+                padding: 18px 16px !important;
                 font-size: 15px !important;
                 line-height: 1.6 !important;
             }
 
             .email-footer {
-                padding: 18px 14px 24px 14px !important;
+                padding: 18px 16px 24px 16px !important;
             }
 
             .brand-title {
@@ -331,7 +331,7 @@
         
         <table class="email-container" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
             align="center" bgcolor="#ffffff"
-            style="width: 100% !important; max-width: 580px !important; margin: 0 auto !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+            style="width: 100% !important; max-width: 580px !important; margin: 0 auto !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border: 1px solid #f1f5f9; border-radius: 10px; overflow: hidden;">
 
             <!-- ================= HEADER BERSAMA ================= -->
             <tr>

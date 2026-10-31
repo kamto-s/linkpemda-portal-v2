@@ -41,11 +41,4 @@
         style="background-color: #f0fdf4 !important; background-image: linear-gradient(#f0fdf4, #f0fdf4) !important; border: 1px solid #dcfce7 !important; border-left: 4px solid #22c55e !important; border-radius: 6px; padding: 14px 18px; margin: 24px 0; font-size: 13px; color: #166534 !important; line-height: 1.6;">
         <strong>Informasi Keamanan:</strong> Tautan undangan ini hanya berlaku selama <strong>24 jam</strong>. Setelah akun diaktifkan, Anda dapat langsung login ke dalam sistem portal.
     </div>
-
-    <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
-        <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 0; word-break: break-all;">
-            Jika tombol di atas tidak dapat diklik, salin dan tempel tautan berikut ke browser Anda:<br>
-            <a href="{{ $resetUrl }}" style="color: #0284c7; text-decoration: underline;">{{ $resetUrl }}</a>
-        </p>
-    </div>
 @endsection

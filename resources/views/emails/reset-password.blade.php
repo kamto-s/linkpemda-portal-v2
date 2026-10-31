@@ -24,11 +24,4 @@
         style="background-color: #fffbeb !important; background-image: linear-gradient(#fffbeb, #fffbeb) !important; border: 1px solid #fef3c7 !important; border-left: 4px solid #f59e0b !important; border-radius: 6px; padding: 14px 18px; margin: 24px 0; font-size: 13px; color: #92400e !important; line-height: 1.6;">
         <strong>Perhatian:</strong> Tautan ini hanya berlaku selama <strong>60 menit</strong>. Jika Anda tidak merasa meminta pengaturan ulang kata sandi, abaikan email ini dan akun Anda tetap aman.
     </div>
-
-    <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
-        <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 0; word-break: break-all;">
-            Jika tombol di atas tidak dapat diklik, salin dan tempel tautan berikut ke browser Anda:<br>
-            <a href="{{ $resetUrl }}" style="color: #0284c7; text-decoration: underline;">{{ $resetUrl }}</a>
-        </p>
-    </div>
 @endsection
