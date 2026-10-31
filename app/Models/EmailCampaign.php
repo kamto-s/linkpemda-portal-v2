@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CampaignStatus;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -44,14 +45,14 @@ class EmailCampaign extends BaseModel
         return $this->hasManyThrough(Contact::class, EmailCampaignRecipient::class, 'campaign_id', 'id', 'id', 'contact_id');
     }
 
-    public function getStartedAtAttribute(): ?Carbon
+    public function getStartedAtAttribute(): ?CarbonInterface
     {
         $firstSent = $this->recipients()->whereNotNull('sent_at')->min('sent_at');
         if ($firstSent) {
             return Carbon::parse($firstSent);
         }
 
-        if ($this->status !== CampaignStatus::Draft) {
+        if ($this->status !== CampaignStatus::Draft && $this->created_at) {
             return $this->created_at;
         }
 

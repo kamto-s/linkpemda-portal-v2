@@ -16,7 +16,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.admin.app')]
-#[Title('Email Blast')]
+#[Title('Kirim Email')]
 class Form extends Component
 {
     public ?EmailCampaign $campaign = null;
@@ -351,7 +351,11 @@ class Form extends Component
 
     public function sendBlast()
     {
-        abort_unless(auth()->user()?->can('send-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengirim blast campaign email.');
+        abort_unless(
+            auth()->user()?->can('send-campaigns') || auth()->user()?->can('create-campaigns') || auth()->user()?->can('edit-campaigns'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengirim blast campaign email.'
+        );
 
         $this->validate();
 

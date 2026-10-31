@@ -114,7 +114,8 @@ class Form extends Component
             if (strtolower($this->role->name) === 'superadmin') {
                 $this->role->syncPermissions(Permission::all());
             } else {
-                $this->role->syncPermissions($this->selectedPermissions);
+                $perms = $this->syncActionPermissions($this->selectedPermissions);
+                $this->role->syncPermissions($perms);
             }
 
             session()->flash('success', "Hak akses role \"{$this->role->name}\" berhasil disimpan.");
@@ -132,7 +133,8 @@ class Form extends Component
                 'guard_name' => 'web',
             ]);
 
-            $role->syncPermissions($this->selectedPermissions);
+            $perms = $this->syncActionPermissions($this->selectedPermissions);
+            $role->syncPermissions($perms);
 
             session()->flash('success', "Role baru \"{$role->name}\" berhasil ditambahkan.");
         }
@@ -140,6 +142,36 @@ class Form extends Component
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         return redirect()->route('admin.role.index');
+    }
+
+    /**
+     * Sinkronisasi izin aksi turunan (kirim blast, import/export kontak, publish postingan)
+     * saat izin utama (create/edit) diaktifkan pada role.
+     *
+     * @param  array<string>  $permissions
+     * @return array<string>
+     */
+    protected function syncActionPermissions(array $permissions): array
+    {
+        $perms = $permissions;
+
+        // Kirim blast campaign otomatis aktif jika tambah atau ubah campaign dipilih
+        if (in_array('create-campaigns', $perms, true) || in_array('edit-campaigns', $perms, true)) {
+            $perms[] = 'send-campaigns';
+        }
+
+        // Import dan export kontak otomatis aktif jika tambah kontak dipilih
+        if (in_array('create-contacts', $perms, true)) {
+            $perms[] = 'import-contacts';
+            $perms[] = 'export-contacts';
+        }
+
+        // Publish artikel/materi otomatis aktif jika tambah atau ubah post dipilih
+        if (in_array('create-posts', $perms, true) || in_array('edit-posts', $perms, true)) {
+            $perms[] = 'publish-posts';
+        }
+
+        return array_values(array_unique($perms));
     }
 
     /**
@@ -212,7 +244,7 @@ class Form extends Component
             // Email Marketing
             'campaigns' => [
                 'group' => 'Email Marketing',
-                'name' => 'Email Blast & Campaign',
+                'name' => 'Kirim Email & Campaign',
                 'view' => 'view-campaigns',
                 'create' => 'create-campaigns',
                 'edit' => 'edit-campaigns',

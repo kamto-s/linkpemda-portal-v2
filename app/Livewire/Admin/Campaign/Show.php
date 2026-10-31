@@ -35,7 +35,11 @@ class Show extends Component
 
     public function retryFailed(): void
     {
-        abort_unless(auth()->user()?->can('send-campaigns'), 403, 'Anda tidak memiliki hak akses untuk mengirim ulang email blast.');
+        abort_unless(
+            auth()->user()?->can('send-campaigns') || auth()->user()?->can('create-campaigns') || auth()->user()?->can('edit-campaigns'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengirim ulang email blast.'
+        );
 
         $failedRecipients = $this->campaign->recipients()
             ->where('status', RecipientStatus::Failed->value)

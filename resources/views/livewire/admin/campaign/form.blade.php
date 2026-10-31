@@ -117,7 +117,7 @@
         <div class="card">
             <div class="card-header">
                 <h4 class="header-title">
-                    {{ $isEditing ? 'Form Ubah Email: ' . $campaign->title : 'Form Konten Email Blast' }}
+                    {{ $isEditing ? 'Form Ubah Email: ' . $campaign->title : 'Form Konten Email' }}
                 </h4>
                 <p class="sub-header mb-0">
                     Tentukan judul campaign, subjek email, dan susun pesan penawaran.
@@ -132,7 +132,7 @@
                                 <label class="form-label fw-bold">Judul Campaign <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror"
-                                    wire:model="title" placeholder="Nama campaign">
+                                    wire:model="title">
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -141,7 +141,7 @@
                                 <label class="form-label fw-bold">Subjek Email <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('subject') is-invalid @enderror"
-                                    wire:model="subject" placeholder="Subjek email penerima">
+                                    wire:model="subject">
                                 @error('subject')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -156,9 +156,9 @@
                             <div class="d-flex align-items-center gap-1 flex-wrap">
                                 <button type="button"
                                     class="btn btn-xs btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1 fw-semibold"
-                                    data-bs-toggle="modal" data-bs-target="#templateModal"
+                                    data-bs-toggle="offcanvas" data-bs-target="#templateOffcanvas" aria-controls="templateOffcanvas"
                                     title="Pilih Template Siap Pakai">
-                                    <i class="mdi mdi-file-document-outline"></i> Pilih Template
+                                    <i class="mdi mdi-dock-right"></i> Pilih Template
                                 </button>
 
                                 <span class="text-muted mx-1">|</span>
@@ -521,114 +521,95 @@
         </div>
     @endif
 
-    <!-- Modal Pemilihan Template Email -->
-    <div wire:ignore.self class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
-                <div class="modal-header py-3 bg-light border-bottom">
-                    <div>
-                        <h5 class="modal-title fw-bold text-dark mb-0" id="templateModalLabel">
-                            <i class="mdi mdi-email-newsletter text-primary me-1"></i> Katalog Template Email Pelatihan
-                            &amp; Bimtek
-                        </h5>
-                        <p class="text-muted fs-12 mb-0">Pilih template siap pakai dengan gaya komunikasi santai,
-                            ramah, dan persuasif untuk penawaran kelas pelatihan atau update seputar bimtek.</p>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Offcanvas Pemilihan & Pratinjau Template Email (Right Side, Isi Konten Diperluas Penuh) -->
+    <div wire:ignore.self class="offcanvas offcanvas-end shadow-lg border-start" tabindex="-1" id="templateOffcanvas"
+        aria-labelledby="templateOffcanvasLabel" style="width: 580px; max-width: 92vw; z-index: 1055;">
+        <div class="offcanvas-header py-3 px-3 bg-light border-bottom">
+            <div class="d-flex align-items-center gap-2">
+                <div class="avatar-sm bg-primary-subtle text-primary rounded d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                    <i class="mdi mdi-email-newsletter fs-20"></i>
                 </div>
+                <div>
+                    <h5 class="offcanvas-title fw-bold text-dark mb-0 fs-15" id="templateOffcanvasLabel">
+                        Katalog Template Email
+                    </h5>
+                </div>
+            </div>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
 
-                <div class="modal-body p-4 bg-light-subtle" style="max-height: 72vh; overflow-y: auto;">
-                    <!-- Toolbar Pencarian & Filter Kategori -->
-                    <div class="row g-2 align-items-center mb-3">
-                        <div class="col-md-7 col-lg-6">
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0"><i
-                                        class="mdi mdi-magnify text-muted"></i></span>
-                                <input type="text" id="templateSearchInput" class="form-control border-start-0"
-                                    placeholder="Cari template (misal: early bird, tips, in-house, webinar, kalender, reminder)..."
-                                    oninput="filterTemplates()">
-                                <button class="btn btn-outline-secondary btn-sm" type="button"
-                                    onclick="clearTemplateSearch()" id="btnClearTemplateSearch"
-                                    style="display: none;">
-                                    <i class="mdi mdi-close"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-5 col-lg-6 text-md-end">
-                            <span class="badge bg-white text-muted border px-2 py-1 fs-12" id="templateCountBadge">
-                                Menampilkan {{ $emailTemplates->count() }} template
+        <div class="offcanvas-body p-3 bg-light-subtle d-flex flex-column" style="overflow-y: auto;">
+            <!-- Toolbar Pencarian & Filter Dropdown (Sticky) -->
+            <div class="sticky-top bg-light-subtle pb-2 border-bottom mb-3" style="z-index: 10; top: -1rem; margin-top: -0.5rem; padding-top: 0.5rem;">
+                <div class="row g-2 align-items-center mb-1">
+                    <div class="col-sm-7 col-12">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="mdi mdi-magnify text-muted"></i>
                             </span>
+                            <input type="text" id="templateSearchInput" class="form-control border-start-0"
+                                placeholder="Cari judul, subjek, atau isi..." oninput="filterTemplates()">
+                            <button class="btn btn-outline-secondary btn-sm" type="button"
+                                onclick="clearTemplateSearch()" id="btnClearTemplateSearch" style="display: none;">
+                                <i class="mdi mdi-close"></i>
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Kategori Filter Pills -->
-                    <div class="d-flex gap-1 flex-wrap mb-3" id="templateCategoryFilters">
-                        <button type="button" class="btn btn-sm btn-primary py-1 px-2 fs-12 template-cat-btn active"
-                            data-cat="all" onclick="filterTemplateCategory('all', this)">
-                            Semua ({{ $emailTemplates->count() }})
-                        </button>
-                        @foreach ($templateCategories as $cat)
-                            @php $cCount = $emailTemplates->where('category', $cat)->count(); @endphp
-                            @if ($cCount > 0)
-                                <button type="button"
-                                    class="btn btn-sm btn-outline-secondary py-1 px-2 fs-12 template-cat-btn"
-                                    data-cat="{{ $cat->value }}"
-                                    onclick="filterTemplateCategory('{{ $cat->value }}', this)">
-                                    <i class="{{ $cat->icon() }} me-1"></i>{{ $cat->label() }}
-                                    ({{ $cCount }})
-                                </button>
-                            @endif
-                        @endforeach
+                    <div class="col-sm-5 col-12">
+                        <select id="templateCategorySelect" class="form-select form-select-sm" onchange="filterTemplateCategory(this.value)">
+                            <option value="all">Semua Kategori ({{ $emailTemplates->count() }})</option>
+                            @foreach ($templateCategories as $cat)
+                                @php $cCount = $emailTemplates->where('category', $cat)->count(); @endphp
+                                @if ($cCount > 0)
+                                    <option value="{{ $cat->value }}">{{ $cat->label() }} ({{ $cCount }})</option>
+                                @endif
+                            @endforeach
+                        </select>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Pesan jika pencarian kosong -->
-                    <div id="templateEmptyState" class="text-center py-5" style="display: none;">
-                        <i class="mdi mdi-text-box-search-outline text-muted" style="font-size: 40px;"></i>
-                        <p class="text-muted fs-14 mt-2 mb-1">Tidak ada template yang cocok dengan pencarian Anda.</p>
-                        <button type="button" class="btn btn-sm btn-light border mt-2"
-                            onclick="clearTemplateSearch()">Reset Pencarian</button>
-                    </div>
+            <!-- Pesan jika pencarian kosong -->
+            <div id="templateEmptyState" class="text-center py-5 my-auto" style="display: none;">
+                <i class="mdi mdi-text-box-search-outline text-muted" style="font-size: 44px;"></i>
+                <p class="text-muted fs-14 mt-2 mb-1">Tidak ada template yang cocok dengan pencarian Anda.</p>
+                <button type="button" class="btn btn-sm btn-light border mt-2" onclick="clearTemplateSearch()">Reset Pencarian</button>
+            </div>
 
-                    <!-- Grid Card Template (Dynamic from Database) -->
-                    <div class="row g-3" id="templateCardContainer">
-                        @foreach ($emailTemplates as $tpl)
-                            <div class="col-md-6 col-lg-6 template-item-col"
-                                data-category="{{ $tpl->category->value }}">
-                                <div class="card h-100 border shadow-sm template-card">
-                                    <div class="card-body p-3 d-flex flex-column">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <span class="badge {{ $tpl->category->badgeClass() }} fs-11">
-                                                <i
-                                                    class="{{ $tpl->category->icon() }} me-1"></i>{{ $tpl->category->label() }}
-                                            </span>
-                                        </div>
-                                        <h6 class="fw-bold mb-1 text-dark">{{ $tpl->name }}</h6>
-                                        <p class="text-muted fs-12 mb-3 flex-grow-1 text-truncate"
-                                            title="{{ $tpl->subject }}">
-                                            <i class="mdi mdi-email-outline me-1"></i>{{ $tpl->subject }}
-                                        </p>
-                                        <div class="d-flex gap-2 mt-auto">
-                                            <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold"
-                                                onclick="applyEmailTemplate('{{ $tpl->id }}')">
-                                                <i class="mdi mdi-check-circle-outline me-1"></i> Gunakan Template Ini
-                                            </button>
-                                        </div>
-                                    </div>
+            <!-- List Card Template (Stack vertikal 1 kolom di panel kanan, isi email diperluas penuh tanpa scrollbar ganda) -->
+            <div class="d-flex flex-column gap-3" id="templateCardContainer">
+                @foreach ($emailTemplates as $tpl)
+                    <div class="template-item-col" data-category="{{ $tpl->category->value }}">
+                        <div class="card border shadow-sm template-card mb-0 bg-white">
+                            <div class="card-body p-3 d-flex flex-column">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="badge {{ $tpl->category->badgeClass() }} fs-11">
+                                        <i class="{{ $tpl->category->icon() }} me-1"></i>{{ $tpl->category->label() }}
+                                    </span>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
 
-                <div class="modal-footer py-2 bg-white d-flex justify-content-between align-items-center">
-                    <span class="text-muted fs-12">
-                        <i class="mdi mdi-information-outline me-1"></i> Template dapat disesuaikan kembali setelah
-                        dimasukkan ke editor.
-                    </span>
-                    <button type="button" class="btn btn-sm btn-light border px-3"
-                        data-bs-dismiss="modal">Tutup</button>
-                </div>
+                                <h5 class="fw-bold text-dark fs-15 mb-2">{{ $tpl->name }}</h5>
+
+                                <div class="bg-light p-2 rounded mb-3 border text-dark fs-12">
+                                    <i class="mdi mdi-email-outline text-primary me-1"></i>
+                                    <span class="text-muted">Subjek:</span> <strong class="text-dark">{{ $tpl->subject }}</strong>
+                                </div>
+
+                                <!-- Isi Konten Email Diperluas Penuh (Tanpa max-height & Tanpa scroll internal) -->
+                                <div class="template-full-content border rounded p-3 mb-3 bg-white"
+                                    style="font-size: 13px; line-height: 1.6; color: #2d3748; background-color: #fafbfc !important; border-color: #e5e7eb !important;">
+                                    {!! $tpl->body_content !!}
+                                </div>
+
+                                <!-- Tombol Aksi -->
+                                <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold py-2 shadow-sm"
+                                    onclick="applyEmailTemplate('{{ $tpl->id }}')">
+                                    <i class="mdi mdi-check-circle-outline me-1"></i> Gunakan Template Ini
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -1615,15 +1596,13 @@
 
         let currentTemplateCategory = 'all';
 
-        window.filterTemplateCategory = function(category, btnEl) {
-            currentTemplateCategory = category;
+        window.filterTemplateCategory = function(category) {
+            currentTemplateCategory = category || 'all';
 
-            document.querySelectorAll('.template-cat-btn').forEach(btn => {
-                btn.classList.remove('btn-primary', 'active');
-                btn.classList.add('btn-outline-secondary');
-            });
-            btnEl.classList.remove('btn-outline-secondary');
-            btnEl.classList.add('btn-primary', 'active');
+            const selectEl = document.getElementById('templateCategorySelect');
+            if (selectEl && selectEl.value !== currentTemplateCategory) {
+                selectEl.value = currentTemplateCategory;
+            }
 
             filterTemplates();
         };
@@ -1694,31 +1673,32 @@
             if (window.Livewire) {
                 @this.set('body_content', html, false);
 
-                // Auto-fill subject if currently empty
-                const subjectVal = @this.get('subject');
-                if (!subjectVal || subjectVal.trim() === '') {
-                    @this.set('subject', defaultSubjects[templateKey] || '', false);
+                // Auto-fill subject with template's subject
+                const defaultSubject = defaultSubjects[templateKey] || '';
+                if (defaultSubject) {
+                    @this.set('subject', defaultSubject, false);
                 }
             }
 
-            // Close Modal
-            const modalEl = document.getElementById('templateModal');
-            if (modalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modalInstance.hide();
+            // Close Offcanvas
+            const offcanvasEl = document.getElementById('templateOffcanvas');
+            if (offcanvasEl) {
+                const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+                offcanvasInstance.hide();
             }
         };
 
-        const templateModalEl = document.getElementById('templateModal');
-        if (templateModalEl) {
-            templateModalEl.addEventListener('show.bs.modal', function() {
+        const templateOffcanvasEl = document.getElementById('templateOffcanvas');
+        if (templateOffcanvasEl) {
+            templateOffcanvasEl.addEventListener('show.bs.offcanvas', function() {
                 if (typeof clearTemplateSearch === 'function') {
                     clearTemplateSearch();
                 }
-                const firstFilterBtn = document.querySelector('.template-cat-btn[data-cat="all"]');
-                if (firstFilterBtn) {
-                    filterTemplateCategory('all', firstFilterBtn);
+                const selectEl = document.getElementById('templateCategorySelect');
+                if (selectEl) {
+                    selectEl.value = 'all';
                 }
+                filterTemplateCategory('all');
             });
         }
     </script>

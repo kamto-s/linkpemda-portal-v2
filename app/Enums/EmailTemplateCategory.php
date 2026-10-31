@@ -27,7 +27,7 @@ enum EmailTemplateCategory: string
             self::Marketing => 'bg-primary-subtle text-primary border border-primary-subtle',
             self::Info => 'bg-warning-subtle text-warning border border-warning-subtle',
             self::Agenda => 'bg-info-subtle text-info border border-info-subtle',
-            self::Reminder => 'bg-orange-subtle text-orange border border-orange-subtle',
+            self::Reminder => 'bg-danger-subtle text-danger border border-danger-subtle',
             self::Formal => 'bg-secondary-subtle text-secondary border border-secondary-subtle',
         };
     }
