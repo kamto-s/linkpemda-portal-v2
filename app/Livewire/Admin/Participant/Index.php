@@ -226,6 +226,13 @@ class Index extends Component
         $this->dispatch('open-qr-modal');
     }
 
+    public function planDownload(string $type, ?string $participantId = null): void
+    {
+        $label = str_contains($type, 'kwitansi') ? 'Kwitansi' : 'Sertifikat';
+        $scope = str_contains($type, 'bulk') ? 'masal' : '';
+        session()->flash('info', "Tombol Unduh {$label} {$scope} (PDF) telah disiapkan. Fitur pembuatan file PDF akan segera diaktifkan pada alur berikutnya.");
+    }
+
     protected function getFilteredQuery(bool $withEmailStatus = true)
     {
         return Participant::query()

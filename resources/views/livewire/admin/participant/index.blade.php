@@ -31,6 +31,13 @@
         </div>
     @endif
 
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-information-outline me-1"></i> {{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Statistik Ringkasan -->
     <div class="row g-2 mb-3">
         <div class="col-6 col-md-3">
@@ -80,7 +87,7 @@
                 <div class="card-body py-2 px-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fs-12 d-block">Total Kwitansi</span>
+                            <span class="text-muted fs-12 d-block">Total Biaya</span>
                             <h5 class="mb-0 fw-bold text-dark fs-15">Rp {{ number_format($totalAmount, 0, ',', '.') }}</h5>
                         </div>
                         <i class="mdi mdi-cash-multiple text-info fs-24"></i>
@@ -171,11 +178,51 @@
                         </div>
                     </div>
 
+                    <!-- Bar Aksi Masal (Bulk Actions) -->
+                    @if (count($selectedParticipants) > 0)
+                        <div class="alert alert-primary d-flex align-items-center justify-content-between mb-3 py-2 px-3 border-0 bg-primary-subtle text-primary-emphasis flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary fs-12 rounded-pill px-2 py-1">{{ count($selectedParticipants) }}</span>
+                                <span class="fw-semibold">peserta terpilih</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <!-- Tombol Kirim Email Masal -->
+                                <button type="button" class="btn btn-sm btn-primary" wire:click="sendBulkCertificateEmail"
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove wire:target="sendBulkCertificateEmail">
+                                        <i class="mdi mdi-email-send me-1"></i> Kirim E-Sertifikat ({{ count($selectedParticipants) }})
+                                    </span>
+                                    <span wire:loading wire:target="sendBulkCertificateEmail">
+                                        <span class="spinner-border spinner-border-sm me-1"></span> Mengirim...
+                                    </span>
+                                </button>
+
+                                <!-- Tombol Download Sertifikat Masal (Rencana) -->
+                                <button type="button" class="btn btn-sm btn-outline-danger" style="--bs-btn-bg: #fff;" wire:click="planDownload('sertifikat_bulk')">
+                                    <i class="mdi mdi-file-pdf-box me-1"></i> Unduh Sertifikat PDF
+                                </button>
+
+                                <!-- Tombol Download Kwitansi Masal (Rencana) -->
+                                <button type="button" class="btn btn-sm btn-outline-success" style="--bs-btn-bg: #fff;" wire:click="planDownload('kwitansi_bulk')">
+                                    <i class="mdi mdi-receipt me-1"></i> Unduh Kwitansi PDF
+                                </button>
+
+                                <!-- Batal Seleksi -->
+                                <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2 text-decoration-none" wire:click="$set('selectedParticipants', [])">
+                                    <i class="mdi mdi-close"></i> Batal
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Tabel Peserta -->
                     <div class="table-responsive" style="overflow: visible;">
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
+                                    <th style="width: 36px;">
+                                        <input type="checkbox" class="form-check-input" wire:model.live="selectAll" title="Pilih Semua di Halaman Ini">
+                                    </th>
                                     <th>Peserta</th>
                                     <th>Email &amp; No. HP</th>
                                     <th>Instansi / OPD</th>
@@ -188,7 +235,10 @@
                             </thead>
                             <tbody>
                                 @forelse ($participants as $participant)
-                                    <tr wire:key="{{ $participant->id }}">
+                                    <tr wire:key="{{ $participant->id }}" class="{{ in_array((string) $participant->id, $selectedParticipants) ? 'table-active' : '' }}">
+                                        <td>
+                                            <input type="checkbox" class="form-check-input" value="{{ (string) $participant->id }}" wire:model.live="selectedParticipants">
+                                        </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span
@@ -278,6 +328,15 @@
                                                             <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync text-info' : 'mdi-send text-primary' }} me-1"></i>
                                                             {{ $participant->is_email_sent ? 'Kirim Ulang Email' : 'Kirim E-Sertifikat' }}
                                                         </a>
+                                                        <!-- Unduh PDF Sertifikat & Kwitansi (Rencana) -->
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="planDownload('sertifikat', '{{ $participant->id }}')">
+                                                            <i class="mdi mdi-file-pdf-box me-1 text-danger"></i> Unduh Sertifikat (PDF)
+                                                        </a>
+                                                        <a class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="planDownload('kwitansi', '{{ $participant->id }}')">
+                                                            <i class="mdi mdi-receipt me-1 text-success"></i> Unduh Kwitansi (PDF)
+                                                        </a>
                                                         @if ($participant->qr_code_path)
                                                             <a class="dropdown-item" href="javascript:void(0);"
                                                                 wire:click="showQrModal('{{ $participant->id }}')">
@@ -303,7 +362,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center py-4 text-muted">
+                                        <td colspan="9" class="text-center py-4 text-muted">
                                             <i class="mdi mdi-account-off font-size-24 d-block mb-1"></i>
                                             Tidak ada data peserta yang ditemukan.
                                         </td>

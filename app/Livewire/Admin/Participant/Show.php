@@ -57,6 +57,12 @@ class Show extends Component
         }
     }
 
+    public function planDownload(string $type): void
+    {
+        $label = $type === 'kwitansi' ? 'Kwitansi' : 'Sertifikat';
+        session()->flash('info', "Tombol Unduh {$label} (PDF) telah disiapkan. Alur pembuatan dokumen PDF akan segera diaktifkan pada alur berikutnya.");
+    }
+
     public function delete(): mixed
     {
         abort_unless(

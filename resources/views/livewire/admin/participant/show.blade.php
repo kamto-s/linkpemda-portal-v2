@@ -39,6 +39,13 @@
         </div>
     @endif
 
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-information-outline me-1"></i> {{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Header Profil Peserta & Action Bar -->
     <div class="card mb-3">
         <div class="card-body p-3 p-lg-4">
@@ -59,6 +66,13 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button" class="btn btn-outline-danger" wire:click="planDownload('sertifikat')">
+                        <i class="mdi mdi-file-pdf-box me-1"></i> Unduh Sertifikat
+                    </button>
+                    <button type="button" class="btn btn-outline-success" wire:click="planDownload('kwitansi')">
+                        <i class="mdi mdi-receipt me-1"></i> Unduh Kwitansi
+                    </button>
+
                     @canany(['edit-participants', 'edit-certificates'])
                         <button type="button" class="btn btn-outline-primary"
                             wire:click="sendCertificateEmail" wire:loading.attr="disabled">

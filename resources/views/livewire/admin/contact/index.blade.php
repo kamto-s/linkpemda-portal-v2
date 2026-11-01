@@ -258,7 +258,7 @@
                                 <strong>Kategori</strong> (Pemerintah/Swasta), dan <strong>Status</strong>.
                             </small>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-primary bg-white"
+                        <button type="button" class="btn btn-sm btn-outline-primary" style="--bs-btn-bg: #fff;"
                             wire:click="downloadTemplate">
                             <i class="mdi mdi-download me-1"></i> Download Template Excel
                         </button>
