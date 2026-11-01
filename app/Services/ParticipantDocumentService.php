@@ -195,13 +195,38 @@ class ParticipantDocumentService
         $pdf->MultiCell(187, 5, $participant->theme ?? '', 0, 'L');
 
         // Blok detail: No. Sertifikat, Tanggal, Tempat, Lokasi
-        $detail = "No. Sertifikat   : " . ($participant->certificate_number ?? '-')
-                . "\nTanggal          : " . ($participant->certificate_date ?? '-')
-                . "\nTempat           : " . ($participant->event_venue ?? '-')
-                . "\nLokasi             : " . ($participant->event_location ?? '-');
+        // Menggunakan kolom terpisah agar tanda titik dua (:) 100% lurus sejajar presisi
+        $details = [
+            ['No. Sertifikat', $participant->certificate_number ?? '-'],
+            ['Tanggal',        $participant->certificate_date ?? '-'],
+            ['Tempat',         $participant->event_venue ?? '-'],
+            ['Lokasi',         $participant->event_location ?? '-'],
+        ];
+
+        $startX      = 114;
+        $startY      = 119.5;
+        $lineHeight  = 5;
+        $labelWidth  = 27; // Lebar tetap kolom label (mm)
+        $colonWidth  = 3;  // Lebar kolom titik dua (mm)
+
         $pdf->SetFont('Arial', '', 12);
-        $pdf->SetXY(114, 119.5);
-        $pdf->MultiCell(120, 5, $detail, 0, 'L');
+        $pdf->SetTextColor(0, 0, 0);
+
+        foreach ($details as $i => [$label, $val]) {
+            $y = $startY + ($i * $lineHeight);
+
+            // Kolom Label
+            $pdf->SetXY($startX, $y);
+            $pdf->Cell($labelWidth, $lineHeight, $label, 0, 0, 'L');
+
+            // Kolom Titik Dua (posisi X absolut sama persis untuk semua baris)
+            $pdf->SetXY($startX + $labelWidth, $y);
+            $pdf->Cell($colonWidth, $lineHeight, ':', 0, 0, 'L');
+
+            // Kolom Nilai Teks
+            $pdf->SetXY($startX + $labelWidth + $colonWidth + 1, $y);
+            $pdf->Cell(120, $lineHeight, $val, 0, 0, 'L');
+        }
 
         // QR Code
         $qrPath = $this->resolveQrPath($participant);
@@ -223,11 +248,12 @@ class ParticipantDocumentService
     {
         $pdf->SetTitle('Kwitansi_' . $participant->name . ' (' . $participant->certificate_number . ')');
 
-        // Tanggal Registrasi
+        // Tanggal Kwitansi (Kanan Atas)
+        $receiptDate = $participant->receipt_date ?: ($participant->registration_date ?? '');
         $pdf->SetFont('Arial', '', 11);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY(90, 39);
-        $pdf->MultiCell(100, 7, $participant->registration_date ?? '', 0, 'R');
+        $pdf->MultiCell(100, 7, $receiptDate, 0, 'R');
 
         // Nomor Kwitansi
         $pdf->SetFont('Arial', '', 11);
@@ -270,13 +296,13 @@ class ParticipantDocumentService
         $pdf->SetXY(67, 113);
         $pdf->MultiCell(122, 5, $participant->theme ?? '', 0, 'L');
 
-        // Tanggal kegiatan, Tempat, Lokasi
-        $receiptDate = $participant->receipt_date ?? '';
-        $venue       = $participant->event_venue ?? '';
-        $location    = $participant->event_location ?? '';
+        // Pelaksanaan Kegiatan: Tanggal Pelaksanaan Bimtek, Tempat, Lokasi
+        $eventDate = $participant->certificate_date ?: ($participant->receipt_date ?? '');
+        $venue     = $participant->event_venue ?? '';
+        $location  = $participant->event_location ?? '';
         $pdf->SetFont('Arial', '', 11);
         $pdf->SetXY(67, 138.3);
-        $pdf->MultiCell(120, 5, $receiptDate . ', ' . $venue . ' - ' . $location, 0, 'L');
+        $pdf->MultiCell(120, 5, $eventDate . ', ' . $venue . ' - ' . $location, 0, 'L');
     }
 
     // =========================================================================

@@ -105,7 +105,7 @@
                                             </div>
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Nama Instansi / Perusahaan</label>
+                                                <label class="form-label fw-semibold">Instansi / Perusahaan</label>
                                                 <input type="text" class="form-control @error('institution_name') is-invalid @enderror" wire:model="institution_name">
                                                 @error('institution_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                             </div>

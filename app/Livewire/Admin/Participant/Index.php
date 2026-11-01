@@ -258,7 +258,7 @@ class Index extends Component
     {
         $participant = Participant::findOrFail($id);
         $this->previewQrUrl = $participant->qr_code_url;
-        $this->previewQrTitle = "QR Code Sertifikat: {$participant->name} ({$participant->certificate_number})";
+        $this->previewQrTitle = "{$participant->name} ({$participant->certificate_number})";
 
         $this->dispatch('open-qr-modal');
     }

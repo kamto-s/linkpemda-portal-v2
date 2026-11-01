@@ -78,27 +78,27 @@
                             <i class="mdi mdi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu shadow-sm">
-                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Berwarna</li>
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Warna</li>
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'view') }}" target="_blank">
-                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat / Preview (Warna)
+                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Sertifikat
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download') }}" target="_blank">
-                                    <i class="mdi mdi-download me-2 text-danger"></i> Unduh Sertifikat (Warna)
+                                    <i class="mdi mdi-download me-2 text-danger"></i> Unduh Sertifikat
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider my-1"></li>
-                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Blank (Kertas Cetak)</li>
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Blank</li>
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'print') }}" target="_blank">
-                                    <i class="mdi mdi-printer me-2 text-secondary"></i> Print / Preview (Blank)
+                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Sertifikat
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download-blank') }}" target="_blank">
-                                    <i class="mdi mdi-download me-2 text-primary"></i> Unduh Sertifikat (Blank)
+                                    <i class="mdi mdi-download me-2 text-primary"></i> Unduh Sertifikat
                                 </a>
                             </li>
                         </ul>
@@ -118,12 +118,12 @@
                         <ul class="dropdown-menu shadow-sm">
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'view') }}" target="_blank">
-                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat / Preview
+                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Kwitansi
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'download') }}" target="_blank">
-                                    <i class="mdi mdi-download me-2 text-success"></i> Unduh (Download)
+                                    <i class="mdi mdi-download me-2 text-success"></i> Unduh Kwitansi
                                 </a>
                             </li>
                         </ul>
@@ -147,7 +147,7 @@
                     @endcanany
 
                     @canany(['delete-participants', 'delete-certificates'])
-                        <button type="button" class="btn btn-outline-danger"
+                        <button type="button" class="btn btn-danger"
                             wire:click="delete"
                             wire:confirm="Apakah Anda yakin ingin menghapus data peserta {{ $participant->name }}?">
                             <i class="mdi mdi-trash-can me-1"></i> Hapus
@@ -166,7 +166,7 @@
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
-                        Informasi Identitas &amp; Kontak
+                        Informasi Peserta
                     </h5>
                 </div>
                 <div class="card-body">
@@ -180,7 +180,7 @@
                             <span class="fw-medium text-dark">{{ $participant->position ?: '-' }}</span>
                         </div>
                         <div class="col-sm-6">
-                            <span class="text-muted fs-12 d-block">Instansi / OPD / Pemda</span>
+                            <span class="text-muted fs-12 d-block">Instansi / Perushaan</span>
                             <span class="fw-medium text-dark">{{ $participant->institution_name ?: '-' }}</span>
                         </div>
                         <div class="col-sm-6">
@@ -216,13 +216,13 @@
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
-                        Kegiatan Bimtek &amp; E-Sertifikat
+                        Kegiatan Pelatihan &amp; E-Sertifikat
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-12">
-                            <span class="text-muted fs-12 d-block">Tema / Judul Kegiatan Bimtek</span>
+                            <span class="text-muted fs-12 d-block">Tema / Judul Kegiatan</span>
                             <p class="mb-0 fw-medium text-dark">{{ $participant->theme ?: 'Belum diisi' }}</p>
                         </div>
                         <div class="col-sm-6">
@@ -232,7 +232,7 @@
                             </span>
                         </div>
                         <div class="col-sm-6">
-                            <span class="text-muted fs-12 d-block">Tanggal Pelaksanaan Kegiatan</span>
+                            <span class="text-muted fs-12 d-block">Tanggal Pelaksanaan</span>
                             <span class="text-dark fw-medium">
                                 <i class="mdi mdi-calendar me-1 text-primary"></i>{{ $participant->certificate_date ?: '-' }}
                             </span>
@@ -242,7 +242,7 @@
                             <span class="text-dark">{{ $participant->event_venue ?: '-' }}</span>
                         </div>
                         <div class="col-sm-6">
-                            <span class="text-muted fs-12 d-block">Kota Lokasi Acara</span>
+                            <span class="text-muted fs-12 d-block">Lokasi Acara</span>
                             <span class="text-dark">{{ $participant->event_location ?: '-' }}</span>
                         </div>
                     </div>
@@ -292,14 +292,10 @@
                 </div>
                 <div class="card-body text-center p-4">
                     @if ($participant->qr_code_url)
-                        <div class="p-2 border rounded d-inline-block bg-white shadow-sm mb-3">
+                        <div class="p-2 border rounded d-inline-block bg-white shadow-sm">
                             <img src="{{ $participant->qr_code_url }}" alt="QR Code {{ $participant->certificate_number }}"
                                 class="img-fluid" style="width: 160px; height: 160px; object-fit: contain;">
                         </div>
-                        <div class="font-monospace text-muted fs-12 mb-2">{{ $participant->qr_code_path }}</div>
-                        <a href="{{ $participant->qr_code_url }}" download="{{ $participant->qr_code_path }}" class="btn btn-sm btn-light border">
-                            <i class="mdi mdi-download me-1"></i> Unduh Gambar QR
-                        </a>
                     @else
                         <div class="py-4 text-muted">
                             <i class="bx bx-qr font-size-48 d-block mb-2 text-secondary opacity-50"></i>

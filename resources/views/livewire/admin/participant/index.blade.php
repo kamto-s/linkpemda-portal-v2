@@ -183,7 +183,7 @@
                         <div class="alert alert-primary d-flex align-items-center justify-content-between mb-3 py-2 px-3 border-0 bg-primary-subtle text-primary-emphasis flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-primary fs-12 rounded-pill px-2 py-1">{{ count($selectedParticipants) }}</span>
-                                <span class="fw-semibold">peserta terpilih</span>
+                                <span class="fw-semibold">Peserta terpilih</span>
                             </div>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <!-- Tombol Kirim Email Masal -->
@@ -202,7 +202,7 @@
                                     wire:click="downloadBulkPdf('sertifikat')" wire:loading.attr="disabled"
                                     title="Unduh kumpulan PDF sertifikat warna yang dipilih dalam file .ZIP">
                                     <span wire:loading.remove wire:target="downloadBulkPdf('sertifikat')">
-                                        <i class="mdi mdi-file-pdf-box me-1"></i> Sertifikat Warna (.ZIP)
+                                        <i class="mdi mdi-download me-1"></i> Sertifikat Warna (.ZIP)
                                     </span>
                                     <span wire:loading wire:target="downloadBulkPdf('sertifikat')">
                                         <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
@@ -214,7 +214,7 @@
                                     wire:click="downloadBulkPdf('blank')" wire:loading.attr="disabled"
                                     title="Unduh kumpulan PDF sertifikat blank (tanpa background) dalam file .ZIP">
                                     <span wire:loading.remove wire:target="downloadBulkPdf('blank')">
-                                        <i class="mdi mdi-printer me-1"></i> Sertifikat Blank (.ZIP)
+                                        <i class="mdi mdi-download me-1"></i> Sertifikat Blank (.ZIP)
                                     </span>
                                     <span wire:loading wire:target="downloadBulkPdf('blank')">
                                         <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
@@ -226,7 +226,7 @@
                                     wire:click="downloadBulkPdf('kwitansi')" wire:loading.attr="disabled"
                                     title="Unduh kumpulan PDF kwitansi yang dipilih dalam file .ZIP">
                                     <span wire:loading.remove wire:target="downloadBulkPdf('kwitansi')">
-                                        <i class="mdi mdi-receipt me-1"></i> Kwitansi (.ZIP)
+                                        <i class="mdi mdi-download me-1"></i> Kwitansi (.ZIP)
                                     </span>
                                     <span wire:loading wire:target="downloadBulkPdf('kwitansi')">
                                         <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
@@ -359,15 +359,15 @@
                                                             <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.certificate.view', $participant->id) }}">
-                                                                <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Sertifikat (Warna)
+                                                                <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Sertifikat Warna
                                                             </a>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.certificate.print', $participant->id) }}">
-                                                                <i class="mdi mdi-printer me-2 text-secondary"></i> Sertifikat Blank (Print)
+                                                                <i class="mdi mdi-printer me-2 text-secondary"></i> Sertifikat Blank
                                                             </a>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.kwitansi.view', $participant->id) }}">
-                                                                <i class="mdi mdi-receipt me-2 text-success"></i> Kwitansi (PDF)
+                                                                <i class="mdi mdi-receipt me-2 text-success"></i> Kwitansi
                                                             </a>
                                                             <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item"
@@ -454,9 +454,6 @@
                             File gambar QR belum ditemukan di server.
                         </div>
                     @endif
-                </div>
-                <div class="modal-footer py-1">
-                    <button type="button" class="btn btn-sm btn-secondary w-100" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>

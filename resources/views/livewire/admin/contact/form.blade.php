@@ -81,7 +81,7 @@
 
                             <!-- Jabatan -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Nama Instansi / Perusahaan <span
+                                <label class="form-label fw-bold">Instansi / Perusahaan <span
                                         class="text-danger">*</span></label>
                                 <input type="text"
                                     class="form-control @error('organization_name') is-invalid @enderror"
