@@ -8,6 +8,8 @@ use App\Livewire\Admin\Category\Index as CategoryIndex;
 use App\Livewire\Admin\Contact\Form as ContactForm;
 use App\Livewire\Admin\Contact\Index as ContactIndex;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Participant\Form as ParticipantForm;
+use App\Livewire\Admin\Participant\Index as ParticipantIndex;
 use App\Livewire\Admin\Role\Form as RoleForm;
 use App\Livewire\Admin\Role\Index as RoleIndex;
 use App\Livewire\Admin\SystemSetting\Index as SystemSettingIndex;
@@ -83,6 +85,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/campaigns/{campaign}/edit', CampaignForm::class)->name('campaign.edit');
         Route::get('/campaigns/{campaign}', CampaignShow::class)->name('campaign.show');
         Route::post('/campaigns/upload-image', [CampaignImageUploadController::class, 'upload'])->name('campaign.upload-image');
+
+        // Administrasi - Data Peserta (Linkpemda)
+        Route::get('/participants/linkpemda', ParticipantIndex::class)->name('participant.linkpemda.index');
+        Route::get('/participants/linkpemda/create', ParticipantForm::class)->name('participant.linkpemda.create');
+        Route::get('/participants/linkpemda/{participant}/edit', ParticipantForm::class)->name('participant.linkpemda.edit');
 
         // Setting
         Route::get('/system-settings', SystemSettingIndex::class)->name('system-setting.index');

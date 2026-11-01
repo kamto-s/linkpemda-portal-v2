@@ -155,18 +155,20 @@
             @canany(['view-certificates', 'view-participants', 'view-registrations', 'view-documents', 'view-messages'])
                 <li class="menu-title" title="Administrasi"><i class="mdi mdi-dots-horizontal"></i> <span>Administrasi</span></li>
 
-                <!-- 1. Sertifikat -->
-                @can('view-certificates')
-                    <li class="menu-item">
-                        <a href="#menuSertifikat" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                            <span class="menu-icon"><i class="bx bx-medal"></i></span>
-                            <span class="menu-text"> Sertifikat </span>
+                <!-- 1. Data Peserta (Linkpemda & Tren Media Diklat) -->
+                @canany(['view-participants', 'view-certificates'])
+                    <li class="menu-item {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
+                        <a href="#menuSertifikat" data-bs-toggle="collapse"
+                            aria-expanded="{{ request()->routeIs('admin.participant.linkpemda.*') ? 'true' : 'false' }}"
+                            class="menu-link waves-effect waves-light {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
+                            <span class="menu-icon"><i class="bx bx-group"></i></span>
+                            <span class="menu-text"> Data Peserta </span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <div class="collapse" id="menuSertifikat">
+                        <div class="collapse {{ request()->routeIs('admin.participant.linkpemda.*') ? 'show' : '' }}" id="menuSertifikat">
                             <ul class="sub-menu">
-                                <li class="menu-item">
-                                    <a class='menu-link' href='#'>
+                                <li class="menu-item {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
+                                    <a wire:navigate class='menu-link' href='{{ route('admin.participant.linkpemda.index') }}'>
                                         <span class="menu-text">Linkpemda</span>
                                     </a>
                                 </li>
@@ -178,13 +180,13 @@
                             </ul>
                         </div>
                     </li>
-                @endcan
+                @endcanany
 
                 <!-- 2. Data Peserta / OPD -->
                 @can('view-participants')
                     <li class="menu-item">
                         <a class='menu-link waves-effect waves-light' href='#'>
-                            <span class="menu-icon"><i class="bx bx-group"></i></span>
+                            <span class="menu-icon"><i class="bx bx-medal"></i></span>
                             <span class="menu-text"> Data Peserta </span>
                         </a>
                     </li>
