@@ -182,16 +182,6 @@
                     </li>
                 @endcanany
 
-                <!-- 2. Data Peserta / OPD -->
-                @can('view-participants')
-                    <li class="menu-item">
-                        <a class='menu-link waves-effect waves-light' href='#'>
-                            <span class="menu-icon"><i class="bx bx-medal"></i></span>
-                            <span class="menu-text"> Data Peserta </span>
-                        </a>
-                    </li>
-                @endcan
-
                 <!-- 3. Pendaftaran Masuk -->
                 @can('view-registrations')
                     <li class="menu-item">

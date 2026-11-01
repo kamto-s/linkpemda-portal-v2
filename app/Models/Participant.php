@@ -41,23 +41,42 @@ class Participant extends BaseModel
     }
 
     /**
-     * Boot method to auto-assign QR code image file name based on certificate_number if empty.
+     * Boot method to auto-assign certificate number, receipt number & QR code image file name.
      */
     protected static function booted(): void
     {
         static::creating(function (Participant $participant) {
+            if (empty($participant->certificate_number)) {
+                $participant->certificate_number = static::generateCertificateNumber();
+            }
+
+            if (empty($participant->receipt_number)) {
+                $participant->receipt_number = $participant->certificate_number;
+            }
+
             if (empty($participant->qr_code_path) && ! empty($participant->certificate_number)) {
                 $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $participant->certificate_number);
-                $participant->qr_code_path = $sanitized.'.png';
+                $participant->qr_code_path = "{$sanitized}.png";
+            }
+        });
+
+        static::updating(function (Participant $participant) {
+            if ($participant->isDirty('certificate_number') && ! empty($participant->certificate_number)) {
+                if (empty($participant->receipt_number) || $participant->receipt_number === $participant->getOriginal('certificate_number')) {
+                    $participant->receipt_number = $participant->certificate_number;
+                }
+                $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $participant->certificate_number);
+                $participant->qr_code_path = "{$sanitized}.png";
             }
         });
     }
 
     /**
-     * Helper untuk menghasilkan nomor sertifikat otomatis berikutnya sesuai format Linkpemda (LP).
-     * Contoh: LP-00171-II-2025
+     * Helper untuk menghasilkan nomor sertifikat otomatis dengan kode acak (random) unik Linkpemda (LP).
+     * Format: LP-[5-digit acak]-[Bulan Romawi]-[Tahun]
+     * Contoh: LP-72941-XI-2026
      */
-    public static function generateNextCertificateNumber(?CarbonInterface $date = null): string
+    public static function generateCertificateNumber(?CarbonInterface $date = null): string
     {
         $date = $date ?? now();
         $prefix = 'LP';
@@ -69,18 +88,21 @@ class Participant extends BaseModel
         ];
         $monthRoman = $romanMonths[(int) $date->format('n')] ?? 'I';
 
-        $latest = static::where('certificate_number', 'like', "{$prefix}-%-{$year}")
-            ->orderByRaw('LENGTH(certificate_number) DESC, certificate_number DESC')
-            ->value('certificate_number');
+        do {
+            // 5 digit angka acak (10000 - 99999) agar nomor unik dan tidak dapat ditebak
+            $randomCode = (string) random_int(10000, 99999);
+            $number = "{$prefix}-{$randomCode}-{$monthRoman}-{$year}";
+        } while (static::where('certificate_number', $number)->exists());
 
-        $nextNumber = 1;
-        if ($latest && preg_match('/'.$prefix.'-(\d+)-/i', $latest, $matches)) {
-            $nextNumber = (int) $matches[1] + 1;
-        }
+        return $number;
+    }
 
-        $paddedNumber = str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
-
-        return "{$prefix}-{$paddedNumber}-{$monthRoman}-{$year}";
+    /**
+     * Alias untuk backward compatibility
+     */
+    public static function generateNextCertificateNumber(?CarbonInterface $date = null): string
+    {
+        return static::generateCertificateNumber($date);
     }
 
     /**
