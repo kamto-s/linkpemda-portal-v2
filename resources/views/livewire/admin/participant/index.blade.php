@@ -197,14 +197,40 @@
                                     </span>
                                 </button>
 
-                                <!-- Tombol Download Sertifikat Masal (Rencana) -->
-                                <button type="button" class="btn btn-sm btn-outline-danger" style="--bs-btn-bg: #fff;" wire:click="planDownload('sertifikat_bulk')">
-                                    <i class="mdi mdi-file-pdf-box me-1"></i> Unduh Sertifikat PDF
+                                <!-- Tombol Download Sertifikat Masal (.ZIP) -->
+                                <button type="button" class="btn btn-sm btn-outline-danger" style="--bs-btn-bg: #fff;"
+                                    wire:click="downloadBulkPdf('sertifikat')" wire:loading.attr="disabled"
+                                    title="Unduh kumpulan PDF sertifikat warna yang dipilih dalam file .ZIP">
+                                    <span wire:loading.remove wire:target="downloadBulkPdf('sertifikat')">
+                                        <i class="mdi mdi-file-pdf-box me-1"></i> Sertifikat Warna (.ZIP)
+                                    </span>
+                                    <span wire:loading wire:target="downloadBulkPdf('sertifikat')">
+                                        <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
+                                    </span>
                                 </button>
 
-                                <!-- Tombol Download Kwitansi Masal (Rencana) -->
-                                <button type="button" class="btn btn-sm btn-outline-success" style="--bs-btn-bg: #fff;" wire:click="planDownload('kwitansi_bulk')">
-                                    <i class="mdi mdi-receipt me-1"></i> Unduh Kwitansi PDF
+                                <!-- Tombol Download Sertifikat Blank Masal (.ZIP) -->
+                                <button type="button" class="btn btn-sm btn-outline-secondary" style="--bs-btn-bg: #fff;"
+                                    wire:click="downloadBulkPdf('blank')" wire:loading.attr="disabled"
+                                    title="Unduh kumpulan PDF sertifikat blank (tanpa background) dalam file .ZIP">
+                                    <span wire:loading.remove wire:target="downloadBulkPdf('blank')">
+                                        <i class="mdi mdi-printer me-1"></i> Sertifikat Blank (.ZIP)
+                                    </span>
+                                    <span wire:loading wire:target="downloadBulkPdf('blank')">
+                                        <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
+                                    </span>
+                                </button>
+
+                                <!-- Tombol Download Kwitansi Masal (.ZIP) -->
+                                <button type="button" class="btn btn-sm btn-outline-success" style="--bs-btn-bg: #fff;"
+                                    wire:click="downloadBulkPdf('kwitansi')" wire:loading.attr="disabled"
+                                    title="Unduh kumpulan PDF kwitansi yang dipilih dalam file .ZIP">
+                                    <span wire:loading.remove wire:target="downloadBulkPdf('kwitansi')">
+                                        <i class="mdi mdi-receipt me-1"></i> Kwitansi (.ZIP)
+                                    </span>
+                                    <span wire:loading wire:target="downloadBulkPdf('kwitansi')">
+                                        <span class="spinner-border spinner-border-sm me-1"></span> Mengompres...
+                                    </span>
                                 </button>
 
                                 <!-- Batal Seleksi -->
@@ -308,54 +334,55 @@
                                             <small class="text-muted">{{ $participant->created_at ? $participant->created_at->format('H:i') . ' WIB' : '-' }}</small>
                                         </td>
                                         <td class="text-end">
-                                            <div class="btn-group">
-                                                <button type="button"
-                                                    class="btn btn-sm btn-light dropdown-toggle text-end"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true"
-                                                    aria-expanded="false">
-                                                    <i class="mdi mdi-dots-vertical"></i>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-end shadow-sm"
-                                                    style="z-index: 9999;">
-                                                    @canany(['view-participants', 'view-certificates'])
-                                                        <a class="dropdown-item" href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate>
-                                                            <i class="mdi mdi-eye-outline me-1 text-info"></i> Lihat Detail
-                                                        </a>
-                                                    @endcanany
-                                                    @canany(['edit-participants', 'edit-certificates'])
-                                                        <a class="dropdown-item" href="javascript:void(0);"
-                                                            wire:click="sendCertificateEmail('{{ $participant->id }}')">
-                                                            <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync text-info' : 'mdi-send text-primary' }} me-1"></i>
-                                                            {{ $participant->is_email_sent ? 'Kirim Ulang Email' : 'Kirim E-Sertifikat' }}
-                                                        </a>
-                                                        <!-- Unduh PDF Sertifikat & Kwitansi (Rencana) -->
-                                                        <a class="dropdown-item" href="javascript:void(0);"
-                                                            wire:click="planDownload('sertifikat', '{{ $participant->id }}')">
-                                                            <i class="mdi mdi-file-pdf-box me-1 text-danger"></i> Unduh Sertifikat (PDF)
-                                                        </a>
-                                                        <a class="dropdown-item" href="javascript:void(0);"
-                                                            wire:click="planDownload('kwitansi', '{{ $participant->id }}')">
-                                                            <i class="mdi mdi-receipt me-1 text-success"></i> Unduh Kwitansi (PDF)
-                                                        </a>
-                                                        @if ($participant->qr_code_path)
+                                            <div class="d-flex align-items-center justify-content-end gap-1">
+                                                {{-- Tombol Cepat: Lihat Detail --}}
+                                                <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate
+                                                    class="btn btn-sm btn-light border" title="Lihat Detail & Dokumen Lengkap">
+                                                    <i class="mdi mdi-eye-outline text-primary"></i>
+                                                </a>
+
+                                                {{-- Dropdown Aksi Lainnya --}}
+                                                <div class="btn-group">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-light border dropdown-toggle"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                        <i class="mdi mdi-dots-vertical"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end shadow-sm" style="z-index: 9999;">
+                                                        @canany(['edit-participants', 'edit-certificates'])
                                                             <a class="dropdown-item" href="javascript:void(0);"
-                                                                wire:click="showQrModal('{{ $participant->id }}')">
-                                                                <i class="bx bx-qr me-1 text-secondary"></i> Lihat QR Code
+                                                                wire:click="sendCertificateEmail('{{ $participant->id }}')">
+                                                                <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync text-info' : 'mdi-send text-primary' }} me-2"></i>
+                                                                {{ $participant->is_email_sent ? 'Kirim Ulang Email' : 'Kirim E-Sertifikat' }}
                                                             </a>
-                                                        @endif
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('admin.participant.linkpemda.edit', $participant->id) }}"
-                                                            wire:navigate>
-                                                            <i class="mdi mdi-pencil me-1"></i> Edit
-                                                        </a>
-                                                    @endcanany
-                                                    @canany(['delete-participants', 'delete-certificates'])
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                            wire:click="confirmDelete('{{ $participant->id }}')">
-                                                            <i class="mdi mdi-trash-can me-1"></i> Hapus
-                                                        </a>
-                                                    @endcanany
+                                                            <div class="dropdown-divider my-1"></div>
+                                                            <a class="dropdown-item" target="_blank"
+                                                                href="{{ route('admin.participant.linkpemda.certificate.view', $participant->id) }}">
+                                                                <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Sertifikat (Warna)
+                                                            </a>
+                                                            <a class="dropdown-item" target="_blank"
+                                                                href="{{ route('admin.participant.linkpemda.certificate.print', $participant->id) }}">
+                                                                <i class="mdi mdi-printer me-2 text-secondary"></i> Sertifikat Blank (Print)
+                                                            </a>
+                                                            <a class="dropdown-item" target="_blank"
+                                                                href="{{ route('admin.participant.linkpemda.kwitansi.view', $participant->id) }}">
+                                                                <i class="mdi mdi-receipt me-2 text-success"></i> Kwitansi (PDF)
+                                                            </a>
+                                                            <div class="dropdown-divider my-1"></div>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('admin.participant.linkpemda.edit', $participant->id) }}"
+                                                                wire:navigate>
+                                                                <i class="mdi mdi-pencil me-2 text-warning"></i> Edit Data
+                                                            </a>
+                                                        @endcanany
+                                                        @canany(['delete-participants', 'delete-certificates'])
+                                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                                wire:click="confirmDelete('{{ $participant->id }}')">
+                                                                <i class="mdi mdi-trash-can me-2"></i> Hapus
+                                                            </a>
+                                                        @endcanany
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>

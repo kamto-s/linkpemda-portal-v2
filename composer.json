@@ -10,11 +10,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "chillerlan/php-qrcode": "*",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^4.1",
         "phpoffice/phpspreadsheet": "*",
+        "setasign/fpdf": "*",
+        "setasign/fpdi": "*",
         "spatie/laravel-permission": "*"
     },
     "require-dev": {

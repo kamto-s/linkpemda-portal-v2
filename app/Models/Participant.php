@@ -42,6 +42,7 @@ class Participant extends BaseModel
 
     /**
      * Boot method to auto-assign certificate number, receipt number & QR code image file name.
+     * Juga otomatis generate file fisik gambar QR Code setelah peserta berhasil dibuat/diperbarui.
      */
     protected static function booted(): void
     {
@@ -60,6 +61,11 @@ class Participant extends BaseModel
             }
         });
 
+        // Generate file QR code PNG setelah data berhasil disimpan
+        static::created(function (Participant $participant) {
+            static::generateQrCodeFile($participant);
+        });
+
         static::updating(function (Participant $participant) {
             if ($participant->isDirty('certificate_number') && ! empty($participant->certificate_number)) {
                 if (empty($participant->receipt_number) || $participant->receipt_number === $participant->getOriginal('certificate_number')) {
@@ -69,6 +75,50 @@ class Participant extends BaseModel
                 $participant->qr_code_path = "{$sanitized}.png";
             }
         });
+
+        // Re-generate QR code jika nomor sertifikat berubah
+        static::updated(function (Participant $participant) {
+            if ($participant->wasChanged('certificate_number')) {
+                static::generateQrCodeFile($participant);
+            }
+        });
+    }
+
+    /**
+     * Generate file PNG QR code ke public/uploads/qr_code/ dan simpan ke storage.
+     * QR code mengarah ke halaman verifikasi sertifikat publik.
+     */
+    public static function generateQrCodeFile(Participant $participant): bool
+    {
+        if (empty($participant->certificate_number)) {
+            return false;
+        }
+
+        try {
+            $verifyUrl = route('certificate.verify', ['certificate_number' => $participant->certificate_number]);
+
+            $options = new \chillerlan\QRCode\QROptions([
+                'outputInterface'  => \chillerlan\QRCode\Output\QRGdImagePNG::class,
+                'eccLevel'         => \chillerlan\QRCode\Common\EccLevel::L,
+                'outputBase64'     => false,
+                'imageTransparent' => false,
+                'scale'            => 10,
+            ]);
+
+            $imageData = (new \chillerlan\QRCode\QRCode($options))->render($verifyUrl);
+
+            $dir = public_path('uploads/qr_code');
+            if (! file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $participant->certificate_number);
+            file_put_contents("{$dir}/{$sanitized}.png", $imageData);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**
@@ -134,23 +184,34 @@ class Participant extends BaseModel
      */
     public function getQrCodeUrlAttribute(): ?string
     {
-        if (empty($this->qr_code_path)) {
+        if (empty($this->certificate_number)) {
             return null;
+        }
+
+        if (empty($this->qr_code_path)) {
+            $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $this->certificate_number);
+            $this->qr_code_path = "{$sanitized}.png";
         }
 
         if (str_starts_with($this->qr_code_path, 'http://') || str_starts_with($this->qr_code_path, 'https://')) {
             return $this->qr_code_path;
         }
 
-        if (file_exists(public_path('assets/images/qr_codes/'.$this->qr_code_path))) {
-            return asset('assets/images/qr_codes/'.$this->qr_code_path);
+        // Jika file belum ada di disk, generate otomatis
+        if (! file_exists(public_path('uploads/qr_code/'.$this->qr_code_path)) &&
+            ! file_exists(public_path('assets/images/qr_codes/'.$this->qr_code_path))) {
+            static::generateQrCodeFile($this);
         }
 
         if (file_exists(public_path('uploads/qr_code/'.$this->qr_code_path))) {
             return asset('uploads/qr_code/'.$this->qr_code_path);
         }
 
-        return asset('storage/qr_codes/'.$this->qr_code_path);
+        if (file_exists(public_path('assets/images/qr_codes/'.$this->qr_code_path))) {
+            return asset('assets/images/qr_codes/'.$this->qr_code_path);
+        }
+
+        return asset('uploads/qr_code/'.$this->qr_code_path);
     }
 
     /**

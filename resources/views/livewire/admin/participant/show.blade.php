@@ -66,12 +66,68 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <button type="button" class="btn btn-outline-danger" wire:click="planDownload('sertifikat')">
-                        <i class="mdi mdi-file-pdf-box me-1"></i> Unduh Sertifikat
-                    </button>
-                    <button type="button" class="btn btn-outline-success" wire:click="planDownload('kwitansi')">
-                        <i class="mdi mdi-receipt me-1"></i> Unduh Kwitansi
-                    </button>
+                    {{-- Tombol Sertifikat --}}
+                    <div class="btn-group" role="group">
+                        <a href="{{ $this->getPdfUrl('sertifikat', 'view') }}" target="_blank"
+                            class="btn btn-outline-danger"
+                            title="Lihat / Preview Sertifikat PDF">
+                            <i class="mdi mdi-file-pdf-box me-1"></i> Sertifikat
+                        </a>
+                        <button type="button" class="btn btn-outline-danger dropdown-toggle dropdown-toggle-split px-2"
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Pilihan Dokumen Sertifikat">
+                            <i class="mdi mdi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow-sm">
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Berwarna</li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'view') }}" target="_blank">
+                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat / Preview (Warna)
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download') }}" target="_blank">
+                                    <i class="mdi mdi-download me-2 text-danger"></i> Unduh Sertifikat (Warna)
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Blank (Kertas Cetak)</li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'print') }}" target="_blank">
+                                    <i class="mdi mdi-printer me-2 text-secondary"></i> Print / Preview (Blank)
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download-blank') }}" target="_blank">
+                                    <i class="mdi mdi-download me-2 text-primary"></i> Unduh Sertifikat (Blank)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {{-- Tombol Kwitansi --}}
+                    <div class="btn-group" role="group">
+                        <a href="{{ $this->getPdfUrl('kwitansi', 'view') }}" target="_blank"
+                            class="btn btn-outline-success"
+                            title="Lihat / Preview Kwitansi PDF">
+                            <i class="mdi mdi-receipt me-1"></i> Kwitansi
+                        </a>
+                        <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split px-2"
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Pilihan Dokumen Kwitansi">
+                            <i class="mdi mdi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow-sm">
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'view') }}" target="_blank">
+                                    <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat / Preview
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'download') }}" target="_blank">
+                                    <i class="mdi mdi-download me-2 text-success"></i> Unduh (Download)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     @canany(['edit-participants', 'edit-certificates'])
                         <button type="button" class="btn btn-outline-primary"
@@ -109,8 +165,8 @@
             <!-- 1. Informasi Peserta & Instansi -->
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
-                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                        <i class="bx bx-user me-1 text-primary"></i> 1. Informasi Identitas &amp; Kontak
+                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
+                        Informasi Identitas &amp; Kontak
                     </h5>
                 </div>
                 <div class="card-body">
@@ -159,8 +215,8 @@
             <!-- 2. Data Kegiatan Bimtek -->
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
-                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                        <i class="bx bx-medal me-1 text-primary"></i> 2. Kegiatan Bimtek &amp; E-Sertifikat
+                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
+                        Kegiatan Bimtek &amp; E-Sertifikat
                     </h5>
                 </div>
                 <div class="card-body">
@@ -196,8 +252,8 @@
             <!-- 3. Kwitansi Pembayaran & Biaya Kontribusi -->
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
-                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                        <i class="bx bx-receipt me-1 text-primary"></i> 3. Kwitansi Pembayaran &amp; Biaya Kontribusi
+                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
+                        Kwitansi Pembayaran &amp; Biaya Kontribusi
                     </h5>
                 </div>
                 <div class="card-body">
@@ -230,8 +286,8 @@
             <!-- Card QR Code Sertifikat -->
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
-                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                        <i class="bx bx-qr me-1 text-primary"></i> QR Code Verifikasi
+                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
+                       QR Code Verifikasi
                     </h5>
                 </div>
                 <div class="card-body text-center p-4">
@@ -257,8 +313,8 @@
             <!-- Card Status Pengiriman Email & Log Sistem -->
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
-                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                        <i class="mdi mdi-information-outline me-1 text-primary"></i> Status &amp; Riwayat
+                    <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
+                        Status &amp; Riwayat
                     </h5>
                 </div>
                 <div class="card-body">

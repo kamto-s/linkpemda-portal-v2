@@ -57,10 +57,50 @@ class Show extends Component
         }
     }
 
-    public function planDownload(string $type): void
+    /**
+     * Mengembalikan URL route PDF sesuai type & action.
+     * Digunakan dari blade via @this.pdfUrl('sertifikat','view') dll.
+     */
+    public function getPdfUrl(string $type, string $action = 'view'): string
     {
-        $label = $type === 'kwitansi' ? 'Kwitansi' : 'Sertifikat';
-        session()->flash('info', "Tombol Unduh {$label} (PDF) telah disiapkan. Alur pembuatan dokumen PDF akan segera diaktifkan pada alur berikutnya.");
+        $routeMap = [
+            'sertifikat' => [
+                'view'           => 'admin.participant.linkpemda.certificate.view',
+                'download'       => 'admin.participant.linkpemda.certificate.download',
+                'print'          => 'admin.participant.linkpemda.certificate.print',
+                'download-blank' => 'admin.participant.linkpemda.certificate.download-blank',
+            ],
+            'kwitansi' => [
+                'view'     => 'admin.participant.linkpemda.kwitansi.view',
+                'download' => 'admin.participant.linkpemda.kwitansi.download',
+            ],
+        ];
+
+        $routeName = $routeMap[$type][$action] ?? null;
+
+        return $routeName ? route($routeName, $this->participant) : '#';
+    }
+
+    public function downloadCertificate(string $type = 'default')
+    {
+        abort_unless(
+            auth()->user()?->can('view-participants') || auth()->user()?->can('view-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengunduh sertifikat.'
+        );
+
+        return app(\App\Services\ParticipantDocumentService::class)->streamDownload($this->participant, $type);
+    }
+
+    public function downloadKwitansi()
+    {
+        abort_unless(
+            auth()->user()?->can('view-participants') || auth()->user()?->can('view-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengunduh kwitansi.'
+        );
+
+        return app(\App\Services\ParticipantDocumentService::class)->streamDownload($this->participant, 'kwitansi');
     }
 
     public function delete(): mixed

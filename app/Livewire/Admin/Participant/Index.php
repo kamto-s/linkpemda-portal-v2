@@ -217,6 +217,43 @@ class Index extends Component
         session()->flash('success', "Pengiriman masal selesai: {$sentCount} e-sertifikat berhasil dikirim.".($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
     }
 
+    /**
+     * Unduh berkas PDF masal (Sertifikat atau Kwitansi) untuk peserta yang dipilih dalam format .ZIP
+     */
+    public function downloadBulkPdf(string $type = 'sertifikat')
+    {
+        abort_unless(
+            auth()->user()?->can('view-participants') || auth()->user()?->can('view-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengunduh dokumen.'
+        );
+
+        if (empty($this->selectedParticipants)) {
+            session()->flash('error', 'Pilih minimal 1 peserta untuk mengunduh berkas masal.');
+
+            return null;
+        }
+
+        $participants = Participant::whereIn('id', $this->selectedParticipants)->get();
+        $service = app(\App\Services\ParticipantDocumentService::class);
+        $zipPath = $service->buildBulkZip($participants, $type);
+
+        if (! $zipPath || ! file_exists($zipPath)) {
+            session()->flash('error', 'Gagal membuat file ZIP dokumen masal.');
+
+            return null;
+        }
+
+        $label = match ($type) {
+            'kwitansi' => 'Kwitansi',
+            'blank'    => 'Sertifikat_Blank',
+            default    => 'Sertifikat_Warna',
+        };
+        $downloadName = "Bulk_{$label}_Linkpemda_" . date('Ymd_His') . ".zip";
+
+        return response()->download($zipPath, $downloadName)->deleteFileAfterSend(true);
+    }
+
     public function showQrModal(string $id): void
     {
         $participant = Participant::findOrFail($id);
@@ -226,11 +263,33 @@ class Index extends Component
         $this->dispatch('open-qr-modal');
     }
 
-    public function planDownload(string $type, ?string $participantId = null): void
+    /**
+     * Mengembalikan URL route PDF untuk peserta tertentu.
+     * Dipanggil dari blade: @php($this->pdfRoute('sertifikat', 'view', $participant->id))
+     */
+    public function getPdfRoute(string $type, string $action, string $participantId): string
     {
-        $label = str_contains($type, 'kwitansi') ? 'Kwitansi' : 'Sertifikat';
-        $scope = str_contains($type, 'bulk') ? 'masal' : '';
-        session()->flash('info', "Tombol Unduh {$label} {$scope} (PDF) telah disiapkan. Fitur pembuatan file PDF akan segera diaktifkan pada alur berikutnya.");
+        $participant = Participant::find($participantId);
+        if (! $participant) {
+            return '#';
+        }
+
+        $routeMap = [
+            'sertifikat' => [
+                'view'           => 'admin.participant.linkpemda.certificate.view',
+                'download'       => 'admin.participant.linkpemda.certificate.download',
+                'print'          => 'admin.participant.linkpemda.certificate.print',
+                'download-blank' => 'admin.participant.linkpemda.certificate.download-blank',
+            ],
+            'kwitansi' => [
+                'view'     => 'admin.participant.linkpemda.kwitansi.view',
+                'download' => 'admin.participant.linkpemda.kwitansi.download',
+            ],
+        ];
+
+        $routeName = $routeMap[$type][$action] ?? null;
+
+        return $routeName ? route($routeName, $participant) : '#';
     }
 
     protected function getFilteredQuery(bool $withEmailStatus = true)

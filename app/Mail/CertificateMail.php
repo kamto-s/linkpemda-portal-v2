@@ -47,5 +47,27 @@ class CertificateMail extends Mailable
             ],
         );
     }
+
+    /**
+     * Lampirkan file PDF E-Sertifikat ke dalam email.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        try {
+            $service = app(\App\Services\ParticipantDocumentService::class);
+            $binary = $service->getPdfBinary($this->participant, 'default');
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->participant->name);
+            $filename = "Sertifikat_{$safeName}_{$this->participant->certificate_number}.pdf";
+
+            return [
+                \Illuminate\Mail\Mailables\Attachment::fromData(fn () => $binary, $filename)
+                    ->withMime('application/pdf'),
+            ];
+        } catch (\Throwable) {
+            return [];
+        }
+    }
 }
 

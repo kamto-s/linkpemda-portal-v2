@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CampaignImageUploadController;
+use App\Http\Controllers\Admin\ParticipantDocumentController;
 use App\Livewire\Admin\Campaign\Form as CampaignForm;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
 use App\Livewire\Admin\Campaign\Show as CampaignShow;
@@ -32,6 +33,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'welcome')->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Public Certificate Verification (Frontend)
+|--------------------------------------------------------------------------
+*/
+Route::get('/sertifikat/cek/{certificate_number}', function (string $certificate_number) {
+    $participant = \App\Models\Participant::where('certificate_number', $certificate_number)->first();
+    return view('certificate.verify', compact('participant', 'certificate_number'));
+})->name('certificate.verify');
+
+// Alias kompatibilitas mundur dengan sistem lama linkpemda
+Route::get('/sertifikat/status/{no_certf}', function (string $no_certf) {
+    return redirect()->route('certificate.verify', ['certificate_number' => $no_certf]);
+})->name('sertifikat.status.dinamis');
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +108,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/linkpemda/create', ParticipantForm::class)->name('participant.linkpemda.create');
         Route::get('/participants/linkpemda/{participant}/edit', ParticipantForm::class)->name('participant.linkpemda.edit');
         Route::get('/participants/linkpemda/{participant}', ParticipantShow::class)->name('participant.linkpemda.show');
+
+        // Dokumen PDF Peserta (Sertifikat & Kwitansi) — dibuka via target="_blank"
+        Route::get('/participants/linkpemda/{participant}/certificate/view', [ParticipantDocumentController::class, 'viewCertificate'])->name('participant.linkpemda.certificate.view');
+        Route::get('/participants/linkpemda/{participant}/certificate/download', [ParticipantDocumentController::class, 'downloadCertificate'])->name('participant.linkpemda.certificate.download');
+        Route::get('/participants/linkpemda/{participant}/certificate/print', [ParticipantDocumentController::class, 'printCertificate'])->name('participant.linkpemda.certificate.print');
+        Route::get('/participants/linkpemda/{participant}/certificate/download-blank', [ParticipantDocumentController::class, 'downloadCertificateBlank'])->name('participant.linkpemda.certificate.download-blank');
+        Route::get('/participants/linkpemda/{participant}/kwitansi/view', [ParticipantDocumentController::class, 'viewKwitansi'])->name('participant.linkpemda.kwitansi.view');
+        Route::get('/participants/linkpemda/{participant}/kwitansi/download', [ParticipantDocumentController::class, 'downloadKwitansi'])->name('participant.linkpemda.kwitansi.download');
 
         // Setting
         Route::get('/system-settings', SystemSettingIndex::class)->name('system-setting.index');
