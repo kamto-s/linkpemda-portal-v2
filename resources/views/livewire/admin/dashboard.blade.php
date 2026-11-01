@@ -1,247 +1,555 @@
 <div>
-    <!-- start page title -->
+    <!-- Page Header & Title -->
     <div class="py-3 py-lg-4">
-        <div class="row">
-            <div class="col-lg-6">
-                <h4 class="page-title mb-0">Dashboard</h4>
-            </div>
-            <div class="col-lg-6">
-                <div class="d-none d-lg-block">
-                    <ol class="breadcrumb m-0 float-end">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">Dashtrap</a></li>
-                        <li class="breadcrumb-item active">Dashboard</li>
-                    </ol>
-                </div>
+        <div class="row align-items-center">
+            <div class="col-lg-12">
+                <h4 class="page-title mb-1 fw-bold">Dashboard</h4>
             </div>
         </div>
     </div>
-    <!-- end page title -->
 
-    <div class="row">
-        <div class="col-md-6 col-xl-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge badge-soft-primary float-end">Daily</span>
-                        <h5 class="card-title mb-0">Cost per Unit</h5>
-                    </div>
-                    <div class="row d-flex align-items-center mb-4">
-                        <div class="col-8">
-                            <h2 class="d-flex align-items-center mb-0">
-                                $17.21
-                            </h2>
-                        </div>
-                        <div class="col-4 text-end">
-                            <span class="text-muted">12.5% <i class="mdi mdi-arrow-up text-success"></i></span>
-                        </div>
-                    </div>
-
-                    <div class="progress shadow-sm" style="height: 5px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 57%;">
-                        </div>
-                    </div>
-                </div>
-                <!--end card body-->
-            </div><!-- end card-->
-        </div> <!-- end col-->
-
-        <div class="col-md-6 col-xl-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge badge-soft-primary float-end">Per Week</span>
-                        <h5 class="card-title mb-0">Market Revenue</h5>
-                    </div>
-                    <div class="row d-flex align-items-center mb-4">
-                        <div class="col-8">
-                            <h2 class="d-flex align-items-center mb-0">
-                                $1875.54
-                            </h2>
-                        </div>
-                        <div class="col-4 text-end">
-                            <span class="text-muted">18.71% <i class="mdi mdi-arrow-down text-danger"></i></span>
-                        </div>
-                    </div>
-
-                    <div class="progress shadow-sm" style="height: 5px;">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 57%;">
-                        </div>
-                    </div>
-                </div>
-                <!--end card body-->
-            </div><!-- end card-->
-        </div> <!-- end col-->
-
-        <div class="col-md-6 col-xl-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge badge-soft-primary float-end">Per Month</span>
-                        <h5 class="card-title mb-0">Expenses</h5>
-                    </div>
-                    <div class="row d-flex align-items-center mb-4">
-                        <div class="col-8">
-                            <h2 class="d-flex align-items-center mb-0">
-                                $784.62
-                            </h2>
-                        </div>
-                        <div class="col-4 text-end">
-                            <span class="text-muted">57% <i class="mdi mdi-arrow-up text-success"></i></span>
-                        </div>
-                    </div>
-
-                    <div class="progress shadow-sm" style="height: 5px;">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 57%;">
-                        </div>
-                    </div>
-                </div>
-                <!--end card body-->
+    <div class="card border shadow-none bg-light-subtle mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2 py-1">
+                <span class="rounded bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                    <i class="mdi mdi-account-group fs-16"></i>
+                </span>
+                <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
+                    Administrasi
+                </h5>
             </div>
-            <!--end card-->
-        </div> <!-- end col-->
-
-        <div class="col-md-6 col-xl-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge badge-soft-primary float-end">All Time</span>
-                        <h5 class="card-title mb-0">Daily Visits</h5>
-                    </div>
-                    <div class="row d-flex align-items-center mb-4">
-                        <div class="col-8">
-                            <h2 class="d-flex align-items-center mb-0">
-                                1,15,187
-                            </h2>
-                        </div>
-                        <div class="col-4 text-end">
-                            <span class="text-muted">17.8% <i class="mdi mdi-arrow-down text-danger"></i></span>
-                        </div>
-                    </div>
-
-                    <div class="progress shadow-sm" style="height: 5px;">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 57%;"></div>
-                    </div>
-                </div>
-                <!--end card body-->
-            </div><!-- end card-->
-        </div> <!-- end col-->
-    </div>
-    <!-- end row-->
-
-
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Sales Analytics</h4>
-                    <p class="card-subtitle mb-4">From date of 1st Jan 2020 to continue</p>
-                    <div id="morris-bar-example" class="morris-chart"></div>
-                </div> <!--end card body-->
-            </div> <!-- end card-->
-        </div> <!-- end col -->
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Stock</h4>
-                    <p class="card-subtitle mb-4">Recent Stock</p>
-
-                    <div class="text-center">
-                        <input data-plugin="knob" data-width="165" data-height="165" data-linecap=round
-                            data-fgColor="#7a08c2" value="95" data-skin="tron" data-angleOffset="180"
-                            data-readOnly=true data-thickness=".15" />
-                        <h5 class="text-muted mt-3">Total sales made today</h5>
-
-
-                        <p class="text-muted w-75 mx-auto sp-line-2">Traditional heading
-                            elements are
-                            designed to work best in the meat of your page content.</p>
-
-                        <div class="row mt-3">
-                            <div class="col-6">
-                                <p class="text-muted font-15 mb-1 text-truncate">Target</p>
-                                <h4><i class="fas fa-arrow-up text-success me-1"></i>$7.8k</h4>
-
+            @canany(['view-participants', 'view-certificates'])
+                <a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate class="btn btn-sm btn-light border bg-white">
+                    <i class="mdi mdi-format-list-bulleted me-1"></i> Data Peserta
+                </a>
+            @endcanany
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-9">
+                    <div class="card border mb-0">
+                        <div
+                            class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h6 class="card-title mb-0 fw-bold text-dark fs-14">
+                                    <i class="mdi mdi-chart-line text-primary me-1"></i> Tren Pendaftaran Peserta Bimtek
+                                    Linkpemda
+                                </h6>
+                                <small class="text-muted">Grafik garis jumlah peserta terdaftar dan sertifikat terkirim
+                                    per
+                                    bulan (Jan &ndash; Des)</small>
                             </div>
-                            <div class="col-6">
-                                <p class="text-muted font-15 mb-1 text-truncate">Last week</p>
-                                <h4><i class="fas fa-arrow-down text-danger me-1"></i>$1.4k</h4>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted fs-12 mb-0 d-none d-sm-inline">Tahun:</label>
+                                <select wire:model.live="selectedYear" class="form-select form-select-sm"
+                                    style="width: 105px;">
+                                    @foreach ($availableYears as $year)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-
+                        </div>
+                        <div class="card-body p-3">
+                            <div wire:ignore>
+                                <div id="participant-line-chart" style="min-height: 320px;"></div>
+                            </div>
                         </div>
                     </div>
-                </div> <!--end card body-->
-            </div> <!-- end card-->
-        </div> <!-- end col -->
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h4 class="card-title">Account Transactions</h4>
-                            <p class="card-subtitle mb-4">Transaction period from 21 July to
-                                25 Aug</p>
-                            <h3>$7841.12 <span class="badge badge-soft-success float-end">+7.5%</span>
-                            </h3>
-                        </div>
-                    </div> <!-- end row -->
-
-                    <div id="sparkline1" class="mt-3"></div>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="dropdown float-end position-relative">
-                        <a href="#" class="dropdown-toggle h4 text-muted" data-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="mdi mdi-dots-vertical"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="#" class="dropdown-item">Action</a></li>
-                            <li><a href="#" class="dropdown-item">Another action</a></li>
-                            <li><a href="#" class="dropdown-item">Something else here</a></li>
-                            <li class="dropdown-divider"></li>
-                            <li><a href="#" class="dropdown-item">Separated link</a></li>
-                        </ul>
-                    </div>
-                    <h4 class="card-title d-inline-block">Total Revenue</h4>
-
-                    <div id="morris-line-example" class="morris-chart" style="height: 290px;"></div>
-
-                    <div class="row text-center mt-4">
-                        <div class="col-6">
-                            <h4>$7841.12</h4>
-                            <p class="text-muted mb-0">Total Revenue</p>
-                        </div>
-                        <div class="col-6">
-                            <h4>17</h4>
-                            <p class="text-muted mb-0">Open Compaign</p>
+                <div class="col-3">
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Total Peserta</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span
+                                            class="fs-4 fw-bold text-dark lh-1">{{ number_format($totalParticipants) }}</span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-primary-subtle text-primary px-2 py-1">
+                                    <i class="mdi mdi-account-group fs-4"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Sertifikat Terkirim</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span
+                                            class="fs-4 fw-bold text-success lh-1">{{ number_format($emailSentCount) }}</span>
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle fs-11">
+                                            {{ $emailSentPercentage }}% Terkirim
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-success-subtle text-success px-2 py-1">
+                                    <i class="mdi mdi-email-check fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Belum Dikirim</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span
+                                            class="fs-4 fw-bold text-warning     lh-1">{{ number_format($emailPendingCount) }}</span>
+                                        <span class="badge bg-warning-subtle text-warning fw-medium">Pending</span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-warning-subtle text-warning px-2 py-1">
+                                    <i class="mdi mdi-clock-outline fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border rounded-3 mb-0">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Total Biaya</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fs-4 fw-bold text-dark lh-1">Rp
+                                            {{ number_format($totalAmount, 0, ',', '.') }}</span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-info-subtle text-info px-2 py-1">
+                                    <i class="mdi mdi-cash-multiple text-info fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    @push('styles')
-        <link href="{{ asset('assets/admin/libs/morris.js/morris.css') }}" rel="stylesheet" type="text/css" />
-    @endpush
+    <!-- ======================================================================= -->
+    <!-- KELOMPOK 2: EMAIL MARKETING & PROMOSI -->
+    <!-- ======================================================================= -->
+    <div class="card border shadow-none bg-light-subtle mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2 py-1">
+                <span class="rounded bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                    <i class="bx bx-broadcast fs-16"></i>
+                </span>
+                <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
+                    Email Marketing
+                </h5>
+            </div>
+            <div class="d-flex gap-2">
+                @can('view-contacts')
+                    <a href="{{ route('admin.contact.index') }}" wire:navigate class="btn btn-sm btn-light border bg-white">
+                        <i class="bx bx-book-content me-1"></i> Kelola Kontak
+                    </a>
+                @endcan
+                @can('create-campaigns')
+                    <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-sm btn-success">
+                        <i class="bx bx-send me-1"></i> Kirim Email Baru
+                    </a>
+                @endcan
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-9">
+                    <div class="card border mb-0">
+                        <div
+                            class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h6 class="card-title mb-0 fw-bold text-dark fs-14">
+                                    <i class="bx bx-bar-chart-alt-2 text-success me-1"></i> Volume Pengiriman Email Campaign
+                                </h6>
+                                <small class="text-muted">Grafik batang volume email blast sukses terkirim vs target penerima per bulan</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted fs-12 mb-0 d-none d-sm-inline">Tahun:</label>
+                                <select wire:model.live="selectedCampaignYear" class="form-select form-select-sm"
+                                    style="width: 105px;">
+                                    @foreach ($availableYears as $year)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div wire:ignore>
+                                <div id="campaign-volume-chart" style="min-height: 320px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Total Kontak</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fs-4 fw-bold text-dark lh-1">{{ number_format($totalContacts) }}</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle fs-11">
+                                            {{ number_format($activeContacts) }} Aktif
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-primary-subtle text-primary px-2 py-1">
+                                    <i class="bx bx-book-content fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Total Campaign</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fs-4 fw-bold text-info lh-1">{{ number_format($totalCampaigns) }}</span>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle fs-11">
+                                            {{ number_format($completedCampaigns) }} Selesai
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-info-subtle text-info px-2 py-1">
+                                    <i class="bx bx-broadcast fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border rounded-3 mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Blast Terkirim</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fs-4 fw-bold text-success lh-1">{{ number_format($totalMarketingSent) }}</span>
+                                        @if ($totalMarketingFailed > 0)
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-11">
+                                                {{ number_format($totalMarketingFailed) }} Gagal
+                                            </span>
+                                        @else
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle fs-11">
+                                                100% Sukses
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-success-subtle text-success px-2 py-1">
+                                    <i class="bx bx-check-double fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border rounded-3 mb-0">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="text-muted small">Template Email</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fs-4 fw-bold text-dark lh-1">{{ number_format($totalTemplates) }}</span>
+                                        <a href="{{ route('admin.template.index') }}" wire:navigate
+                                            class="badge bg-warning-subtle text-warning border border-warning-subtle fs-11 text-decoration-none">
+                                            Lihat Desain
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="rounded-3 bg-warning-subtle text-warning px-2 py-1">
+                                    <i class="bx bx-layer fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @push('scripts')
-        <!-- Knob charts js -->
-        <script src="{{ asset('assets/admin/libs/jquery-knob/jquery.knob.min.js') }}"></script>
-        <!-- Sparkline Js-->
-        <script src="{{ asset('assets/admin/libs/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
-        <script src="{{ asset('assets/admin/libs/morris.js/morris.min.js') }}"></script>
-        <script src="{{ asset('assets/admin/libs/raphael/raphael.min.js') }}"></script>
-        <!-- Dashboard init-->
-        <script src="{{ asset('assets/admin/js/pages/dashboard.js') }}"></script>
+        <!-- ApexCharts JS -->
+        <script src="{{ asset('assets/admin/libs/apexcharts/apexcharts.min.js') }}"></script>
     @endpush
-
 </div>
+
+@script
+<script>
+    const ensureApexCharts = (callback) => {
+        if (typeof ApexCharts !== 'undefined') {
+            callback();
+            return;
+        }
+
+        let existingScript = document.querySelector('script[src*="apexcharts.min.js"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', callback, { once: true });
+            setTimeout(() => {
+                if (typeof ApexCharts !== 'undefined') callback();
+            }, 300);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = "{{ asset('assets/admin/libs/apexcharts/apexcharts.min.js') }}";
+        script.onload = callback;
+        document.head.appendChild(script);
+    };
+
+    const destroyAllCharts = () => {
+        if (window.__participantApexChart) {
+            try {
+                window.__participantApexChart.destroy();
+            } catch (e) {}
+            window.__participantApexChart = null;
+        }
+        const chartEl = document.getElementById('participant-line-chart');
+        if (chartEl) {
+            chartEl.innerHTML = '';
+        }
+
+        if (window.__campaignApexChart) {
+            try {
+                window.__campaignApexChart.destroy();
+            } catch (e) {}
+            window.__campaignApexChart = null;
+        }
+        const campEl = document.getElementById('campaign-volume-chart');
+        if (campEl) {
+            campEl.innerHTML = '';
+        }
+    };
+
+    const renderChart = (labels, totalData, sentData) => {
+        const el = document.getElementById('participant-line-chart');
+        if (!el) return;
+
+        ensureApexCharts(() => {
+            const chartEl = document.getElementById('participant-line-chart');
+            if (!chartEl || typeof ApexCharts === 'undefined') return;
+
+            // Jika instance sudah ada di memory dan elemen canvas masih ada, cukup updateOptions
+            if (window.__participantApexChart && chartEl.querySelector('.apexcharts-canvas')) {
+                try {
+                    window.__participantApexChart.updateOptions({
+                        xaxis: { categories: labels },
+                        series: [
+                            { name: 'Total Peserta', data: totalData },
+                            { name: 'Sertifikat Terkirim', data: sentData }
+                        ]
+                    });
+                    return;
+                } catch (e) {
+                    if (window.__participantApexChart) {
+                        try { window.__participantApexChart.destroy(); } catch (err) {}
+                        window.__participantApexChart = null;
+                    }
+                    chartEl.innerHTML = '';
+                }
+            } else {
+                if (window.__participantApexChart) {
+                    try { window.__participantApexChart.destroy(); } catch (err) {}
+                    window.__participantApexChart = null;
+                }
+                chartEl.innerHTML = '';
+            }
+
+            const options = {
+                chart: {
+                    height: 310,
+                    type: 'line',
+                    fontFamily: 'inherit',
+                    toolbar: { show: false },
+                    zoom: { enabled: false },
+                    dropShadow: {
+                        enabled: true,
+                        top: 2,
+                        left: 1,
+                        blur: 4,
+                        opacity: 0.1
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: [3, 2]
+                },
+                series: [
+                    { name: 'Total Peserta', data: totalData },
+                    { name: 'Sertifikat Terkirim', data: sentData }
+                ],
+                colors: ['#3b82f6', '#10b981'],
+                markers: {
+                    size: 4,
+                    hover: { size: 6 }
+                },
+                xaxis: {
+                    categories: labels,
+                    labels: {
+                        style: { colors: '#6c757d', fontSize: '12px' }
+                    }
+                },
+                yaxis: {
+                    min: 0,
+                    forceNiceScale: true,
+                    labels: {
+                        formatter: (val) => Math.round(val),
+                        style: { colors: '#6c757d', fontSize: '12px' }
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+                    y: {
+                        formatter: (val) => val + ' orang'
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    markers: { radius: 12 }
+                },
+                grid: {
+                    borderColor: '#e9ecef',
+                    strokeDashArray: 4
+                }
+            };
+
+            window.__participantApexChart = new ApexCharts(chartEl, options);
+            window.__participantApexChart.render();
+        });
+    };
+
+    const renderCampaignChart = (labels, sentRecipients, totalRecipients) => {
+        const el = document.getElementById('campaign-volume-chart');
+        if (!el) return;
+
+        ensureApexCharts(() => {
+            const chartEl = document.getElementById('campaign-volume-chart');
+            if (!chartEl || typeof ApexCharts === 'undefined') return;
+
+            if (window.__campaignApexChart && chartEl.querySelector('.apexcharts-canvas')) {
+                try {
+                    window.__campaignApexChart.updateOptions({
+                        xaxis: { categories: labels },
+                        series: [
+                            { name: 'Email Terkirim', data: sentRecipients },
+                            { name: 'Target Penerima', data: totalRecipients }
+                        ]
+                    });
+                    return;
+                } catch (e) {
+                    if (window.__campaignApexChart) {
+                        try { window.__campaignApexChart.destroy(); } catch (err) {}
+                        window.__campaignApexChart = null;
+                    }
+                    chartEl.innerHTML = '';
+                }
+            } else {
+                if (window.__campaignApexChart) {
+                    try { window.__campaignApexChart.destroy(); } catch (err) {}
+                    window.__campaignApexChart = null;
+                }
+                chartEl.innerHTML = '';
+            }
+
+            const options = {
+                chart: {
+                    height: 310,
+                    type: 'bar',
+                    fontFamily: 'inherit',
+                    toolbar: { show: false },
+                    zoom: { enabled: false }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '40%',
+                        borderRadius: 5,
+                        borderRadiusApplication: 'end'
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                series: [
+                    { name: 'Email Terkirim', data: sentRecipients },
+                    { name: 'Target Penerima', data: totalRecipients }
+                ],
+                colors: ['#10b981', '#6366f1'],
+                xaxis: {
+                    categories: labels,
+                    labels: {
+                        style: { colors: '#6c757d', fontSize: '12px' }
+                    }
+                },
+                yaxis: {
+                    min: 0,
+                    forceNiceScale: true,
+                    labels: {
+                        formatter: (val) => Math.round(val),
+                        style: { colors: '#6c757d', fontSize: '12px' }
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+                    y: {
+                        formatter: (val) => val + ' user'
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    markers: { radius: 4 }
+                },
+                grid: {
+                    borderColor: '#e9ecef',
+                    strokeDashArray: 4
+                }
+            };
+
+            window.__campaignApexChart = new ApexCharts(chartEl, options);
+            window.__campaignApexChart.render();
+        });
+    };
+
+    // Bersihkan semua chart saat user berpindah halaman via wire:navigate
+    document.addEventListener('livewire:navigating', () => {
+        destroyAllCharts();
+    }, { once: true });
+
+    // Render grafik setelah element siap
+    setTimeout(() => {
+        renderChart(@json($chartLabels), @json($chartData), @json($chartSentData));
+        renderCampaignChart(@json($chartLabels), @json($campaignSentRecipients), @json($campaignTotalRecipients));
+    }, 150);
+
+    // Update grafik secara dinamis saat filter tahun berubah
+    $wire.on('update-chart', (payload) => {
+        const data = Array.isArray(payload) ? (payload[0] || {}) : (payload || {});
+        renderChart(data.labels || [], data.totalData || [], data.sentData || []);
+    });
+
+    $wire.on('update-campaign-chart', (payload) => {
+        const data = Array.isArray(payload) ? (payload[0] || {}) : (payload || {});
+        renderCampaignChart(data.labels || [], data.sentRecipients || [], data.totalRecipients || []);
+    });
+</script>
+@endscript
