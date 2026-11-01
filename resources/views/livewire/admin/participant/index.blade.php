@@ -136,6 +136,15 @@
                         </div>
 
                         <div class="col-md-2">
+                            <select class="form-select" wire:model.live="selectedMonth">
+                                <option value="">Semua Bulan</option>
+                                @foreach ($months as $num => $monthName)
+                                    <option value="{{ $num }}">{{ $monthName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
                             <select class="form-select" wire:model.live="selectedYear">
                                 <option value="">Semua Tahun</option>
                                 @foreach ($years as $yr)
@@ -144,7 +153,7 @@
                             </select>
                         </div>
 
-                        @if ($search !== '' || $selectedEmailStatus !== '' || $selectedYear !== '')
+                        @if ($search !== '' || $selectedEmailStatus !== '' || $selectedMonth !== '' || $selectedYear !== '')
                             <div class="col-auto">
                                 <button type="button" class="btn btn-light text-danger" wire:click="resetFilters">
                                     <i class="mdi mdi-filter-remove me-1"></i> Reset
@@ -188,8 +197,11 @@
                                                     {{ mb_substr($participant->name, 0, 2) }}
                                                 </span>
                                                 <div>
-                                                    <div class="fw-semibold text-dark">{{ $participant->name }}</div>
-                                                    <small class="text-muted">{{ $participant->position ?: '-' }}</small>
+                                                    <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate
+                                                        class="fw-semibold text-dark text-decoration-none">
+                                                        {{ $participant->name }}
+                                                    </a>
+                                                    <small class="text-muted d-block">{{ $participant->position ?: '-' }}</small>
                                                 </div>
                                             </div>
                                         </td>
@@ -255,6 +267,11 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
                                                     style="z-index: 9999;">
+                                                    @canany(['view-participants', 'view-certificates'])
+                                                        <a class="dropdown-item" href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate>
+                                                            <i class="mdi mdi-eye-outline me-1 text-info"></i> Lihat Detail
+                                                        </a>
+                                                    @endcanany
                                                     @canany(['edit-participants', 'edit-certificates'])
                                                         <a class="dropdown-item" href="javascript:void(0);"
                                                             wire:click="sendCertificateEmail('{{ $participant->id }}')">

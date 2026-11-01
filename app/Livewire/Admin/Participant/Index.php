@@ -24,6 +24,8 @@ class Index extends Component
 
     public string $selectedEmailStatus = '';
 
+    public string $selectedMonth = '';
+
     public string $selectedYear = '';
 
     public int $perPage = 10;
@@ -62,6 +64,11 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatedSelectedMonth(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectedYear(): void
     {
         $this->resetPage();
@@ -69,7 +76,7 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'selectedEmailStatus', 'selectedYear', 'selectedParticipants', 'selectAll']);
+        $this->reset(['search', 'selectedEmailStatus', 'selectedMonth', 'selectedYear', 'selectedParticipants', 'selectAll']);
         $this->resetPage();
     }
 
@@ -219,20 +226,54 @@ class Index extends Component
         $this->dispatch('open-qr-modal');
     }
 
-    protected function getQuery()
+    protected function getFilteredQuery(bool $withEmailStatus = true)
     {
         return Participant::query()
             ->search($this->search)
-            ->when($this->selectedEmailStatus !== '', function ($q) {
+            ->when($withEmailStatus && $this->selectedEmailStatus !== '', function ($q) {
                 $q->where('email_status', $this->selectedEmailStatus);
+            })
+            ->when($this->selectedMonth !== '', function ($q) {
+                $monthNum = (int) $this->selectedMonth;
+                $romanMonths = [
+                    1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+                    7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+                ];
+                $indonesianMonths = [
+                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+                ];
+
+                $roman = $romanMonths[$monthNum] ?? '';
+                $indoName = $indonesianMonths[$monthNum] ?? '';
+
+                $q->where(function ($sub) use ($monthNum, $roman, $indoName) {
+                    $sub->whereMonth('created_at', $monthNum);
+                    if ($roman) {
+                        $sub->orWhere('certificate_number', 'like', "%-{$roman}-%");
+                    }
+                    if ($indoName) {
+                        $sub->orWhere('certificate_date', 'like', "%{$indoName}%")
+                            ->orWhere('registration_date', 'like', "%{$indoName}%")
+                            ->orWhere('receipt_date', 'like', "%{$indoName}%");
+                    }
+                });
             })
             ->when($this->selectedYear !== '', function ($q) {
                 $q->where(function ($sub) {
-                    $sub->where('certificate_number', 'like', "%-{$this->selectedYear}")
-                        ->orWhere('certificate_date', 'like', "%{$this->selectedYear}%");
+                    $sub->whereYear('created_at', $this->selectedYear)
+                        ->orWhere('certificate_number', 'like', "%-{$this->selectedYear}")
+                        ->orWhere('certificate_date', 'like', "%{$this->selectedYear}%")
+                        ->orWhere('registration_date', 'like', "%{$this->selectedYear}%")
+                        ->orWhere('receipt_date', 'like', "%{$this->selectedYear}%");
                 });
-            })
-            ->latest('created_at');
+            });
+    }
+
+    protected function getQuery()
+    {
+        return $this->getFilteredQuery(true)->latest('created_at');
     }
 
     public function render()
@@ -243,15 +284,41 @@ class Index extends Component
         $currentYear = (int) now()->format('Y');
         $years = range($currentYear, $currentYear - 4);
 
-        // Statistik ringkas & total nominal kwitansi
-        $totalParticipants = Participant::count();
-        $emailSentCount = Participant::where('email_status', 'sent')->count();
-        $emailPendingCount = Participant::where('email_status', 'pending')->count();
-        $totalAmount = Participant::sum('amount');
+        // Daftar bulan untuk filter
+        $months = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+
+        // Statistik ringkas & nominal kwitansi dinamis mengikuti filter yang aktif
+        $filteredQuery = $this->getFilteredQuery(true);
+        $totalParticipants = (clone $filteredQuery)->count();
+        $totalAmount = (clone $filteredQuery)->sum('amount');
+
+        // Jika filter status email aktif, hitung sesuai filter tersebut; jika semua status, hitung dari query terfilter
+        if ($this->selectedEmailStatus !== '') {
+            $emailSentCount = $this->selectedEmailStatus === 'sent' ? $totalParticipants : 0;
+            $emailPendingCount = $this->selectedEmailStatus === 'pending' ? $totalParticipants : 0;
+        } else {
+            $baseQuery = $this->getFilteredQuery(false);
+            $emailSentCount = (clone $baseQuery)->where('email_status', 'sent')->count();
+            $emailPendingCount = (clone $baseQuery)->where('email_status', 'pending')->count();
+        }
 
         return view('livewire.admin.participant.index', [
             'participants' => $participants,
             'years' => $years,
+            'months' => $months,
             'totalParticipants' => $totalParticipants,
             'emailSentCount' => $emailSentCount,
             'emailPendingCount' => $emailPendingCount,

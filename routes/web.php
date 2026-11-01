@@ -10,6 +10,7 @@ use App\Livewire\Admin\Contact\Index as ContactIndex;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Participant\Form as ParticipantForm;
 use App\Livewire\Admin\Participant\Index as ParticipantIndex;
+use App\Livewire\Admin\Participant\Show as ParticipantShow;
 use App\Livewire\Admin\Role\Form as RoleForm;
 use App\Livewire\Admin\Role\Index as RoleIndex;
 use App\Livewire\Admin\SystemSetting\Index as SystemSettingIndex;
@@ -90,6 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/linkpemda', ParticipantIndex::class)->name('participant.linkpemda.index');
         Route::get('/participants/linkpemda/create', ParticipantForm::class)->name('participant.linkpemda.create');
         Route::get('/participants/linkpemda/{participant}/edit', ParticipantForm::class)->name('participant.linkpemda.edit');
+        Route::get('/participants/linkpemda/{participant}', ParticipantShow::class)->name('participant.linkpemda.show');
 
         // Setting
         Route::get('/system-settings', SystemSettingIndex::class)->name('system-setting.index');
