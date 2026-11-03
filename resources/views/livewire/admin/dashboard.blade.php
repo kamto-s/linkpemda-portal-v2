@@ -8,7 +8,70 @@
         </div>
     </div>
 
-    <div class="card-body mb-3">
+    <div class="card-body mb-4">
+        <div class="card border mb-0">
+            <div
+                class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h5 class="card-title mb-0 fw-bold text-dark fs-14">
+                        <i class="bx bx-bar-chart-alt-2 text-success me-1"></i> Grafik Pengiriman Email
+                    </h5>
+                    <small class="text-muted">Volume email blast sukses terkirim vs target penerima
+                        per bulan</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="text-muted fs-12 mb-0 d-none d-sm-inline">Tahun:</label>
+                    <select wire:model.live="selectedCampaignYear" class="form-select form-select-sm"
+                        style="width: 105px;">
+                        @foreach ($availableYears as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-3">
+                <div wire:ignore>
+                    <div id="campaign-volume-chart" style="min-height: 320px;"></div>
+                </div>
+            </div>
+
+            <!-- Status Email Marketing di Bawah Grafik (Simple 1 Baris Sejajar dengan Icon) -->
+            <div class="card-footer bg-white border-top py-2 px-3">
+                <div class="d-flex align-items-center gap-4 flex-wrap fs-13">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bx bx-book-content text-primary fs-16"></i>
+                        <span class="text-muted">Total Kontak:</span>
+                        <span class="fw-bold text-dark">{{ number_format($totalContacts) }}</span>
+                        <span class="badge bg-success-subtle text-success fs-10">{{ number_format($activeContacts) }}
+                            Aktif</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bx bx-broadcast text-info fs-16"></i>
+                        <span class="text-muted">Total Campaign:</span>
+                        <span class="fw-bold text-dark">{{ number_format($totalCampaigns) }}</span>
+                        <span class="badge bg-info-subtle text-info fs-10">{{ number_format($completedCampaigns) }}
+                            Selesai</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bx bx-check-double text-success fs-16"></i>
+                        <span class="text-muted">Blast Terkirim:</span>
+                        <span class="fw-bold text-success">{{ number_format($totalMarketingSent) }}</span>
+                        @if ($totalMarketingFailed > 0)
+                            <span
+                                class="badge bg-danger-subtle text-danger fs-10">{{ number_format($totalMarketingFailed) }}
+                                Gagal</span>
+                        @else
+                            <span class="badge bg-success-subtle text-success fs-10">100% Sukses</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body mb-4">
         <div class="card border mb-0">
             <div
                 class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -66,7 +129,7 @@
         </div>
     </div>
 
-    <div class="card-body mb-3">
+    <div class="card-body mb-4">
         <div class="card border mb-0">
             <div
                 class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -105,162 +168,6 @@
                         <i class="mdi mdi-cash-multiple text-success fs-16"></i>
                         <span class="text-muted">Total Biaya:</span>
                         <span class="fw-bold text-dark">Rp {{ number_format($trenTotalAmount, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================================= -->
-    <!-- KELOMPOK 3: EMAIL MARKETING & PROMOSI -->
-    <!-- ======================================================================= -->
-    <div class="card border shadow-none bg-light-subtle mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-2 py-1">
-                <span
-                    class="rounded bg-success-subtle text-success d-inline-flex align-items-center justify-content-center"
-                    style="width: 28px; height: 28px;">
-                    <i class="bx bx-broadcast fs-16"></i>
-                </span>
-                <h5 class="card-title mb-0 fs-14 fw-bold text-dark">
-                    Email Marketing
-                </h5>
-            </div>
-            <div class="d-flex gap-2">
-                @can('view-contacts')
-                    <a href="{{ route('admin.contact.index') }}" wire:navigate class="btn btn-sm btn-light border bg-white">
-                        <i class="bx bx-book-content me-1"></i> Kelola Kontak
-                    </a>
-                @endcan
-                @can('create-campaigns')
-                    <a href="{{ route('admin.campaign.create') }}" wire:navigate class="btn btn-sm btn-success">
-                        <i class="bx bx-send me-1"></i> Kirim Email Baru
-                    </a>
-                @endcan
-            </div>
-        </div>
-
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-9">
-                    <div class="card border mb-0">
-                        <div
-                            class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div>
-                                <h6 class="card-title mb-0 fw-bold text-dark fs-14">
-                                    <i class="bx bx-bar-chart-alt-2 text-success me-1"></i> Volume Pengiriman Email
-                                    Campaign
-                                </h6>
-                                <small class="text-muted">Grafik batang volume email blast sukses terkirim vs target
-                                    penerima per bulan</small>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="text-muted fs-12 mb-0 d-none d-sm-inline">Tahun:</label>
-                                <select wire:model.live="selectedCampaignYear" class="form-select form-select-sm"
-                                    style="width: 105px;">
-                                    @foreach ($availableYears as $year)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-body p-3">
-                            <div wire:ignore>
-                                <div id="campaign-volume-chart" style="min-height: 320px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="card border rounded-3 mb-2">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="text-muted small">Total Kontak</div>
-                                    <div class="d-flex align-items-center gap-2 mt-1">
-                                        <span
-                                            class="fs-4 fw-bold text-dark lh-1">{{ number_format($totalContacts) }}</span>
-                                        <span
-                                            class="badge bg-success-subtle text-success border border-success-subtle fs-11">
-                                            {{ number_format($activeContacts) }} Aktif
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="rounded-3 bg-primary-subtle text-primary px-2 py-1">
-                                    <i class="bx bx-book-content fs-4"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border rounded-3 mb-2">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="text-muted small">Total Campaign</div>
-                                    <div class="d-flex align-items-center gap-2 mt-1">
-                                        <span
-                                            class="fs-4 fw-bold text-info lh-1">{{ number_format($totalCampaigns) }}</span>
-                                        <span class="badge bg-info-subtle text-info border border-info-subtle fs-11">
-                                            {{ number_format($completedCampaigns) }} Selesai
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="rounded-3 bg-info-subtle text-info px-2 py-1">
-                                    <i class="bx bx-broadcast fs-4"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border rounded-3 mb-2">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="text-muted small">Blast Terkirim</div>
-                                    <div class="d-flex align-items-center gap-2 mt-1">
-                                        <span
-                                            class="fs-4 fw-bold text-success lh-1">{{ number_format($totalMarketingSent) }}</span>
-                                        @if ($totalMarketingFailed > 0)
-                                            <span
-                                                class="badge bg-danger-subtle text-danger border border-danger-subtle fs-11">
-                                                {{ number_format($totalMarketingFailed) }} Gagal
-                                            </span>
-                                        @else
-                                            <span
-                                                class="badge bg-success-subtle text-success border border-success-subtle fs-11">
-                                                100% Sukses
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="rounded-3 bg-success-subtle text-success px-2 py-1">
-                                    <i class="bx bx-check-double fs-4"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border rounded-3 mb-0">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="text-muted small">Template Email</div>
-                                    <div class="d-flex align-items-center gap-2 mt-1">
-                                        <span
-                                            class="fs-4 fw-bold text-dark lh-1">{{ number_format($totalTemplates) }}</span>
-                                        <a href="{{ route('admin.template.index') }}" wire:navigate
-                                            class="badge bg-warning-subtle text-warning border border-warning-subtle fs-11 text-decoration-none">
-                                            Lihat Desain
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="rounded-3 bg-warning-subtle text-warning px-2 py-1">
-                                    <i class="bx bx-layer fs-4"></i>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -570,8 +477,8 @@
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '40%',
-                        borderRadius: 5,
+                        columnWidth: '32%',
+                        borderRadius: 4,
                         borderRadiusApplication: 'end'
                     }
                 },
@@ -606,13 +513,13 @@
                     shared: true,
                     intersect: false,
                     y: {
-                        formatter: (val) => val + ' user'
+                        formatter: (val) => val + ' email'
                     }
                 },
                 legend: {
                     position: 'top',
                     horizontalAlign: 'right',
-                    markers: { radius: 4 }
+                    markers: { radius: 12 }
                 },
                 grid: {
                     borderColor: '#e9ecef',
