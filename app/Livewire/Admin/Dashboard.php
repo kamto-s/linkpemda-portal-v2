@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\EmailCampaign;
 use App\Models\EmailTemplate;
 use App\Models\Participant;
+use App\Models\TrenParticipant;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -16,6 +17,7 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public int $selectedYear;
+    public int $selectedTrenYear;
     public int $selectedCampaignYear;
 
     public function mount(): void
@@ -23,6 +25,7 @@ class Dashboard extends Component
         abort_unless(auth()->user()?->can('view-dashboard'), 403, 'Anda tidak memiliki hak akses untuk melihat dashboard.');
 
         $this->selectedYear         = (int) now()->format('Y');
+        $this->selectedTrenYear     = (int) now()->format('Y');
         $this->selectedCampaignYear = (int) now()->format('Y');
     }
 
@@ -34,6 +37,16 @@ class Dashboard extends Component
             labels: $data['labels'],
             totalData: $data['totalData'],
             sentData: $data['sentData'],
+        );
+    }
+
+    public function updatedSelectedTrenYear(): void
+    {
+        $data = $this->getTrenChartData();
+
+        $this->dispatch('update-tren-chart',
+            labels: $data['labels'],
+            totalData: $data['totalData'],
         );
     }
 
@@ -71,6 +84,28 @@ class Dashboard extends Component
             'labels'    => $chartLabels,
             'totalData' => $chartData,
             'sentData'  => $chartSentData,
+        ];
+    }
+
+    protected function getTrenChartData(): array
+    {
+        $months = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
+        ];
+
+        $chartLabels = array_values($months);
+        $chartData   = [];
+
+        foreach (array_keys($months) as $m) {
+            $chartData[] = TrenParticipant::whereYear('created_at', $this->selectedTrenYear)
+                ->whereMonth('created_at', $m)
+                ->count();
+        }
+
+        return [
+            'labels'    => $chartLabels,
+            'totalData' => $chartData,
         ];
     }
 
@@ -123,7 +158,27 @@ class Dashboard extends Component
         $availableYears = range($currentYear, $currentYear - 3);
 
         // =========================================================================
-        // 2. DATA EMAIL MARKETING & PROMOSI
+        // 2. DATA ADMINISTRASI PESERTA TREN MEDIA DIKLAT
+        // =========================================================================
+        $trenTotalParticipants  = TrenParticipant::count();
+        $trenTotalCertificates  = TrenParticipant::whereNotNull('certificate_number')->count();
+        $trenTotalAmount        = TrenParticipant::sum('amount');
+        $trenThisMonthCount     = TrenParticipant::whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+        $trenUniqueInstitutions = TrenParticipant::whereNotNull('institution_name')
+            ->where('institution_name', '!=', '')
+            ->distinct('institution_name')
+            ->count('institution_name');
+        $trenUniqueThemes       = TrenParticipant::whereNotNull('theme')
+            ->where('theme', '!=', '')
+            ->distinct('theme')
+            ->count('theme');
+
+        $trenChartData = $this->getTrenChartData();
+
+        // =========================================================================
+        // 3. DATA EMAIL MARKETING & PROMOSI
         // =========================================================================
         $totalContacts       = Contact::count();
         $activeContacts      = Contact::where('is_active', true)->count();
@@ -149,7 +204,17 @@ class Dashboard extends Component
             'chartSentData'       => $chartData['sentData'],
             'availableYears'      => $availableYears,
 
-            // Modul 2: Email Marketing
+            // Modul 2: Administrasi Peserta Tren Media Diklat
+            'trenTotalParticipants'  => $trenTotalParticipants,
+            'trenTotalCertificates'  => $trenTotalCertificates,
+            'trenTotalAmount'        => $trenTotalAmount,
+            'trenThisMonthCount'     => $trenThisMonthCount,
+            'trenUniqueInstitutions' => $trenUniqueInstitutions,
+            'trenUniqueThemes'       => $trenUniqueThemes,
+            'trenChartLabels'        => $trenChartData['labels'],
+            'trenChartData'          => $trenChartData['totalData'],
+
+            // Modul 3: Email Marketing
             'totalContacts'           => $totalContacts,
             'activeContacts'          => $activeContacts,
             'totalCampaigns'          => $totalCampaigns,
