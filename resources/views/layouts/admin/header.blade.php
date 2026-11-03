@@ -5,8 +5,7 @@
 
             <div class="logo-box">
                 <a wire:navigate class='logo-light' href="{{ route('admin.dashboard') }}">
-                    <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg"
-                        height="22">
+                    <img src="{{ asset('assets/admin/images/logo-light.png') }}" alt="logo" class="logo-lg" height="22">
                     <img src="{{ asset('assets/admin/images/logo-sm.png') }}" alt="small logo" class="logo-sm"
                         height="22">
                 </a>
@@ -54,7 +53,8 @@
                         <!-- item-->
                         <div class="dropdown-item p-0 notify-item card read-noti shadow-none mb-1">
                             <div class="card-body">
-                                <span class="float-end noti-close-btn text-muted" style="cursor: pointer;" title="Tutup"><i class="mdi mdi-close"></i></span>
+                                <span class="float-end noti-close-btn text-muted" style="cursor: pointer;"
+                                    title="Tutup"><i class="mdi mdi-close"></i></span>
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
                                         <div class="notify-icon bg-info">
@@ -93,7 +93,7 @@
                     href="javascript:void(0);" role="button" aria-haspopup="false" aria-expanded="false">
 
                     <span
-                        class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase shadow-sm"
+                        class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase shadow-sm"
                         style="width: 32px; height: 32px; font-size: 13px;">
                         {{ auth()->user()?->initials() ?? 'U' }}
                     </span>
@@ -127,7 +127,8 @@
                     <div class="dropdown-divider"></div>
 
                     @if(auth()->user()?->can('manage-users'))
-                        <a wire:navigate href="{{ route('admin.user.edit', auth()->user()) }}" class="dropdown-item notify-item">
+                        <a wire:navigate href="{{ route('admin.user.edit', auth()->user()) }}"
+                            class="dropdown-item notify-item">
                             <i class="mdi mdi-account-circle"></i>
                             <span>Profile</span>
                         </a>
