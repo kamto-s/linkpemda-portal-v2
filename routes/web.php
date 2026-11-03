@@ -39,15 +39,36 @@ Route::view('/', 'welcome')->name('home');
 | Public Certificate Verification (Frontend)
 |--------------------------------------------------------------------------
 */
+// Halaman verifikasi publik (direct scan QR code baru)
 Route::get('/sertifikat/cek/{certificate_number}', function (string $certificate_number) {
-    $participant = \App\Models\Participant::where('certificate_number', $certificate_number)->first();
-    return view('certificate.verify', compact('participant', 'certificate_number'));
-})->name('certificate.verify');
+    $cleanNumber = trim(urldecode($certificate_number));
+    $participant = \App\Models\Participant::where('certificate_number', $cleanNumber)
+        ->orWhere('certificate_number', $certificate_number)
+        ->first();
 
-// Alias kompatibilitas mundur dengan sistem lama linkpemda
+    return view('certificate.verify', compact('participant', 'certificate_number'));
+})->name('certificate.verify')->where('certificate_number', '.*');
+
+// Alias kompatibilitas mundur dengan sistem lama linkpemda (direct scan QR code lama)
 Route::get('/sertifikat/status/{no_certf}', function (string $no_certf) {
     return redirect()->route('certificate.verify', ['certificate_number' => $no_certf]);
-})->name('sertifikat.status.dinamis');
+})->name('sertifikat.status.dinamis')->where('no_certf', '.*');
+
+// Form pencarian manual nomor sertifikat (kompatibilitas sistem lama)
+Route::get('/sertifikat', function (\Illuminate\Http\Request $request) {
+    if ($no = $request->query('no_certf') ?? $request->query('certificate_number')) {
+        return redirect()->route('certificate.verify', ['certificate_number' => $no]);
+    }
+    return view('certificate.verify', ['participant' => null, 'certificate_number' => '']);
+})->name('sertifikat.search');
+
+Route::post('/sertifikat', function (\Illuminate\Http\Request $request) {
+    $no = $request->input('no_certf') ?? $request->input('certificate_number');
+    if ($no) {
+        return redirect()->route('certificate.verify', ['certificate_number' => trim($no)]);
+    }
+    return redirect()->route('sertifikat.search');
+})->name('sertifikat.status');
 
 /*
 |--------------------------------------------------------------------------
