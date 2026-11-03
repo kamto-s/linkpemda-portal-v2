@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Sertifikat Digital - {{ function_exists('system_setting') ? system_setting('app_name', 'Linkpemda') : config('app.name', 'Linkpemda') }}</title>
+    <title>Verifikasi Sertifikat Digital -
+        {{ function_exists('system_setting') ? system_setting('app_name', 'Linkpemda') : config('app.name', 'Linkpemda') }}
+    </title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -12,7 +15,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
 
@@ -151,22 +155,27 @@
                 flex-direction: column;
                 gap: 4px;
             }
-            .detail-label, .detail-value {
+
+            .detail-label,
+            .detail-value {
                 width: 100%;
             }
+
             .card-status-header {
                 padding: 24px 16px;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="verify-wrapper">
         <!-- Logo Linkpemda -->
         <div class="brand-header">
             <a href="{{ route('home') }}">
-                <img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt="Logo Linkpemda" height="38" onerror="this.src='{{ asset('assets/admin') }}/images/logo-sm.png'">
+                <img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt="Logo Linkpemda" height="38"
+                    onerror="this.src='{{ asset('assets/admin') }}/images/logo-sm.png'">
             </a>
         </div>
 
@@ -222,11 +231,14 @@
                             <div class="detail-value">{{ $participant->institution_name ?: '-' }}</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label"><i class="mdi mdi-book-open-page-variant me-1 text-muted"></i> Tema Bimtek</div>
-                            <div class="detail-value text-primary" style="color: #008F83 !important;">{{ $participant->theme ?: '-' }}</div>
+                            <div class="detail-label"><i class="mdi mdi-book-open-page-variant me-1 text-muted"></i> Tema
+                                Bimtek</div>
+                            <div class="detail-value text-primary" style="color: #008F83 !important;">
+                                {{ $participant->theme ?: '-' }}</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label"><i class="mdi mdi-calendar me-1 text-muted"></i> Tanggal Kegiatan</div>
+                            <div class="detail-label"><i class="mdi mdi-calendar me-1 text-muted"></i> Tanggal Kegiatan
+                            </div>
                             <div class="detail-value">{{ $participant->certificate_date ?: '-' }}</div>
                         </div>
                         @if ($participant->event_venue)
@@ -243,7 +255,8 @@
                         @endif
                     </div>
 
-                    <div class="alert alert-success d-flex align-items-center gap-2 mb-0 py-2 fs-13" style="background-color: rgba(0, 143, 131, 0.08); border-color: rgba(0, 143, 131, 0.25); color: #007369;">
+                    <div class="alert alert-success d-flex align-items-center gap-2 mb-0 py-2 fs-13"
+                        style="background-color: rgba(0, 143, 131, 0.08); border-color: rgba(0, 143, 131, 0.25); color: #007369;">
                         <i class="mdi mdi-shield-check fs-18"></i>
                         <div>Dokumen ini sah dan terdaftar resmi oleh penyelenggara <strong>Linkpemda</strong>.</div>
                     </div>
@@ -255,7 +268,8 @@
 
                     <div class="text-center py-2 mb-4">
                         <p class="text-muted fs-14">
-                            Nomor sertifikat tidak ditemukan di pangkalan data kami. Pastikan nomor sertifikat yang Anda masukkan sudah benar atau silakan hubungi panitia penyelenggara.
+                            Nomor sertifikat tidak ditemukan di pangkalan data kami. Pastikan nomor sertifikat yang Anda
+                            masukkan sudah benar atau silakan hubungi panitia penyelenggara.
                         </p>
                     </div>
 
@@ -263,7 +277,8 @@
                     <form action="{{ route('sertifikat.status') }}" method="POST">
                         @csrf
                         <div class="input-group">
-                            <input type="text" name="no_certf" class="form-control" placeholder="Masukkan Nomor Sertifikat Lain..." required>
+                            <input type="text" name="no_certf" class="form-control"
+                                placeholder="Masukkan Nomor Sertifikat Lain..." required>
                             <button type="submit" class="btn btn-brand">Cek Ulang</button>
                         </div>
                     </form>
@@ -273,7 +288,8 @@
                         @csrf
                         <div class="mb-3">
                             <label class="form-label fw-semibold fs-13">Masukkan Nomor Sertifikat</label>
-                            <input type="text" name="no_certf" class="form-control form-control-lg fs-15" placeholder="Contoh: LP/2026/001..." required autofocus>
+                            <input type="text" name="no_certf" class="form-control form-control-lg fs-15"
+                                placeholder="Contoh: LP/2026/001..." required autofocus>
                         </div>
                         <button type="submit" class="btn btn-brand w-100 py-2 fs-14">
                             <i class="mdi mdi-magnify me-1"></i> Periksa Keaslian Sertifikat
@@ -284,7 +300,9 @@
 
             <!-- Footer Card -->
             <div class="p-3 bg-light border-top text-center text-muted fs-12">
-                &copy; {{ date('Y') }} {{ function_exists('system_setting') ? system_setting('app_name', 'Linkpemda') : config('app.name', 'Linkpemda') }}. Sistem Verifikasi Sertifikat Digital.
+                &copy; {{ date('Y') }}
+                {{ function_exists('system_setting') ? system_setting('app_name', 'Linkpemda') : config('app.name', 'Linkpemda') }}.
+                Sistem Verifikasi Sertifikat Digital.
             </div>
         </div>
 
@@ -294,4 +312,5 @@
     </div>
 
 </body>
+
 </html>
