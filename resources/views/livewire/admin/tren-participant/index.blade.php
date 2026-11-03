@@ -238,7 +238,7 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span
-                                                    class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                    class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
                                                     style="width: 32px; height: 32px; font-size: 11px; flex-shrink: 0;">
                                                     {{ mb_substr($participant->name, 0, 2) }}
                                                 </span>
@@ -332,12 +332,11 @@
                                                             <a class="dropdown-item"
                                                                 href="{{ route('admin.participant.trendiklat.edit', $participant->id) }}"
                                                                 wire:navigate>
-                                                                <i class="mdi mdi-pencil me-2 text-primary"></i> Ubah Data
+                                                                <i class="mdi mdi-pencil me-2 text-warning"></i> Edit Data
                                                             </a>
                                                         @endcanany
 
                                                         @canany(['delete-participants', 'delete-certificates'])
-                                                            <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                                 wire:click="confirmDelete('{{ $participant->id }}')">
                                                                 <i class="mdi mdi-trash-can me-2"></i> Hapus Data

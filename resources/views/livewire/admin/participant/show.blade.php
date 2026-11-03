@@ -4,7 +4,8 @@
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <div class="d-flex align-items-center gap-2">
-                    <a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate class="btn btn-sm btn-light border" title="Kembali ke Daftar">
+                    <a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate
+                        class="btn btn-sm btn-light border" title="Kembali ke Daftar">
                         <i class="mdi mdi-arrow-left"></i>
                     </a>
                     <div>
@@ -16,7 +17,8 @@
                 <div class="d-none d-lg-block">
                     <ol class="breadcrumb m-0 float-end">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate>Data Peserta</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.participant.linkpemda.index') }}"
+                                wire:navigate>Data Peserta</a></li>
                         <li class="breadcrumb-item active">Detail</li>
                     </ol>
                 </div>
@@ -51,14 +53,16 @@
         <div class="card-body p-3 p-lg-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div class="d-flex align-items-center gap-3">
-                    <span class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold fs-20"
+                    <span
+                        class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center fw-bold fs-20"
                         style="width: 56px; height: 56px; flex-shrink: 0;">
                         {{ mb_substr($participant->name, 0, 2) }}
                     </span>
                     <div>
                         <h4 class="mb-1 text-dark fw-bold">{{ $participant->name }}</h4>
                         <div class="d-flex align-items-center gap-2 flex-wrap text-muted fs-13">
-                            <span><i class="mdi mdi-briefcase-outline me-1"></i>{{ $participant->position ?: 'Peserta Bimtek' }}</span>
+                            <span><i
+                                    class="mdi mdi-briefcase-outline me-1"></i>{{ $participant->position ?: 'Peserta Bimtek' }}</span>
                             <span>•</span>
                             <span><i class="mdi mdi-domain me-1"></i>{{ $participant->institution_name ?: '-' }}</span>
                         </div>
@@ -69,8 +73,7 @@
                     {{-- Tombol Sertifikat --}}
                     <div class="btn-group" role="group">
                         <a href="{{ $this->getPdfUrl('sertifikat', 'view') }}" target="_blank"
-                            class="btn btn-outline-danger"
-                            title="Lihat / Preview Sertifikat PDF">
+                            class="btn btn-outline-danger" title="Lihat / Preview Sertifikat PDF">
                             <i class="mdi mdi-file-pdf-box me-1"></i> Sertifikat
                         </a>
                         <button type="button" class="btn btn-outline-danger dropdown-toggle dropdown-toggle-split px-2"
@@ -78,26 +81,34 @@
                             <i class="mdi mdi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu shadow-sm">
-                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Warna</li>
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Warna
+                            </li>
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'view') }}" target="_blank">
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'view') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Sertifikat
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download') }}" target="_blank">
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-download me-2 text-danger"></i> Unduh Sertifikat
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Blank</li>
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'print') }}" target="_blank">
+                                <hr class="dropdown-divider my-1">
+                            </li>
+                            <li class="dropdown-header text-uppercase fs-11 text-muted fw-bold py-1">Sertifikat Blank
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'print') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Sertifikat
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download-blank') }}" target="_blank">
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('sertifikat', 'download-blank') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-download me-2 text-primary"></i> Unduh Sertifikat
                                 </a>
                             </li>
@@ -107,8 +118,7 @@
                     {{-- Tombol Kwitansi --}}
                     <div class="btn-group" role="group">
                         <a href="{{ $this->getPdfUrl('kwitansi', 'view') }}" target="_blank"
-                            class="btn btn-outline-success"
-                            title="Lihat / Preview Kwitansi PDF">
+                            class="btn btn-outline-success" title="Lihat / Preview Kwitansi PDF">
                             <i class="mdi mdi-receipt me-1"></i> Kwitansi
                         </a>
                         <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split px-2"
@@ -117,12 +127,14 @@
                         </button>
                         <ul class="dropdown-menu shadow-sm">
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'view') }}" target="_blank">
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'view') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Kwitansi
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'download') }}" target="_blank">
+                                <a class="dropdown-item" href="{{ $this->getPdfUrl('kwitansi', 'download') }}"
+                                    target="_blank">
                                     <i class="mdi mdi-download me-2 text-success"></i> Unduh Kwitansi
                                 </a>
                             </li>
@@ -130,8 +142,8 @@
                     </div>
 
                     @canany(['edit-participants', 'edit-certificates'])
-                        <button type="button" class="btn btn-outline-primary"
-                            wire:click="sendCertificateEmail" wire:loading.attr="disabled">
+                        <button type="button" class="btn btn-outline-primary" wire:click="sendCertificateEmail"
+                            wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="sendCertificateEmail">
                                 <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync' : 'mdi-send' }} me-1"></i>
                                 {{ $participant->is_email_sent ? 'Kirim Ulang Email' : 'Kirim E-Sertifikat' }}
@@ -141,14 +153,14 @@
                             </span>
                         </button>
 
-                        <a href="{{ route('admin.participant.linkpemda.edit', $participant->id) }}" wire:navigate class="btn btn-primary">
+                        <a href="{{ route('admin.participant.linkpemda.edit', $participant->id) }}" wire:navigate
+                            class="btn btn-primary">
                             <i class="mdi mdi-pencil me-1"></i> Edit Data
                         </a>
                     @endcanany
 
                     @canany(['delete-participants', 'delete-certificates'])
-                        <button type="button" class="btn btn-danger"
-                            wire:click="delete"
+                        <button type="button" class="btn btn-danger" wire:click="delete"
                             wire:confirm="Apakah Anda yakin ingin menghapus data peserta {{ $participant->name }}?">
                             <i class="mdi mdi-trash-can me-1"></i> Hapus
                         </button>
@@ -190,7 +202,8 @@
                         <div class="col-sm-6">
                             <span class="text-muted fs-12 d-block">Alamat Email</span>
                             @if ($participant->email)
-                                <a href="mailto:{{ $participant->email }}" class="text-primary text-decoration-none fw-medium">
+                                <a href="mailto:{{ $participant->email }}"
+                                    class="text-primary text-decoration-none fw-medium">
                                     <i class="mdi mdi-email-outline me-1"></i>{{ $participant->email }}
                                 </a>
                             @else
@@ -200,8 +213,8 @@
                         <div class="col-sm-6">
                             <span class="text-muted fs-12 d-block">No. WhatsApp / HP</span>
                             @if ($participant->phone)
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $participant->phone) }}" target="_blank"
-                                    class="text-success text-decoration-none fw-medium">
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $participant->phone) }}"
+                                    target="_blank" class="text-success text-decoration-none fw-medium">
                                     <i class="bx bxl-whatsapp me-1"></i>{{ $participant->phone }}
                                 </a>
                             @else
@@ -234,7 +247,8 @@
                         <div class="col-sm-6">
                             <span class="text-muted fs-12 d-block">Tanggal Pelaksanaan</span>
                             <span class="text-dark fw-medium">
-                                <i class="mdi mdi-calendar me-1 text-primary"></i>{{ $participant->certificate_date ?: '-' }}
+                                <i
+                                    class="mdi mdi-calendar me-1 text-primary"></i>{{ $participant->certificate_date ?: '-' }}
                             </span>
                         </div>
                         <div class="col-sm-6">
@@ -260,7 +274,8 @@
                     <div class="row g-3">
                         <div class="col-sm-4">
                             <span class="text-muted fs-12 d-block">Nomor Kwitansi</span>
-                            <span class="font-monospace fw-medium text-dark">{{ $participant->receipt_number ?: $participant->certificate_number }}</span>
+                            <span
+                                class="font-monospace fw-medium text-dark">{{ $participant->receipt_number ?: $participant->certificate_number }}</span>
                         </div>
                         <div class="col-sm-4">
                             <span class="text-muted fs-12 d-block">Tanggal Kwitansi</span>
@@ -287,7 +302,7 @@
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
-                       QR Code Verifikasi
+                        QR Code Verifikasi
                     </h5>
                 </div>
                 <div class="card-body text-center p-4">
@@ -361,4 +376,3 @@
         </div>
     </div>
 </div>
-

@@ -268,7 +268,7 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span
-                                                    class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
+                                                    class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase"
                                                     style="width: 32px; height: 32px; font-size: 11px; flex-shrink: 0;">
                                                     {{ mb_substr($participant->name, 0, 2) }}
                                                 </span>
