@@ -1,81 +1,62 @@
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-xl-4 col-md-5">
-            <div class="card">
-                <div class="card-body p-4">
-                    <div class="text-center w-75 mx-auto auth-logo mb-4">
-                        <a class='logo-dark' href="{{ route('home') }}">
-                            <span><img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt=""
-                                    height="34"></span>
-                        </a>
-
-                        <a class='logo-light' href="{{ route('home') }}">
-                            <span><img src="{{ asset('assets/admin') }}/images/logo-light.png" alt=""
-                                    height="34"></span>
-                        </a>
-                        <p class="text-muted fs-13 mt-3">Silahkan login menggunakan akun Anda</p>
-                    </div>
-
-                    @if (session('status'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="mdi mdi-check-circle-outline me-1"></i> {{ session('status') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <form wire:submit="login">
-
-                        <div class="form-group mb-3">
-                            <label class="form-label" for="email">Email</label>
-                            <input class="form-control @error('email') is-invalid @enderror" type="email"
-                                id="email" placeholder="Masukkan Email" wire:model="email">
-
-                            @error('email')
-                                <div class="invalid-feedback text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label" for="password">Password</label>
-                            <input class="form-control @error('password') is-invalid @enderror" type="password"
-                                required="" id="password" placeholder="Masukkan Password" wire:model="password">
-
-                            @error('password')
-                                <div class="invalid-feedback text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <div class="">
-                                <input class="form-check-input" type="checkbox" id="checkbox-signin" checked
-                                    id="remember" wire:model="remember">
-                                <label class="form-check-label ms-2" for="checkbox-signin">Remember me</label>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-0 text-center">
-                            <button class="btn btn-primary w-100" type="submit">
-                                <span wire:loading.remove wire:target="login"> Login</span>
-                                <span wire:loading wire:target="login">
-                                    <span class="spinner-border spinner-border-sm me-1"></span> Memproses...
-                                </span>
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-12 text-center">
-                    <p class="text-white">
-                        <a class="text-white fw-semibold text-decoration-underline" href="{{ route('password.request') }}" wire:navigate>
-                            <i class="mdi mdi-lock-question me-1"></i> Lupa password Anda?
-                        </a>
-                    </p>
-                </div>
-            </div>
-
-        </div>
+<div>
+    <!-- Logo & Header Form -->
+    <div class="text-center mb-4">
+        <a class="d-inline-block mb-3" href="{{ route('home') }}">
+            <img src="{{ asset('assets/admin') }}/images/logo-dark.png" alt="Logo Linkpemda" height="34"
+                onerror="this.src='{{ asset('assets/admin') }}/images/logo-sm.png'">
+        </a>
+        <p class="text-muted fs-13 mb-0">Silakan masukkan email dan password Anda</p>
     </div>
+
+    @if (session('status'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-check-circle-outline me-1"></i> {{ session('status') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <form wire:submit="login">
+        <!-- Input Email -->
+        <div class="form-group mb-3">
+            <label class="form-label" for="email">Alamat Email</label>
+            <input class="form-control @error('email') is-invalid @enderror" type="email" id="email"
+                placeholder="nama@email.com" wire:model="email" autofocus>
+            @error('email')
+                <div class="text-danger fs-12 mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- Input Password -->
+        <div class="form-group mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0" for="password">Password</label>
+                <a class="link-green fs-12" href="{{ route('password.request') }}" wire:navigate>
+                    Lupa password?
+                </a>
+            </div>
+            <input class="form-control @error('password') is-invalid @enderror" type="password" id="password"
+                placeholder="••••••••" wire:model="password">
+            @error('password')
+                <div class="text-danger fs-12 mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="form-group mb-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember" wire:model="remember">
+                <label class="form-check-label text-muted fs-13" for="remember">Ingat saya di perangkat ini</label>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group mb-0">
+            <button class="btn btn-auth-submit" type="submit" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="login">Masuk</span>
+                <span wire:loading wire:target="login">
+                    <span class="spinner-border spinner-border-sm me-1"></span> Memproses...
+                </span>
+            </button>
+        </div>
+    </form>
 </div>
