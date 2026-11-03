@@ -8,7 +8,7 @@
                 <div class="d-none d-lg-block">
                     <ol class="breadcrumb m-0 float-end">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item">Tren Media Diklat</li>
+                        <li class="breadcrumb-item">Tren Media</li>
                         <li class="breadcrumb-item active">{{ $pageTitle }}</li>
                     </ol>
                 </div>
@@ -192,13 +192,6 @@
                                     </span>
                                 </button>
 
-                                @canany(['delete-participants', 'delete-certificates'])
-                                    <button type="button" class="btn btn-sm btn-outline-danger" style="--bs-btn-bg: #fff;"
-                                        wire:click="deleteBulk"
-                                        wire:confirm="Yakin ingin menghapus {{ count($selectedParticipants) }} data peserta terpilih?">
-                                        <i class="mdi mdi-trash-can-outline me-1"></i> Hapus Terpilih
-                                    </button>
-                                @endcanany
 
                                 <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2 text-decoration-none"
                                     wire:click="$set('selectedParticipants', [])">

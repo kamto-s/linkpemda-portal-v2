@@ -9,7 +9,7 @@
                         <i class="mdi mdi-arrow-left"></i>
                     </a>
                     <div>
-                        <h4 class="page-title mb-0">Detail Peserta: {{ $participant->name }}</h4>
+                        <h4 class="page-title mb-0">Detail Peserta Linkpemda: {{ $participant->name }}</h4>
                     </div>
                 </div>
             </div>
@@ -154,7 +154,7 @@
                         </button>
 
                         <a href="{{ route('admin.participant.linkpemda.edit', $participant->id) }}" wire:navigate
-                            class="btn btn-primary">
+                            class="btn btn-warning">
                             <i class="mdi mdi-pencil me-1"></i> Edit Data
                         </a>
                     @endcanany

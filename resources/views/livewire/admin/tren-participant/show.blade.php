@@ -9,7 +9,7 @@
                         <i class="mdi mdi-arrow-left"></i>
                     </a>
                     <div>
-                        <h4 class="page-title mb-0">Detail Peserta: {{ $participant->name }}</h4>
+                        <h4 class="page-title mb-0">Detail Peserta Tren Media: {{ $participant->name }}</h4>
                     </div>
                 </div>
             </div>
@@ -18,7 +18,7 @@
                     <ol class="breadcrumb m-0 float-end">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.participant.trendiklat.index') }}"
-                                wire:navigate>Tren Media Diklat</a></li>
+                                wire:navigate>Tren Media</a></li>
                         <li class="breadcrumb-item active">Detail</li>
                     </ol>
                 </div>
@@ -143,7 +143,7 @@
 
                     @canany(['edit-participants', 'edit-certificates'])
                         <a href="{{ route('admin.participant.trendiklat.edit', $participant->id) }}" wire:navigate
-                            class="btn btn-primary">
+                            class="btn btn-warning">
                             <i class="mdi mdi-pencil me-1"></i> Edit Data
                         </a>
                     @endcanany
