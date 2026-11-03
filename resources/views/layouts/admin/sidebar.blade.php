@@ -104,7 +104,8 @@
             <!-- PROMOSI & EMAIL BLAST -->
             <!-- ============================================== -->
             @canany(['create-campaigns', 'view-campaigns', 'view-templates', 'view-contacts'])
-                <li class="menu-title" title="Email Marketing"><i class="mdi mdi-dots-horizontal"></i> <span>Email Marketing</span></li>
+                <li class="menu-title" title="Email Marketing"><i class="mdi mdi-dots-horizontal"></i> <span>Email
+                        Marketing</span></li>
 
                 @can('create-campaigns')
                     <li class="menu-item {{ request()->routeIs('admin.campaign.create') ? 'active' : '' }}">
@@ -153,28 +154,67 @@
             @endcanany
 
             @canany(['view-certificates', 'view-participants', 'view-registrations', 'view-documents', 'view-messages'])
-                <li class="menu-title" title="Administrasi"><i class="mdi mdi-dots-horizontal"></i> <span>Administrasi</span></li>
+                <li class="menu-title" title="Administrasi"><i class="mdi mdi-dots-horizontal"></i>
+                    <span>Administrasi</span>
+                </li>
 
-                <!-- 1. Data Peserta (Linkpemda & Tren Media Diklat) -->
+                <!-- 1. Linkpemda (Dropdown) -->
                 @canany(['view-participants', 'view-certificates'])
-                    <li class="menu-item {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
-                        <a href="#menuSertifikat" data-bs-toggle="collapse"
-                            aria-expanded="{{ request()->routeIs('admin.participant.linkpemda.*') ? 'true' : 'false' }}"
-                            class="menu-link waves-effect waves-light {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
-                            <span class="menu-icon"><i class="bx bx-group"></i></span>
-                            <span class="menu-text"> Data Peserta </span>
+                    @php
+                        $isLinkpemdaActive = request()->routeIs(['admin.participant.linkpemda.*', 'admin.invoice.linkpemda.*']);
+                    @endphp
+                    <li class="menu-item {{ $isLinkpemdaActive ? 'active' : '' }}">
+                        <a href="#menuLinkpemda" data-bs-toggle="collapse"
+                            aria-expanded="{{ $isLinkpemdaActive ? 'true' : 'false' }}"
+                            class="menu-link waves-effect waves-light {{ $isLinkpemdaActive ? 'active' : '' }}">
+                            <span class="menu-icon"><i class="bx bx-buildings"></i></span>
+                            <span class="menu-text"> Linkpemda </span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <div class="collapse {{ request()->routeIs('admin.participant.linkpemda.*') ? 'show' : '' }}" id="menuSertifikat">
+                        <div class="collapse {{ $isLinkpemdaActive ? 'show' : '' }}" id="menuLinkpemda">
                             <ul class="sub-menu">
                                 <li class="menu-item {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}">
-                                    <a wire:navigate class='menu-link' href='{{ route('admin.participant.linkpemda.index') }}'>
-                                        <span class="menu-text">Linkpemda</span>
+                                    <a wire:navigate
+                                        class='menu-link {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}'
+                                        href='{{ route('admin.participant.linkpemda.index') }}'>
+                                        <span class="menu-text">Data Peserta</span>
                                     </a>
                                 </li>
-                                <li class="menu-item">
+                                <li class="menu-item {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}">
+                                    <a class='menu-link {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}'
+                                        href='#'>
+                                        <span class="menu-text">Invoice</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- 2. Tren Media Diklat (Dropdown) -->
+                    @php
+                        $isTrenActive = request()->routeIs(['admin.participant.trendiklat.*', 'admin.invoice.trendiklat.*']);
+                    @endphp
+                    <li class="menu-item {{ $isTrenActive ? 'active' : '' }}">
+                        <a href="#menuTrenDiklat" data-bs-toggle="collapse"
+                            aria-expanded="{{ $isTrenActive ? 'true' : 'false' }}"
+                            class="menu-link waves-effect waves-light {{ $isTrenActive ? 'active' : '' }}">
+                            <span class="menu-icon"><i class="mdi mdi-school"></i></span>
+                            <span class="menu-text"> Tren Media </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse {{ $isTrenActive ? 'show' : '' }}" id="menuTrenDiklat">
+                            <ul class="sub-menu">
+                                <li
+                                    class="menu-item {{ request()->routeIs('admin.participant.trendiklat.*') ? 'active' : '' }}">
+                                    <a wire:navigate
+                                        class='menu-link {{ request()->routeIs('admin.participant.trendiklat.*') ? 'active' : '' }}'
+                                        href='{{ route('admin.participant.trendiklat.index') }}'>
+                                        <span class="menu-text">Data Peserta</span>
+                                    </a>
+                                </li>
+                                <li class="menu-item {{ request()->routeIs('admin.invoice.trendiklat.*') ? 'active' : '' }}">
                                     <a class='menu-link' href='#'>
-                                        <span class="menu-text">Tren Media Diklat</span>
+                                        <span class="menu-text">Invoice</span>
                                     </a>
                                 </li>
                             </ul>
@@ -214,7 +254,8 @@
             @endcanany
 
             @canany(['view-users', 'view-roles', 'view-settings', 'view-certificate-settings', 'manage-system'])
-                <li class="menu-title" title="Pengaturan"><i class="mdi mdi-dots-horizontal"></i> <span>Pengaturan</span></li>
+                <li class="menu-title" title="Pengaturan"><i class="mdi mdi-dots-horizontal"></i> <span>Pengaturan</span>
+                </li>
 
                 @can('view-users')
                     <li class="menu-item {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">

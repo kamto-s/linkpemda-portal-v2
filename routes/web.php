@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CampaignImageUploadController;
 use App\Http\Controllers\Admin\ParticipantDocumentController;
+use App\Http\Controllers\Admin\TrenParticipantDocumentController;
 use App\Livewire\Admin\Campaign\Form as CampaignForm;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
 use App\Livewire\Admin\Campaign\Show as CampaignShow;
@@ -18,6 +19,9 @@ use App\Livewire\Admin\SystemSetting\Index as SystemSettingIndex;
 use App\Livewire\Admin\Template\Form as TemplateForm;
 use App\Livewire\Admin\Template\Index as TemplateIndex;
 use App\Livewire\Admin\Template\Show as TemplateShow;
+use App\Livewire\Admin\TrenParticipant\Form as TrenParticipantForm;
+use App\Livewire\Admin\TrenParticipant\Index as TrenParticipantIndex;
+use App\Livewire\Admin\TrenParticipant\Show as TrenParticipantShow;
 use App\Livewire\Admin\User\Form as UserForm;
 use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Auth\ForgotPassword;
@@ -137,6 +141,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/linkpemda/{participant}/certificate/download-blank', [ParticipantDocumentController::class, 'downloadCertificateBlank'])->name('participant.linkpemda.certificate.download-blank');
         Route::get('/participants/linkpemda/{participant}/kwitansi/view', [ParticipantDocumentController::class, 'viewKwitansi'])->name('participant.linkpemda.kwitansi.view');
         Route::get('/participants/linkpemda/{participant}/kwitansi/download', [ParticipantDocumentController::class, 'downloadKwitansi'])->name('participant.linkpemda.kwitansi.download');
+
+        // Administrasi - Data Peserta (Tren Media Diklat)
+        Route::get('/participants/trendiklat', TrenParticipantIndex::class)->name('participant.trendiklat.index');
+        Route::get('/participants/trendiklat/create', TrenParticipantForm::class)->name('participant.trendiklat.create');
+        Route::get('/participants/trendiklat/{participant}/edit', TrenParticipantForm::class)->name('participant.trendiklat.edit');
+        Route::get('/participants/trendiklat/{participant}', TrenParticipantShow::class)->name('participant.trendiklat.show');
+
+        // Dokumen PDF Peserta Tren Media Diklat (Sertifikat & Kwitansi) — dibuka via target="_blank"
+        Route::get('/participants/trendiklat/{participant}/certificate/view', [TrenParticipantDocumentController::class, 'viewCertificate'])->name('participant.trendiklat.certificate.view');
+        Route::get('/participants/trendiklat/{participant}/certificate/download', [TrenParticipantDocumentController::class, 'downloadCertificate'])->name('participant.trendiklat.certificate.download');
+        Route::get('/participants/trendiklat/{participant}/certificate/print', [TrenParticipantDocumentController::class, 'printCertificate'])->name('participant.trendiklat.certificate.print');
+        Route::get('/participants/trendiklat/{participant}/certificate/download-blank', [TrenParticipantDocumentController::class, 'downloadCertificateBlank'])->name('participant.trendiklat.certificate.download-blank');
+        Route::get('/participants/trendiklat/{participant}/kwitansi/view', [TrenParticipantDocumentController::class, 'viewKwitansi'])->name('participant.trendiklat.kwitansi.view');
+        Route::get('/participants/trendiklat/{participant}/kwitansi/download', [TrenParticipantDocumentController::class, 'downloadKwitansi'])->name('participant.trendiklat.kwitansi.download');
 
         // Setting
         Route::get('/system-settings', SystemSettingIndex::class)->name('system-setting.index');

@@ -66,10 +66,22 @@ class ParticipantDocumentService
     public function buildPdf(Participant $participant, string $type = 'default'): Fpdi
     {
         $templatePath = match ($type) {
-            'blank'    => public_path('assets/pdf-templates/sertifikat_blank.pdf'),
-            'kwitansi' => public_path('assets/pdf-templates/kwitansi.pdf'),
-            default    => public_path('assets/pdf-templates/sertifikat.pdf'),
+            'blank'    => public_path('assets/pdf-templates/linkpemda/sertifikat_blank.pdf'),
+            'kwitansi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
+            default    => public_path('assets/pdf-templates/linkpemda/sertifikat.pdf'),
         };
+
+        // Fallback jika file masih di folder luar
+        if (! file_exists($templatePath)) {
+            $fallback = match ($type) {
+                'blank'    => public_path('assets/pdf-templates/sertifikat_blank.pdf'),
+                'kwitansi' => public_path('assets/pdf-templates/kwitansi.pdf'),
+                default    => public_path('assets/pdf-templates/sertifikat.pdf'),
+            };
+            if (file_exists($fallback)) {
+                $templatePath = $fallback;
+            }
+        }
 
         $pdf = new Fpdi();
         $pdf->SetAutoPageBreak(false);

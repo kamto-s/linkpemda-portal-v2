@@ -14,7 +14,8 @@ class ParticipantDocumentController extends Controller
 {
     public function __construct(
         protected ParticipantDocumentService $documentService
-    ) {}
+    ) {
+    }
 
     // =========================================================================
     // Sertifikat
