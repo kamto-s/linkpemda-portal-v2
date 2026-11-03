@@ -61,8 +61,8 @@
                                 <input type="text" class="form-control" placeholder="Cari nama atau email..."
                                     wire:model.live.debounce.300ms="search">
                                 @if ($search !== '')
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        wire:click="$set('search', '')" title="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="$set('search', '')"
+                                        title="Hapus pencarian">
                                         <i class="mdi mdi-close"></i>
                                     </button>
                                 @endif
@@ -113,12 +113,13 @@
                     </div>
 
                     <div class="table-responsive" style="overflow: visible;">
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
                                     {{-- <th style="width: 60px;">#</th> --}}
                                     <th>Pengguna</th>
                                     <th>Email</th>
+                                    <th>Role</th>
                                     <th>Status Akun</th>
                                     <th>Aktivasi</th>
                                     <th>Terdaftar</th>
@@ -139,25 +140,30 @@
                                                     style="width: 34px; height: 34px; font-size: 12px;">
                                                     {{ $user->initials() }}
                                                 </span>
-                                                <div class="d-flex flex-column gap-1">
-                                                    <div class="fw-semibold text-dark">{{ $user->name }}
-                                                        @if ($user->id === auth()->id())
-                                                            <span class="badge bg-primary ms-1">Akun Anda</span>
-                                                        @endif
-                                                    </div>
-                                                    <div>
-                                                        @if ($primaryRole === 'superadmin')
-                                                            <span class="badge badge-soft-danger px-2 py-1">Superadmin</span>
-                                                        @elseif ($primaryRole === 'admin')
-                                                            <span class="badge badge-soft-primary px-2 py-1">Admin</span>
-                                                        @else
-                                                            <span class="badge badge-soft-info px-2 py-1">Staff</span>
-                                                        @endif
-                                                    </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="fw-semibold text-dark">{{ $user->name }}</span>
+                                                    @if ($user->id === auth()->id())
+                                                        <span class="badge bg-primary ms-1">Akun Anda</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{ $user->email }}</td>
+                                        <td>
+                                            @if ($primaryRole === 'superadmin')
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Superadmin</span>
+                                            @elseif ($primaryRole === 'admin')
+                                                <span
+                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Admin</span>
+                                            @elseif ($primaryRole === 'staff')
+                                                <span
+                                                    class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Staff</span>
+                                            @else
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">{{ ucfirst($primaryRole ?? '-') }}</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if ($user->is_active)
                                                 <span
@@ -191,10 +197,8 @@
                                                 $canManageThisUser = $isSuperadmin || $primaryRole !== 'superadmin';
                                             @endphp
                                             <div class="btn-group">
-                                                <button type="button"
-                                                    class="btn btn-sm btn-light dropdown-toggle text-end"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true"
-                                                    aria-expanded="false">
+                                                <button type="button" class="btn btn-sm btn-light dropdown-toggle text-end"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <i class="mdi mdi-dots-vertical"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end shadow-sm"
@@ -202,13 +206,13 @@
                                                     @if ($canManageThisUser)
                                                         @canany(['edit-users', 'manage-users'])
                                                             <a class="dropdown-item"
-                                                                href="{{ route('admin.user.edit', $user->id) }}"
-                                                                wire:navigate>
+                                                                href="{{ route('admin.user.edit', $user->id) }}" wire:navigate>
                                                                 <i class="mdi mdi-pencil me-1"></i> Edit
                                                             </a>
                                                             <a class="dropdown-item" href="javascript:void(0);"
                                                                 wire:click="sendPasswordResetLink('{{ $user->id }}')">
-                                                                <i class="mdi {{ $user->email_verified_at ? 'mdi-email-send text-info' : 'mdi-email-sync text-warning' }} me-1"></i>
+                                                                <i
+                                                                    class="mdi {{ $user->email_verified_at ? 'mdi-email-send text-info' : 'mdi-email-sync text-warning' }} me-1"></i>
                                                                 {{ $user->email_verified_at ? 'Kirim Link Password' : 'Kirim Ulang Undangan' }}
                                                             </a>
                                                         @endcanany
@@ -223,8 +227,7 @@
                                                             @endcanany
                                                             @canany(['delete-users', 'manage-users'])
                                                                 <div class="dropdown-divider"></div>
-                                                                <a class="dropdown-item text-danger"
-                                                                    href="javascript:void(0);"
+                                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                                     wire:click="confirmDelete('{{ $user->id }}')">
                                                                     <i class="mdi mdi-trash-can me-1"></i> Hapus
                                                                 </a>
@@ -232,9 +235,9 @@
                                                         @endif
                                                     @else
                                                         <span class="dropdown-item text-muted disabled py-1 fs-12">
-                                                             <i class="mdi mdi-shield-lock me-1 text-danger"></i>
-                                                             Terproteksi (Superadmin)
-                                                         </span>
+                                                            <i class="mdi mdi-shield-lock me-1 text-danger"></i>
+                                                            Terproteksi (Superadmin)
+                                                        </span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -242,7 +245,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">
+                                        <td colspan="7" class="text-center py-4 text-muted">
                                             <i class="mdi mdi-account-off font-size-24 d-block mb-1"></i>
                                             Tidak ada data pengguna yang ditemukan.
                                         </td>
@@ -281,8 +284,7 @@
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-danger" wire:click="delete"
-                            wire:loading.attr="disabled">
+                        <button type="button" class="btn btn-danger" wire:click="delete" wire:loading.attr="disabled">
                             <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1"
                                 role="status"></span>
                             Hapus

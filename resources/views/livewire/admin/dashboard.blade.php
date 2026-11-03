@@ -29,14 +29,9 @@
                     </select>
                 </div>
             </div>
-            <div class="card-body p-3">
-                <div wire:ignore>
-                    <div id="campaign-volume-chart" style="min-height: 320px;"></div>
-                </div>
-            </div>
 
-            <!-- Status Email Marketing di Bawah Grafik (Simple 1 Baris Sejajar dengan Icon) -->
-            <div class="card-footer bg-white border-top py-2 px-3">
+            <!-- Status Email Marketing di Atas Grafik (Di Bawah Header) -->
+            <div class="bg-white border-bottom py-2 px-3">
                 <div class="d-flex align-items-center gap-4 flex-wrap fs-13">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bx bx-book-content text-primary fs-16"></i>
@@ -68,6 +63,12 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card-body p-3">
+                <div wire:ignore>
+                    <div id="campaign-volume-chart" style="min-height: 320px;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -91,14 +92,9 @@
                     </select>
                 </div>
             </div>
-            <div class="card-body p-3">
-                <div wire:ignore>
-                    <div id="participant-line-chart" style="min-height: 320px;"></div>
-                </div>
-            </div>
 
-            <!-- Status Peserta Linkpemda di Bawah Grafik (Simple 1 Baris Sejajar dengan Icon) -->
-            <div class="card-footer bg-white border-top py-2 px-3">
+            <!-- Status Peserta Linkpemda di Atas Grafik (Di Bawah Header) -->
+            <div class="bg-white border-bottom py-2 px-3">
                 <div class="d-flex align-items-center gap-4 flex-wrap fs-13">
                     <div class="d-flex align-items-center gap-2">
                         <i class="mdi mdi-account-group text-primary fs-16"></i>
@@ -126,6 +122,12 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card-body p-3">
+                <div wire:ignore>
+                    <div id="participant-line-chart" style="min-height: 320px;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -149,14 +151,9 @@
                     </select>
                 </div>
             </div>
-            <div class="card-body p-3">
-                <div wire:ignore>
-                    <div id="tren-participant-line-chart" style="min-height: 320px;"></div>
-                </div>
-            </div>
 
-            <!-- Status Peserta Tren Media di Bawah Grafik (Simple 1 Baris Sejajar dengan Icon) -->
-            <div class="card-footer bg-white border-top py-2 px-3">
+            <!-- Status Peserta Tren Media di Atas Grafik (Di Bawah Header) -->
+            <div class="bg-white border-bottom py-2 px-3">
                 <div class="d-flex align-items-center gap-4 flex-wrap fs-13">
                     <div class="d-flex align-items-center gap-2">
                         <i class="mdi mdi-account-group text-primary fs-16"></i>
@@ -169,6 +166,12 @@
                         <span class="text-muted">Total Biaya:</span>
                         <span class="fw-bold text-dark">Rp {{ number_format($trenTotalAmount, 0, ',', '.') }}</span>
                     </div>
+                </div>
+            </div>
+
+            <div class="card-body p-3">
+                <div wire:ignore>
+                    <div id="tren-participant-line-chart" style="min-height: 320px;"></div>
                 </div>
             </div>
         </div>
