@@ -51,7 +51,7 @@
 
                     <div class="d-flex align-items-center gap-2">
                         <i class="bx bx-check-double text-success fs-16"></i>
-                        <span class="text-muted">Blast Terkirim:</span>
+                        <span class="text-muted">Email Terkirim:</span>
                         <span class="fw-bold text-success">{{ number_format($totalMarketingSent) }}</span>
                         @if ($totalMarketingFailed > 0)
                             <span
