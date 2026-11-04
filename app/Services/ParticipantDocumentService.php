@@ -83,6 +83,8 @@ class ParticipantDocumentService
             }
         }
 
+        $templatePath = $this->getCompatibleTemplatePath($templatePath);
+
         $pdf = new Fpdi();
         $pdf->SetAutoPageBreak(false);
         $pdf->setSourceFile($templatePath);
@@ -413,6 +415,101 @@ class ParticipantDocumentService
 
         return static::terbilang((int) ($angka / 1_000_000_000_000)) . ' triliun' .
                ($angka % 1_000_000_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000_000_000) : '');
+    }
+
+    /**
+     * Memastikan file template PDF kompatibel dengan parser FPDI (versi gratis).
+     * FPDI free tidak mendukung kompresi /Type /XRef (cross-reference stream) ala PDF 1.5+.
+     * Fungsi ini secara otomatis mendeteksi dan menormalkan kembali struktur tabel xref tradisional.
+     */
+    protected function getCompatibleTemplatePath(string $path): string
+    {
+        if (! file_exists($path) || ! is_readable($path)) {
+            return $path;
+        }
+
+        $content = @file_get_contents($path);
+        if ($content === false || strpos($content, '/XRef') === false) {
+            return $path;
+        }
+
+        if (! preg_match('/\/Type\s*\/XRef/i', $content)) {
+            return $path;
+        }
+
+        return $this->repairXrefStream($path, $content);
+    }
+
+    /**
+     * Membangun ulang tabel xref konvensional (PDF 1.4) dari dokumen PDF yang memiliki stream /XRef.
+     */
+    protected function repairXrefStream(string $path, string $content): string
+    {
+        try {
+            $cleanPdf = preg_replace('/^%PDF-\d+\.\d+/', '%PDF-1.4', $content);
+
+            if (preg_match('/(\d+)\s+0\s+obj\s*<<[^>]*\/Type\s*\/XRef.*?%%EOF/s', $cleanPdf, $m, PREG_OFFSET_CAPTURE)) {
+                $cleanPdf = substr($cleanPdf, 0, $m[0][1]);
+            }
+
+            preg_match_all('/(\d+)\s+0\s+obj/s', $cleanPdf, $matches, PREG_OFFSET_CAPTURE);
+            if (empty($matches[1])) {
+                return $path;
+            }
+
+            $objects = [];
+            foreach ($matches[1] as $idx => $match) {
+                $num = (int) $match[0];
+                $offset = $matches[0][$idx][1];
+                $objects[$num] = $offset;
+            }
+
+            ksort($objects);
+            $maxObj = max(array_keys($objects));
+
+            $xrefOffset = strlen($cleanPdf);
+            $xref = "xref\n0 " . ($maxObj + 1) . "\n0000000000 65535 f \n";
+
+            for ($i = 1; $i <= $maxObj; $i++) {
+                if (isset($objects[$i])) {
+                    $xref .= sprintf("%010d 00000 n \n", $objects[$i]);
+                } else {
+                    $xref .= "0000000000 65535 f \n";
+                }
+            }
+
+            $root = '1 0 R';
+            $info = '';
+            if (preg_match('/\/Root\s+(\d+\s+\d+\s+R)/', $cleanPdf, $rm)) {
+                $root = $rm[1];
+            }
+            if (preg_match('/\/Info\s+(\d+\s+\d+\s+R)/', $cleanPdf, $im)) {
+                $info = "\n/Info " . $im[1];
+            }
+
+            $trailer = "trailer\n<<\n/Size " . ($maxObj + 1) . "\n/Root " . $root . $info . "\n>>\n";
+            $trailer .= "startxref\n" . $xrefOffset . "\n%%EOF\n";
+
+            $finalPdf = $cleanPdf . $xref . $trailer;
+
+            // Jika file asli writable, perbarui file aslinya
+            if (is_writable($path)) {
+                @file_put_contents($path, $finalPdf);
+                return $path;
+            }
+
+            // Fallback ke storage cache
+            $cacheDir = storage_path('app/pdf-templates-cache');
+            if (! is_dir($cacheDir)) {
+                @mkdir($cacheDir, 0755, true);
+            }
+            $cachePath = $cacheDir . '/' . md5($path . filemtime($path)) . '.pdf';
+            @file_put_contents($cachePath, $finalPdf);
+
+            return file_exists($cachePath) ? $cachePath : $path;
+        } catch (\Throwable) {
+            return $path;
+        }
     }
 }
 
