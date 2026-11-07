@@ -82,11 +82,11 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Key</th>
-                                    <th>Value</th>
-                                    <th>Deskripsi</th>
-                                    <th>Diperbarui</th>
-                                    <th class="text-end" style="width: 120px;">Aksi</th>
+                                    <th style="width: 22%;">Key</th>
+                                    <th style="width: 32%;">Value</th>
+                                    <th style="width: 30%;">Deskripsi</th>
+                                    <th style="width: 11%; white-space: nowrap;">Diperbarui</th>
+                                    <th class="text-end" style="width: 5%; white-space: nowrap;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -101,26 +101,32 @@
                                                 <span class="badge badge-soft-danger px-2 py-1">{{ $itemKey }}</span>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="font-monospace fs-13 text-break" style="max-width: 320px;">
+                                        <td style="max-width: 280px;">
+                                            <small class="font-monospace d-block"
+                                                style="font-size: 12px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5;">
                                                 @if ($itemValue === null || $itemValue === '')
-                                                    <span class="badge bg-light text-muted border">null</span>
+                                                    <span class="badge bg-light text-muted border"
+                                                        style="font-size: 11px;">null</span>
                                                 @elseif ($itemValue === 'true' || $itemValue === 'false')
                                                     <span
-                                                        class="badge {{ $itemValue === 'true' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }} px-2 py-1">
+                                                        class="badge {{ $itemValue === 'true' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }} px-2 py-1"
+                                                        style="font-size: 11px;">
                                                         {{ $itemValue }}
                                                     </span>
-                                                @elseif (strlen($itemValue) > 60)
-                                                    <span class="text-dark" title="{{ $itemValue }}">
-                                                        {{ Str::limit($itemValue, 60) }}
-                                                    </span>
+                                                @elseif (Str::startsWith(trim($itemValue), ['http://', 'https://']))
+                                                    <a href="{{ trim($itemValue) }}" target="_blank" rel="noopener noreferrer"
+                                                        class="text-primary text-decoration-underline"
+                                                        title="Buka tautan: {{ $itemValue }}"
+                                                        style="word-break: break-all;">
+                                                        {{ $itemValue }}<i class="bx bx-link-external ms-1" style="font-size: 11px;"></i>
+                                                    </a>
                                                 @else
-                                                    <span class="text-dark fw-semibold">{{ $itemValue }}</span>
+                                                    <span class="text-dark">{{ $itemValue }}</span>
                                                 @endif
-                                            </div>
+                                            </small>
                                         </td>
-                                        <td>
-                                            <small class="text-muted d-block" style="max-width: 320px;">
+                                        <td style="max-width: 280px;">
+                                            <small class="text-muted d-block" style="word-break: break-word; line-height: 1.4;">
                                                 {{ $item->description ?: '-' }}
                                             </small>
                                         </td>
@@ -202,9 +208,11 @@
 
                         <!-- Nilai Pengaturan -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-dark">
-                                Value
-                            </label>
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <label class="form-label fw-bold text-dark mb-0">
+                                    Value
+                                </label>
+                            </div>
                             <textarea class="form-control font-monospace fs-13 @error('value') is-invalid @enderror"
                                 wire:model="value" rows="3"
                                 placeholder="Masukkan nilai atau teks konfigurasi..."></textarea>

@@ -12,6 +12,9 @@ class SystemSettingSeeder extends Seeder
      */
     public function run(): void
     {
+
+        // SystemSetting::truncate();
+
         $settings = [
             [
                 'key' => 'app_name',
@@ -72,43 +75,48 @@ class SystemSettingSeeder extends Seeder
             // Template PDF - Linkpemda
             // -----------------------------------------------------------------
             [
-                'key' => 'pdf_linkpemda_sertifikat',
-                'value' => 'assets/pdf-templates/linkpemda/sertifikat.pdf',
+                'key' => 'temp_linkpemda_sertifikat',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF sertifikat default Linkpemda (dengan background/ornamen warna).',
             ],
             [
-                'key' => 'pdf_linkpemda_kwitansi',
-                'value' => 'assets/pdf-templates/linkpemda/kwitansi.pdf',
+                'key' => 'temp_linkpemda_kwitansi',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF kwitansi pembayaran peserta Linkpemda.',
             ],
             [
-                'key' => 'pdf_linkpemda_invoice',
-                'value' => 'assets/pdf-templates/linkpemda/invoice.pdf',
+                'key' => 'temp_linkpemda_invoice',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF invoice pembayaran peserta Linkpemda.',
             ],
             // -----------------------------------------------------------------
             // Template PDF - Tren Media Diklat (Trans Edukasi Nasional)
             // -----------------------------------------------------------------
             [
-                'key' => 'pdf_tren_sertifikat',
-                'value' => 'assets/pdf-templates/trenmedia/sertifikat.pdf',
+                'key' => 'temp_tren_sertifikat',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF sertifikat default Tren Media Diklat (Trans Edukasi Nasional).',
             ],
             [
-                'key' => 'pdf_tren_kwitansi',
-                'value' => 'assets/pdf-templates/trenmedia/kwitansi.pdf',
+                'key' => 'temp_tren_kwitansi',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF kwitansi pembayaran peserta Tren Media Diklat.',
             ],
             [
-                'key' => 'pdf_tren_invoice',
-                'value' => 'assets/pdf-templates/trenmedia/invoice.pdf',
+                'key' => 'temp_tren_invoice',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF invoice pembayaran peserta Tren Media Diklat.',
             ],
             // blank sertifikat
             [
-                'key' => 'pdf_sertifikat_blank',
-                'value' => 'assets/pdf-templates/linkpemda/sertifikat_blank.pdf',
+                'key' => 'temp_portrait_blank',
+                'value' => 'https://linkpemda.com/uploads/',
                 'description' => 'Path file template PDF sertifikat blank Linkpemda (tanpa background, untuk cetak di blanko fisik).',
+            ],
+            [
+                'key' => 'temp_landscape_blank',
+                'value' => 'https://linkpemda.com/uploads/',
+                'description' => 'Path file template PDF sertifikat landscape blank Linkpemda (tanpa background, untuk cetak di blanko fisik).',
             ],
         ];
 

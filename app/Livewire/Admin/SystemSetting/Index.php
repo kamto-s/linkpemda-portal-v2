@@ -148,7 +148,7 @@ class Index extends Component
                     ->orWhere($valColumn, 'like', "%{$this->search}%")
                     ->orWhere('description', 'like', "%{$this->search}%");
             })
-            ->latest('updated_at')
+            ->orderBy($keyColumn, 'asc')
             ->paginate($this->perPage);
 
         return view('livewire.admin.system-setting.index', [
