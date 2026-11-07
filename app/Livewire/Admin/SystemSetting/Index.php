@@ -55,6 +55,11 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters(): void
     {
         $this->reset(['search']);
@@ -143,12 +148,15 @@ class Index extends Component
         $valColumn = Schema::hasColumn('system_settings', 'value') ? 'value' : 'setting_value';
 
         $settings = SystemSetting::query()
-            ->when($this->search, function ($query) use ($keyColumn, $valColumn) {
-                $query->where($keyColumn, 'like', "%{$this->search}%")
-                    ->orWhere($valColumn, 'like', "%{$this->search}%")
-                    ->orWhere('description', 'like', "%{$this->search}%");
+            ->when(filled($this->search), function ($query) {
+                $term = '%' . trim($this->search) . '%';
+                $query->where(function ($q) use ($term) {
+                    $q->where('key', 'like', $term)
+                        ->orWhere('value', 'like', $term)
+                        ->orWhere('description', 'like', $term);
+                });
             })
-            ->orderBy($keyColumn, 'asc')
+            ->orderBy('key', 'asc')
             ->paginate($this->perPage);
 
         return view('livewire.admin.system-setting.index', [

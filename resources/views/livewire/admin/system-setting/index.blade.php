@@ -171,7 +171,7 @@
 
     <!-- Modal Form Edit Nilai Pengaturan -->
     <div class="modal fade" id="settingModal" tabindex="-1" aria-hidden="true" wire:ignore.self x-data="{ modal: null }"
-        x-init="modal = bootstrap.Modal.getOrCreateInstance($el)" @open-setting-modal.window="modal.show()"
+        x-init="modal = new bootstrap.Modal($el)" @open-setting-modal.window="modal.show()"
         @close-setting-modal.window="modal.hide()">
         <div class="modal-dialog">
             <div class="modal-content border-0 shadow-lg rounded-3">
@@ -199,6 +199,7 @@
                                     style="font-size: 11px; letter-spacing: 0.5px;">Key</span>
                                 <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
                                     style="font-size: 10px;">
+                                    Terkunci
                                 </span>
                             </div>
                             <div class="font-monospace fw-bold text-dark fs-14 text-break">
