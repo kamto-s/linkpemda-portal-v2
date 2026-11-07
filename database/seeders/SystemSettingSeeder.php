@@ -68,6 +68,48 @@ class SystemSettingSeeder extends Seeder
                 'value' => 'Asia/Jakarta',
                 'description' => 'Zona waktu standar aplikasi (WIB: Asia/Jakarta, WITA: Asia/Makassar, WIT: Asia/Jayapura).',
             ],
+            // -----------------------------------------------------------------
+            // Template PDF - Linkpemda
+            // -----------------------------------------------------------------
+            [
+                'key' => 'pdf_linkpemda_sertifikat',
+                'value' => 'assets/pdf-templates/linkpemda/sertifikat.pdf',
+                'description' => 'Path file template PDF sertifikat default Linkpemda (dengan background/ornamen warna).',
+            ],
+            [
+                'key' => 'pdf_linkpemda_kwitansi',
+                'value' => 'assets/pdf-templates/linkpemda/kwitansi.pdf',
+                'description' => 'Path file template PDF kwitansi pembayaran peserta Linkpemda.',
+            ],
+            [
+                'key' => 'pdf_linkpemda_invoice',
+                'value' => 'assets/pdf-templates/linkpemda/invoice.pdf',
+                'description' => 'Path file template PDF invoice pembayaran peserta Linkpemda.',
+            ],
+            // -----------------------------------------------------------------
+            // Template PDF - Tren Media Diklat (Trans Edukasi Nasional)
+            // -----------------------------------------------------------------
+            [
+                'key' => 'pdf_tren_sertifikat',
+                'value' => 'assets/pdf-templates/trenmedia/sertifikat.pdf',
+                'description' => 'Path file template PDF sertifikat default Tren Media Diklat (Trans Edukasi Nasional).',
+            ],
+            [
+                'key' => 'pdf_tren_kwitansi',
+                'value' => 'assets/pdf-templates/trenmedia/kwitansi.pdf',
+                'description' => 'Path file template PDF kwitansi pembayaran peserta Tren Media Diklat.',
+            ],
+            [
+                'key' => 'pdf_tren_invoice',
+                'value' => 'assets/pdf-templates/trenmedia/invoice.pdf',
+                'description' => 'Path file template PDF invoice pembayaran peserta Tren Media Diklat.',
+            ],
+            // blank sertifikat
+            [
+                'key' => 'pdf_sertifikat_blank',
+                'value' => 'assets/pdf-templates/linkpemda/sertifikat_blank.pdf',
+                'description' => 'Path file template PDF sertifikat blank Linkpemda (tanpa background, untuk cetak di blanko fisik).',
+            ],
         ];
 
         foreach ($settings as $setting) {

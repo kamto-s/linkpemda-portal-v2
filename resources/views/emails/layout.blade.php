@@ -258,42 +258,42 @@
         }
 
         /* ================= Gmail Mobile Specific Anti-Dark Mode Hack ================= */
-        u + .body,
-        u + .body .email-wrapper,
-        u + .body .email-container,
-        u + .body .email-header,
-        u + .body .email-body,
-        u + .body .email-footer,
-        u + .body table,
-        u + .body td {
+        u+.body,
+        u+.body .email-wrapper,
+        u+.body .email-container,
+        u+.body .email-header,
+        u+.body .email-body,
+        u+.body .email-footer,
+        u+.body table,
+        u+.body td {
             background-color: #ffffff !important;
             background-image: linear-gradient(#ffffff, #ffffff) !important;
             background: #ffffff !important;
             color: #1e293b !important;
         }
 
-        u + .body .brand-title,
-        u + .body h1,
-        u + .body h2,
-        u + .body h3,
-        u + .body h4,
-        u + .body strong {
+        u+.body .brand-title,
+        u+.body h1,
+        u+.body h2,
+        u+.body h3,
+        u+.body h4,
+        u+.body strong {
             color: #0f172a !important;
         }
 
-        u + .body .brand-sub,
-        u + .body .email-footer,
-        u + .body .footer-brand {
+        u+.body .brand-sub,
+        u+.body .email-footer,
+        u+.body .footer-brand {
             color: #64748b !important;
         }
 
-        u + .body .btn-action {
+        u+.body .btn-action {
             background-color: #0284c7 !important;
             background-image: linear-gradient(#0284c7, #0284c7) !important;
             color: #ffffff !important;
         }
 
-        u + .body .btn-text {
+        u+.body .btn-text {
             color: #ffffff !important;
         }
 
@@ -328,7 +328,7 @@
     <!-- Wrapper Luar (Lebar Penuh Tanpa Padding Samping yang Mempersempit Layar HP) -->
     <div class="email-wrapper" bgcolor="#ffffff"
         style="width: 100% !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; padding: 16px 0; margin: 0 auto;">
-        
+
         <table class="email-container" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
             align="center" bgcolor="#ffffff"
             style="width: 100% !important; max-width: 580px !important; margin: 0 auto !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border: 1px solid #f1f5f9; border-radius: 10px; overflow: hidden;">
@@ -351,7 +351,8 @@
                                 height="48" border="0">
                         </div>
                     @else
-                        <div class="brand-title" style="font-size: 22px; font-weight: 800; color: #0f172a !important; line-height: 1.2; margin: 0;">
+                        <div class="brand-title"
+                            style="font-size: 22px; font-weight: 800; color: #0f172a !important; line-height: 1.2; margin: 0;">
                             {{ $appName }}<span style="color: #22c55e;">.</span>
                         </div>
                     @endif
@@ -377,7 +378,8 @@
             <tr>
                 <td class="email-footer" align="center" bgcolor="#ffffff"
                     style="padding: 22px 24px 28px 24px; text-align: center; font-size: 12px; line-height: 1.6; color: #64748b !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border-top: 1px solid #f1f5f9;">
-                    <div class="footer-brand" style="font-size: 14px; font-weight: 700; color: #1e293b !important; margin-bottom: 4px;">
+                    <div class="footer-brand"
+                        style="font-size: 14px; font-weight: 700; color: #1e293b !important; margin-bottom: 4px;">
                         {{ $appName }}
                     </div>
 
@@ -386,12 +388,13 @@
                         Telp: (021) 88997129 | WA: <a href="https://wa.me/6281387666605" target="_blank"
                             style="color: #0284c7 !important; text-decoration: none;">+6281387666605</a> |
                         Email: <a href="mailto:{{ system_setting('contact_support_email', 'info@linkpemda.com') }}"
-                            style="color: #0284c7 !important; text-decoration: none;">{{ system_setting('contact_support_email', 'info@linkpemda.com') }}</a>
+                            style="color: #0284c7 !important; text-decoration: none;">{{
+                            system_setting('contact_support_email', 'info@linkpemda.com') }}</a>
                     </div>
 
-                    <div class="footer-links" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; color: #64748b !important;">
+                    <div class="footer-links"
+                        style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; color: #64748b !important;">
                         &copy; {{ date('Y') }} {{ $appName }}. Hak Cipta Dilindungi.<br>
-                        <span style="font-size: 11px; color: #94a3b8 !important;">Email ini dikirim secara otomatis oleh sistem, mohon untuk tidak membalas langsung ke alamat ini.</span>
                     </div>
                 </td>
             </tr>

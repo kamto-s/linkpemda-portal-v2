@@ -510,7 +510,7 @@
                     <div class="p-2 px-3 bg-white border-bottom fs-13">
                         <div class="row g-1">
                             <div class="col-sm-2 text-muted">Pengirim:</div>
-                            <div class="col-sm-10 text-dark">Linkpemda Portal &lt;no-reply@linkpemda.id&gt;</div>
+                            <div class="col-sm-10 text-dark">Linkpemda &lt;info@linkpemda.id&gt;</div>
 
                             <div class="col-sm-2 text-muted">Penerima:</div>
                             <div class="col-sm-10 text-dark">

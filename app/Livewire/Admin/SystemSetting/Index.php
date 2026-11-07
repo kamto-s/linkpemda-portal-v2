@@ -61,17 +61,6 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function openCreateModal(): void
-    {
-        abort_unless(Auth::user()?->hasRole('superadmin'), 403);
-
-        $this->reset(['settingId', 'key', 'value', 'description']);
-        $this->isEditing = false;
-        $this->resetValidation();
-
-        $this->dispatch('open-setting-modal');
-    }
-
     public function edit(string $id): void
     {
         abort_unless(Auth::user()?->hasRole('superadmin'), 403);
@@ -92,42 +81,26 @@ class Index extends Component
     {
         abort_unless(Auth::user()?->hasRole('superadmin'), 403);
 
-        $keyColumn = Schema::hasColumn('system_settings', 'key') ? 'key' : 'setting_key';
+        if (! $this->settingId) {
+            return;
+        }
+
         $valColumn = Schema::hasColumn('system_settings', 'value') ? 'value' : 'setting_value';
 
         $this->validate([
-            'key' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-Z0-9_\-\.]+$/',
-                Rule::unique('system_settings', $keyColumn)->ignore($this->settingId),
-            ],
             'value' => ['nullable', 'string'],
             'description' => ['nullable', 'string', 'max:1000'],
         ], [
-            'key.required' => 'Key pengaturan wajib diisi.',
-            'key.unique' => 'Key pengaturan ini sudah digunakan.',
-            'key.regex' => 'Key pengaturan hanya boleh berisi huruf, angka, garis bawah (_), titik (.), atau tanda hubung (-).',
             'description.max' => 'Deskripsi tidak boleh melebihi 1000 karakter.',
         ]);
 
-        $data = [
-            $keyColumn => $this->key,
+        $setting = SystemSetting::findOrFail($this->settingId);
+        $setting->update([
             $valColumn => $this->value,
             'description' => $this->description,
-        ];
+        ]);
 
-        if ($this->isEditing && $this->settingId) {
-            $setting = SystemSetting::findOrFail($this->settingId);
-            $setting->update($data);
-
-            session()->flash('success', "Pengaturan \"{$this->key}\" berhasil diperbarui.");
-        } else {
-            SystemSetting::create($data);
-
-            session()->flash('success', "Pengaturan baru \"{$this->key}\" berhasil ditambahkan.");
-        }
+        session()->flash('success', "Nilai pengaturan \"{$this->key}\" berhasil diperbarui.");
 
         $this->dispatch('close-setting-modal');
         $this->reset(['settingId', 'key', 'value', 'description', 'isEditing']);
