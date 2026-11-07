@@ -224,7 +224,9 @@
 
                 @if ($contacts->hasPages())
                     <div class="card-footer mb-0">
-                        {{ $contacts->links() }}
+                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                            {{ $contacts->links() }}
+                        </div>
                     </div>
                 @endif
             </div>

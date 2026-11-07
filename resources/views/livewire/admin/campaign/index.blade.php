@@ -302,7 +302,9 @@
 
                 @if ($campaigns->hasPages())
                     <div class="card-footer mb-0">
-                        {{ $campaigns->links() }}
+                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                            {{ $campaigns->links() }}
+                        </div>
                     </div>
                 @endif
             </div>

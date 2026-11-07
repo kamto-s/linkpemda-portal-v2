@@ -362,7 +362,9 @@
 
                 @if ($participants->hasPages())
                     <div class="card-footer mb-0">
-                        {{ $participants->links() }}
+                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                            {{ $participants->links() }}
+                        </div>
                     </div>
                 @endif
             </div>

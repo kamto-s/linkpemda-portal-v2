@@ -134,7 +134,7 @@
                                         <td class="text-end">
                                             <button type="button" class="btn btn-sm btn-soft-primary"
                                                 wire:click="edit('{{ $item->id }}')" title="Edit Nilai Pengaturan">
-                                                <i class="mdi mdi-pencil me-1"></i> Edit
+                                                <i class="bx bx-cog"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -153,7 +153,8 @@
 
                 @if ($settings->hasPages())
                     <div class="card-footer mb-0">
-                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                        <div class="pagination-rounded" x-data
+                            x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
                             {{ $settings->links() }}
                         </div>
                     </div>
