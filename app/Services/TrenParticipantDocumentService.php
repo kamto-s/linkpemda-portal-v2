@@ -21,29 +21,7 @@ class TrenParticipantDocumentService
      */
     public function buildPdf(TrenParticipant $participant, string $type = 'default'): Fpdi
     {
-        $templatePath = match ($type) {
-            'blank' => public_path('assets/pdf-templates/trenmedia/sertifikat_blank.pdf'),
-            'kwitansi' => public_path('assets/pdf-templates/trenmedia/kwitansi.pdf'),
-            default => public_path('assets/pdf-templates/trenmedia/sertifikat.pdf'),
-        };
-
-        // Fallback jika nama file memiliki variasi '_tren' atau ada di linkpemda
-        if (!file_exists($templatePath)) {
-            $fallback = match ($type) {
-                'blank' => file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat_blank_tren.pdf'))
-                    ? public_path('assets/pdf-templates/trenmedia/sertifikat_blank_tren.pdf')
-                    : public_path('assets/pdf-templates/trenmedia/sertifikat.pdf'),
-                'kwitansi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
-                default => file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat_tren.pdf'))
-                    ? public_path('assets/pdf-templates/trenmedia/sertifikat_tren.pdf')
-                    : public_path('assets/pdf-templates/linkpemda/sertifikat.pdf'),
-            };
-            if (file_exists($fallback)) {
-                $templatePath = $fallback;
-            }
-        }
-
-        $templatePath = $this->getCompatibleTemplatePath($templatePath);
+        $templatePath = $this->resolveTemplatePath($type);
 
         $pdf = new Fpdi();
         $pdf->SetAutoPageBreak(false);
@@ -61,6 +39,131 @@ class TrenParticipantDocumentService
         }
 
         return $pdf;
+    }
+
+    /**
+     * Mengambil path template PDF Tren Media Diklat berdasarkan SystemSetting dengan fallback ke aset lokal.
+     * Mendukung URL eksternal (di-download & di-cache secara otomatis) maupun path lokal.
+     *
+     * @param  string  $type  'default' | 'blank' | 'kwitansi'
+     */
+    public function resolveTemplatePath(string $type = 'default'): string
+    {
+        // 1. Ambil setting key dari SystemSetting
+        $settingKey = match ($type) {
+            'blank'    => 'temp_landscape_blank',
+            'kwitansi' => 'temp_tren_kwitansi',
+            default    => 'temp_tren_sertifikat',
+        };
+
+        $configuredPath = trim((string) system_setting($settingKey, ''));
+
+        // Fallback jika blank landscape belum diset, cek alternatif
+        if ($type === 'blank' && empty($configuredPath)) {
+            $configuredPath = trim((string) system_setting('temp_tren_sertifikat_blank', ''));
+        }
+
+        // 2. Jika konfigurasi di SystemSetting ada, proses path/URL-nya
+        if (! empty($configuredPath)) {
+            $resolved = $this->resolveFileFromConfig($configuredPath);
+            if ($resolved && file_exists($resolved)) {
+                return $this->getCompatibleTemplatePath($resolved);
+            }
+        }
+
+        // 3. Fallback aset lokal jika setting kosong atau file belum dapat diakses
+        $fallback = match ($type) {
+            'blank' => file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat_blank_tren.pdf'))
+                ? public_path('assets/pdf-templates/trenmedia/sertifikat_blank_tren.pdf')
+                : (file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat_blank.pdf'))
+                    ? public_path('assets/pdf-templates/trenmedia/sertifikat_blank.pdf')
+                    : public_path('assets/pdf-templates/linkpemda/sertifikat_blank.pdf')),
+            'kwitansi' => file_exists(public_path('assets/pdf-templates/trenmedia/kwitansi.pdf'))
+                ? public_path('assets/pdf-templates/trenmedia/kwitansi.pdf')
+                : public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
+            default => file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat_tren.pdf'))
+                ? public_path('assets/pdf-templates/trenmedia/sertifikat_tren.pdf')
+                : (file_exists(public_path('assets/pdf-templates/trenmedia/sertifikat.pdf'))
+                    ? public_path('assets/pdf-templates/trenmedia/sertifikat.pdf')
+                    : public_path('assets/pdf-templates/linkpemda/sertifikat.pdf')),
+        };
+
+        return $this->getCompatibleTemplatePath($fallback);
+    }
+
+    /**
+     * Memvalidasi dan menyiapkan file fisik dari konfigurasi (bisa berupa URL HTTP/HTTPS atau path lokal).
+     */
+    protected function resolveFileFromConfig(string $configuredPath): ?string
+    {
+        // A. Jika berupa URL (http / https)
+        if (str_starts_with($configuredPath, 'http://') || str_starts_with($configuredPath, 'https://')) {
+            $filename = basename(parse_url($configuredPath, PHP_URL_PATH) ?: '');
+            if (empty($filename)) {
+                $filename = 'template_' . md5($configuredPath) . '.pdf';
+            }
+
+            // Cek 1: Apakah file ada di public/uploads lokal?
+            $localUpload = public_path('uploads/' . $filename);
+            if (file_exists($localUpload) && filesize($localUpload) > 0) {
+                return $localUpload;
+            }
+
+            // Cek 2: Apakah file sudah pernah di-cache di storage?
+            $cacheDir = storage_path('app/pdf-templates-cache');
+            if (! is_dir($cacheDir)) {
+                @mkdir($cacheDir, 0755, true);
+            }
+
+            $cachedFile = $cacheDir . '/' . md5($configuredPath) . '_' . $filename;
+            if (file_exists($cachedFile) && filesize($cachedFile) > 0) {
+                return $cachedFile;
+            }
+
+            // Cek 3: Download dari URL dan simpan ke cache
+            try {
+                $ch = curl_init($configuredPath);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_TIMEOUT        => 10,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_USERAGENT      => 'Linkpemda-Portal/2.0',
+                ]);
+                $data = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($data !== false && $httpCode === 200 && strlen($data) > 0) {
+                    file_put_contents($cachedFile, $data);
+                    return $cachedFile;
+                }
+            } catch (\Throwable) {
+                // Lewati dan gunakan fallback jika koneksi gagal
+            }
+
+            return null;
+        }
+
+        // B. Jika berupa path lokal absolut
+        if (file_exists($configuredPath) && ! is_dir($configuredPath)) {
+            return $configuredPath;
+        }
+
+        // C. Jika berupa path relatif dari public_path()
+        $relativePublic = public_path(ltrim($configuredPath, '/\\'));
+        if (file_exists($relativePublic) && ! is_dir($relativePublic)) {
+            return $relativePublic;
+        }
+
+        // D. Jika berupa path relatif dari storage_path()
+        $relativeStorage = storage_path('app/' . ltrim($configuredPath, '/\\'));
+        if (file_exists($relativeStorage) && ! is_dir($relativeStorage)) {
+            return $relativeStorage;
+        }
+
+        return null;
     }
 
     /**

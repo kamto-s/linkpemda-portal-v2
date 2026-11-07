@@ -31,24 +31,24 @@ class ParticipantDocumentService
         $verifyUrl = route('certificate.verify', ['certificate_number' => $certNumber]);
 
         $options = new QROptions([
-            'outputInterface'  => \chillerlan\QRCode\Output\QRGdImagePNG::class,
-            'eccLevel'         => \chillerlan\QRCode\Common\EccLevel::L,
-            'outputBase64'     => false,
+            'outputInterface' => \chillerlan\QRCode\Output\QRGdImagePNG::class,
+            'eccLevel' => \chillerlan\QRCode\Common\EccLevel::L,
+            'outputBase64' => false,
             'imageTransparent' => false,
-            'scale'            => 10,
+            'scale' => 10,
         ]);
 
         $qr = new QRCode($options);
         $imageData = $qr->render($verifyUrl);
 
         $dir = public_path('uploads/qr_code');
-        if (! file_exists($dir)) {
+        if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
 
         $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $certNumber);
-        $filename  = "{$sanitized}.png";
-        $filePath  = "{$dir}/{$filename}";
+        $filename = "{$sanitized}.png";
+        $filePath = "{$dir}/{$filename}";
 
         if (file_put_contents($filePath, $imageData) === false) {
             return false;
@@ -65,31 +65,13 @@ class ParticipantDocumentService
      */
     public function buildPdf(Participant $participant, string $type = 'default'): Fpdi
     {
-        $templatePath = match ($type) {
-            'blank'    => public_path('assets/pdf-templates/linkpemda/sertifikat_blank.pdf'),
-            'kwitansi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
-            default    => public_path('assets/pdf-templates/linkpemda/sertifikat.pdf'),
-        };
-
-        // Fallback jika file masih di folder luar
-        if (! file_exists($templatePath)) {
-            $fallback = match ($type) {
-                'blank'    => public_path('assets/pdf-templates/sertifikat_blank.pdf'),
-                'kwitansi' => public_path('assets/pdf-templates/kwitansi.pdf'),
-                default    => public_path('assets/pdf-templates/sertifikat.pdf'),
-            };
-            if (file_exists($fallback)) {
-                $templatePath = $fallback;
-            }
-        }
-
-        $templatePath = $this->getCompatibleTemplatePath($templatePath);
+        $templatePath = $this->resolveTemplatePath($type);
 
         $pdf = new Fpdi();
         $pdf->SetAutoPageBreak(false);
         $pdf->setSourceFile($templatePath);
         $template = $pdf->importPage(1);
-        $size     = $pdf->getTemplateSize($template);
+        $size = $pdf->getTemplateSize($template);
         $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
         $pdf->useTemplate($template, 0, 0, $size['width'], $size['height']);
 
@@ -103,16 +85,142 @@ class ParticipantDocumentService
     }
 
     /**
+     * Mengambil path template PDF berdasarkan SystemSetting dengan fallback ke aset lokal.
+     * Mendukung URL eksternal (di-download & di-cache secara otomatis) maupun path lokal.
+     *
+     * @param  string  $type  'default' | 'blank' | 'kwitansi'
+     */
+    public function resolveTemplatePath(string $type = 'default'): string
+    {
+        // 1. Ambil setting key dari SystemSetting
+        $settingKey = match ($type) {
+            'blank' => 'temp_landscape_blank',
+            'kwitansi' => 'temp_linkpemda_kwitansi',
+            default => 'temp_linkpemda_sertifikat',
+        };
+
+        $configuredPath = trim((string) system_setting($settingKey, ''));
+
+        // Fallback jika blank landscape belum diset, cek kemungkinan key alternatif
+        if ($type === 'blank' && empty($configuredPath)) {
+            $configuredPath = trim((string) system_setting('temp_linkpemda_sertifikat_blank', ''));
+        }
+
+        // 2. Jika konfigurasi di SystemSetting ada, proses path/URL-nya
+        if (!empty($configuredPath)) {
+            $resolved = $this->resolveFileFromConfig($configuredPath);
+            if ($resolved && file_exists($resolved)) {
+                return $this->getCompatibleTemplatePath($resolved);
+            }
+        }
+
+        // 3. Fallback aset lokal jika setting kosong atau file belum dapat diakses
+        $fallback = match ($type) {
+            'blank' => public_path('assets/pdf-templates/linkpemda/sertifikat_blank.pdf'),
+            'kwitansi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
+            default => public_path('assets/pdf-templates/linkpemda/sertifikat.pdf'),
+        };
+
+        if (!file_exists($fallback)) {
+            $fallbackAlternative = match ($type) {
+                'blank' => public_path('assets/pdf-templates/sertifikat_blank.pdf'),
+                'kwitansi' => public_path('assets/pdf-templates/kwitansi.pdf'),
+                default => public_path('assets/pdf-templates/sertifikat.pdf'),
+            };
+            if (file_exists($fallbackAlternative)) {
+                $fallback = $fallbackAlternative;
+            }
+        }
+
+        return $this->getCompatibleTemplatePath($fallback);
+    }
+
+    /**
+     * Memvalidasi dan menyiapkan file fisik dari konfigurasi (bisa berupa URL HTTP/HTTPS atau path lokal).
+     */
+    protected function resolveFileFromConfig(string $configuredPath): ?string
+    {
+        // A. Jika berupa URL (http / https)
+        if (str_starts_with($configuredPath, 'http://') || str_starts_with($configuredPath, 'https://')) {
+            $filename = basename(parse_url($configuredPath, PHP_URL_PATH) ?: '');
+            if (empty($filename)) {
+                $filename = 'template_' . md5($configuredPath) . '.pdf';
+            }
+
+            // Cek 1: Apakah file ada di public/uploads lokal?
+            $localUpload = public_path('uploads/' . $filename);
+            if (file_exists($localUpload) && filesize($localUpload) > 0) {
+                return $localUpload;
+            }
+
+            // Cek 2: Apakah file sudah pernah di-cache di storage?
+            $cacheDir = storage_path('app/pdf-templates-cache');
+            if (!is_dir($cacheDir)) {
+                @mkdir($cacheDir, 0755, true);
+            }
+
+            $cachedFile = $cacheDir . '/' . md5($configuredPath) . '_' . $filename;
+            if (file_exists($cachedFile) && filesize($cachedFile) > 0) {
+                return $cachedFile;
+            }
+
+            // Cek 3: Download dari URL dan simpan ke cache
+            try {
+                $ch = curl_init($configuredPath);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_TIMEOUT => 10,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_USERAGENT => 'Linkpemda-Portal/2.0',
+                ]);
+                $data = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($data !== false && $httpCode === 200 && strlen($data) > 0) {
+                    file_put_contents($cachedFile, $data);
+                    return $cachedFile;
+                }
+            } catch (\Throwable) {
+                // Lewati dan gunakan fallback jika koneksi gagal
+            }
+
+            return null;
+        }
+
+        // B. Jika berupa path lokal absolut
+        if (file_exists($configuredPath) && !is_dir($configuredPath)) {
+            return $configuredPath;
+        }
+
+        // C. Jika berupa path relatif dari public_path() (misal: 'uploads/file.pdf' atau 'assets/...')
+        $relativePublic = public_path(ltrim($configuredPath, '/\\'));
+        if (file_exists($relativePublic) && !is_dir($relativePublic)) {
+            return $relativePublic;
+        }
+
+        // D. Jika berupa path relatif dari storage_path()
+        $relativeStorage = storage_path('app/' . ltrim($configuredPath, '/\\'));
+        if (file_exists($relativeStorage) && !is_dir($relativeStorage)) {
+            return $relativeStorage;
+        }
+
+        return null;
+    }
+
+    /**
      * Stream PDF langsung ke browser (inline / tampil di tab baru).
      */
     public function streamInline(Participant $participant, string $type = 'default'): \Illuminate\Http\Response
     {
-        $pdf      = $this->buildPdf($participant, $type);
+        $pdf = $this->buildPdf($participant, $type);
         $filename = $this->buildFilename($participant, $type);
-        $content  = $pdf->Output('S');
+        $content = $pdf->Output('S');
 
         return response($content, 200, [
-            'Content-Type'        => 'application/pdf',
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => "inline; filename=\"{$filename}\"",
         ]);
     }
@@ -122,12 +230,12 @@ class ParticipantDocumentService
      */
     public function streamDownload(Participant $participant, string $type = 'default'): \Illuminate\Http\Response
     {
-        $pdf      = $this->buildPdf($participant, $type);
+        $pdf = $this->buildPdf($participant, $type);
         $filename = $this->buildFilename($participant, $type);
-        $content  = $pdf->Output('S');
+        $content = $pdf->Output('S');
 
         return response($content, 200, [
-            'Content-Type'        => 'application/pdf',
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
     }
@@ -137,7 +245,7 @@ class ParticipantDocumentService
      */
     public function getPdfBinary(Participant $participant, string $type = 'default'): string
     {
-        $pdf      = $this->buildPdf($participant, $type);
+        $pdf = $this->buildPdf($participant, $type);
         $filename = $this->buildFilename($participant, $type);
 
         return $pdf->Output($filename, 'S');
@@ -158,8 +266,8 @@ class ParticipantDocumentService
 
         $pdfType = match ($type) {
             'kwitansi' => 'kwitansi',
-            'blank'    => 'blank',
-            default    => 'default',
+            'blank' => 'blank',
+            default => 'default',
         };
 
         foreach ($participants as $participant) {
@@ -192,7 +300,7 @@ class ParticipantDocumentService
         $pdf->Write(0, $participant->name);
 
         // Jabatan & Instansi
-        $jabatan  = $participant->position ?? '';
+        $jabatan = $participant->position ?? '';
         $instansi = $participant->institution_name ?? '';
         $pdf->SetFont('Arial', 'I', 12);
         $pdf->SetXY(83.5, 75);
@@ -212,16 +320,16 @@ class ParticipantDocumentService
         // Menggunakan kolom terpisah agar tanda titik dua (:) 100% lurus sejajar presisi
         $details = [
             ['No. Sertifikat', $participant->certificate_number ?? '-'],
-            ['Tanggal',        $participant->certificate_date ?? '-'],
-            ['Tempat',         $participant->event_venue ?? '-'],
-            ['Lokasi',         $participant->event_location ?? '-'],
+            ['Tanggal', $participant->certificate_date ?? '-'],
+            ['Tempat', $participant->event_venue ?? '-'],
+            ['Lokasi', $participant->event_location ?? '-'],
         ];
 
-        $startX      = 114;
-        $startY      = 119.5;
-        $lineHeight  = 5;
-        $labelWidth  = 27; // Lebar tetap kolom label (mm)
-        $colonWidth  = 3;  // Lebar kolom titik dua (mm)
+        $startX = 114;
+        $startY = 119.5;
+        $lineHeight = 5;
+        $labelWidth = 27; // Lebar tetap kolom label (mm)
+        $colonWidth = 3;  // Lebar kolom titik dua (mm)
 
         $pdf->SetFont('Arial', '', 12);
         $pdf->SetTextColor(0, 0, 0);
@@ -280,14 +388,14 @@ class ParticipantDocumentService
         $pdf->Write(0, $participant->name);
 
         // Jabatan & Instansi
-        $jabatan  = $participant->position ?? '';
+        $jabatan = $participant->position ?? '';
         $instansi = $participant->institution_name ?? '';
         $pdf->SetFont('Arial', 'I', 10);
         $pdf->SetXY(67, 82);
         $pdf->MultiCell(0, 4.5, $jabatan . "\n" . $instansi, 0, 'L');
 
         // Nominal Rupiah (angka)
-        $amount        = (float) ($participant->amount ?? 0);
+        $amount = (float) ($participant->amount ?? 0);
         $amountFormatted = 'Rp. ' . number_format($amount, 0, ',', '.') . ',-';
         $pdf->SetFont('Arial', 'BI', 11);
         $pdf->SetXY(68, 96);
@@ -312,8 +420,8 @@ class ParticipantDocumentService
 
         // Pelaksanaan Kegiatan: Tanggal Pelaksanaan Bimtek, Tempat, Lokasi
         $eventDate = $participant->certificate_date ?: ($participant->receipt_date ?? '');
-        $venue     = $participant->event_venue ?? '';
-        $location  = $participant->event_location ?? '';
+        $venue = $participant->event_venue ?? '';
+        $location = $participant->event_location ?? '';
         $pdf->SetFont('Arial', '', 11);
         $pdf->SetXY(67, 138.3);
         $pdf->MultiCell(120, 5, $eventDate . ', ' . $venue . ' - ' . $location, 0, 'L');
@@ -369,8 +477,20 @@ class ParticipantDocumentService
             return 'minus ' . static::terbilang(abs($angka));
         }
 
-        $kata = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan',
-                 'sepuluh', 'sebelas'];
+        $kata = [
+            '',
+            'satu',
+            'dua',
+            'tiga',
+            'empat',
+            'lima',
+            'enam',
+            'tujuh',
+            'delapan',
+            'sembilan',
+            'sepuluh',
+            'sebelas'
+        ];
 
         if ($angka < 12) {
             return $kata[$angka];
@@ -382,7 +502,7 @@ class ParticipantDocumentService
 
         if ($angka < 100) {
             return static::terbilang((int) ($angka / 10)) . ' puluh' .
-                   ($angka % 10 > 0 ? ' ' . static::terbilang($angka % 10) : '');
+                ($angka % 10 > 0 ? ' ' . static::terbilang($angka % 10) : '');
         }
 
         if ($angka < 200) {
@@ -391,7 +511,7 @@ class ParticipantDocumentService
 
         if ($angka < 1_000) {
             return static::terbilang((int) ($angka / 100)) . ' ratus' .
-                   ($angka % 100 > 0 ? ' ' . static::terbilang($angka % 100) : '');
+                ($angka % 100 > 0 ? ' ' . static::terbilang($angka % 100) : '');
         }
 
         if ($angka < 2_000) {
@@ -400,21 +520,21 @@ class ParticipantDocumentService
 
         if ($angka < 1_000_000) {
             return static::terbilang((int) ($angka / 1_000)) . ' ribu' .
-                   ($angka % 1_000 > 0 ? ' ' . static::terbilang($angka % 1_000) : '');
+                ($angka % 1_000 > 0 ? ' ' . static::terbilang($angka % 1_000) : '');
         }
 
         if ($angka < 1_000_000_000) {
             return static::terbilang((int) ($angka / 1_000_000)) . ' juta' .
-                   ($angka % 1_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000) : '');
+                ($angka % 1_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000) : '');
         }
 
         if ($angka < 1_000_000_000_000) {
             return static::terbilang((int) ($angka / 1_000_000_000)) . ' miliar' .
-                   ($angka % 1_000_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000_000) : '');
+                ($angka % 1_000_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000_000) : '');
         }
 
         return static::terbilang((int) ($angka / 1_000_000_000_000)) . ' triliun' .
-               ($angka % 1_000_000_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000_000_000) : '');
+            ($angka % 1_000_000_000_000 > 0 ? ' ' . static::terbilang($angka % 1_000_000_000_000) : '');
     }
 
     /**
@@ -424,7 +544,7 @@ class ParticipantDocumentService
      */
     protected function getCompatibleTemplatePath(string $path): string
     {
-        if (! file_exists($path) || ! is_readable($path)) {
+        if (!file_exists($path) || !is_readable($path)) {
             return $path;
         }
 
@@ -433,7 +553,7 @@ class ParticipantDocumentService
             return $path;
         }
 
-        if (! preg_match('/\/Type\s*\/XRef/i', $content)) {
+        if (!preg_match('/\/Type\s*\/XRef/i', $content)) {
             return $path;
         }
 
@@ -500,7 +620,7 @@ class ParticipantDocumentService
 
             // Fallback ke storage cache
             $cacheDir = storage_path('app/pdf-templates-cache');
-            if (! is_dir($cacheDir)) {
+            if (!is_dir($cacheDir)) {
                 @mkdir($cacheDir, 0755, true);
             }
             $cachePath = $cacheDir . '/' . md5($path . filemtime($path)) . '.pdf';

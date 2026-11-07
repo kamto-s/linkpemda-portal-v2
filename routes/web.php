@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CampaignImageUploadController;
+use App\Http\Controllers\Admin\InvoiceDocumentController;
 use App\Http\Controllers\Admin\ParticipantDocumentController;
 use App\Http\Controllers\Admin\TrenParticipantDocumentController;
 use App\Livewire\Admin\Campaign\Form as CampaignForm;
@@ -10,6 +11,9 @@ use App\Livewire\Admin\Category\Index as CategoryIndex;
 use App\Livewire\Admin\Contact\Form as ContactForm;
 use App\Livewire\Admin\Contact\Index as ContactIndex;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Invoice\Form as InvoiceForm;
+use App\Livewire\Admin\Invoice\Index as InvoiceIndex;
+use App\Livewire\Admin\Invoice\Show as InvoiceShow;
 use App\Livewire\Admin\Participant\Form as ParticipantForm;
 use App\Livewire\Admin\Participant\Index as ParticipantIndex;
 use App\Livewire\Admin\Participant\Show as ParticipantShow;
@@ -133,6 +137,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/linkpemda/create', ParticipantForm::class)->name('participant.linkpemda.create');
         Route::get('/participants/linkpemda/{participant}/edit', ParticipantForm::class)->name('participant.linkpemda.edit');
         Route::get('/participants/linkpemda/{participant}', ParticipantShow::class)->name('participant.linkpemda.show');
+
+        // Administrasi - Invoice (Linkpemda)
+        Route::get('/invoices/linkpemda', InvoiceIndex::class)->name('invoice.linkpemda.index');
+        Route::get('/invoices/linkpemda/create', InvoiceForm::class)->name('invoice.linkpemda.create');
+        Route::get('/invoices/linkpemda/{invoice}/edit', InvoiceForm::class)->name('invoice.linkpemda.edit');
+        Route::get('/invoices/linkpemda/{invoice}', InvoiceShow::class)->name('invoice.linkpemda.show');
+        Route::get('/invoices/linkpemda/{invoice}/preview', [InvoiceDocumentController::class, 'streamInline'])->name('invoice.linkpemda.preview');
+        Route::get('/invoices/linkpemda/{invoice}/download', [InvoiceDocumentController::class, 'streamDownload'])->name('invoice.linkpemda.download');
 
         // Dokumen PDF Peserta (Sertifikat & Kwitansi) — dibuka via target="_blank"
         Route::get('/participants/linkpemda/{participant}/certificate/view', [ParticipantDocumentController::class, 'viewCertificate'])->name('participant.linkpemda.certificate.view');

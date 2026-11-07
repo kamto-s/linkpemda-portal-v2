@@ -181,8 +181,9 @@
                                     </a>
                                 </li>
                                 <li class="menu-item {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}">
-                                    <a class='menu-link {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}'
-                                        href='#'>
+                                    <a wire:navigate
+                                        class='menu-link {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}'
+                                        href='{{ route('admin.invoice.linkpemda.index') }}'>
                                         <span class="menu-text">Invoice</span>
                                     </a>
                                 </li>
