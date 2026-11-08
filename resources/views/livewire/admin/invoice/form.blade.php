@@ -274,9 +274,9 @@
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold">Waktu Kegiatan <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text"
+                                                <input type="time"
                                                     class="form-control @error('event_time') is-invalid @enderror"
-                                                    wire:model="event_time" placeholder="Contoh: 08.00 WIB">
+                                                    wire:model="event_time">
                                                 @error('event_time')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror

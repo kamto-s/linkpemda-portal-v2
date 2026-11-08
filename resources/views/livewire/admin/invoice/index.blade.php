@@ -235,7 +235,8 @@
                                                 style="max-width: 175px;" title="{{ $item->company_name }}">
                                                 {{ $item->company_name }}
                                             </a>
-                                            <small class="text-muted d-block text-truncate" style="max-width: 175px;" title="{{ $item->email ?: ($item->phone ?: '-') }}">
+                                            <small class="text-muted d-block text-truncate" style="max-width: 175px;"
+                                                title="{{ $item->email ?: ($item->phone ?: '-') }}">
                                                 {{ $item->email ?: ($item->phone ?: '-') }}
                                             </small>
                                         </td>
@@ -247,8 +248,7 @@
                                                 {{ $item->activity_theme ?: '-' }}
                                             </span>
                                             <small class="text-muted d-block text-nowrap">
-                                                <i
-                                                    class="mdi mdi-calendar-blank text-primary me-1"></i>{{ $item->short_event_date }}
+                                                {{ $item->short_event_date }}
                                             </small>
                                         </td>
 

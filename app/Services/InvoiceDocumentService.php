@@ -213,63 +213,112 @@ class InvoiceDocumentService
             $pdf->Cell(128, $lineH, '-', 0, 1, 'L');
             $curY += $lineH + 3;
         } else {
-            $half = (int) ceil($totalP / 2);
-            $col1Peserta = array_slice($participantsList, 0, $half);
-            $col2Peserta = array_slice($participantsList, $half);
-
-            // Ukuran font dan tinggi baris peserta statis tetap
             $pH = 4.4;
             $fontSize = 9.5;
-            $pesertaHeight = count($col1Peserta) * $pH;
+            $safeBottomY = 266; // Batas bawah aman konten sebelum footer (282 mm)
 
-            // Cek apakah seluruh daftar peserta muat di halaman saat ini:
-            // Jika tidak muat (melebihi batas aman 265 mm) atau posisi saat ini sudah terlalu bawah (> 200 mm),
-            // maka pindahkan seluruh blok Nama Peserta (Label, Titik Dua, dan seluruh list peserta) ke halaman baru bersama-sama ("pindah semua").
-            if (($curY + $pesertaHeight > 265) || ($curY > 200 && $pesertaHeight > 25)) {
+            // Hitung kapasitas baris maksimal yang muat di sisa Halaman 1
+            $availableRowsPage1 = max(5, (int) floor(($safeBottomY - $curY) / $pH));
+
+            // Kasus A: Seluruh peserta muat di Halaman 1 (dalam 2 kolom)
+            if ($totalP <= $availableRowsPage1 * 2) {
+                $half = (int) ceil($totalP / 2);
+                $col1 = array_slice($participantsList, 0, $half);
+                $col2 = array_slice($participantsList, $half);
+
+                // Cetak Label "Nama Peserta"
+                $pdf->SetFont('Arial', 'B', 9.5);
+                $pdf->SetXY(15, $curY);
+                $pdf->Cell($labelW, $lineH, 'Nama Peserta', 0, 0, 'L');
+                $pdf->SetXY($colonX, $curY);
+                $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+                $pdf->SetFont('Arial', '', $fontSize);
+                for ($i = 0; $i < count($col1); $i++) {
+                    $rowY = $curY + ($i * $pH);
+                    $pdf->SetXY($valX, $rowY);
+                    $pdf->Cell(62, $pH, ($i + 1) . '. ' . $col1[$i], 0, 0, 'L');
+
+                    if (isset($col2[$i])) {
+                        $pdf->SetXY(130, $rowY);
+                        $pdf->Cell(65, $pH, ($half + $i + 1) . '. ' . $col2[$i], 0, 0, 'L');
+                    }
+                }
+                $curY += count($col1) * $pH + 5;
+            } else {
+                // Kasus B: Jumlah peserta banyak, penuhi Halaman 1 secara maksimal lalu lanjutkan ke Halaman 2
+                $page1Rows = $availableRowsPage1;
+                $page1Count = $page1Rows * 2;
+                $page1Items = array_slice($participantsList, 0, $page1Count);
+                $remainingItems = array_slice($participantsList, $page1Count);
+
+                $halfP1 = $page1Rows;
+                $p1Col1 = array_slice($page1Items, 0, $halfP1);
+                $p1Col2 = array_slice($page1Items, $halfP1);
+
+                // Cetak Label "Nama Peserta" di Halaman 1
+                $pdf->SetFont('Arial', 'B', 9.5);
+                $pdf->SetXY(15, $curY);
+                $pdf->Cell($labelW, $lineH, 'Nama Peserta', 0, 0, 'L');
+                $pdf->SetXY($colonX, $curY);
+                $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+                $pdf->SetFont('Arial', '', $fontSize);
+                for ($i = 0; $i < count($p1Col1); $i++) {
+                    $rowY = $curY + ($i * $pH);
+                    $pdf->SetXY($valX, $rowY);
+                    $pdf->Cell(62, $pH, ($i + 1) . '. ' . $p1Col1[$i], 0, 0, 'L');
+
+                    if (isset($p1Col2[$i])) {
+                        $pdf->SetXY(130, $rowY);
+                        $pdf->Cell(65, $pH, ($halfP1 + $i + 1) . '. ' . $p1Col2[$i], 0, 0, 'L');
+                    }
+                }
+
+                // Pindah ke Halaman 2 untuk mencetak sisa peserta lanjutan
                 $this->addNewPage($pdf);
                 $curY = 50; // Mulai di bawah kop surat halaman baru
-            }
 
-            // Cetak Label "Nama Peserta" dan titik dua ":" sejajar dengan baris pertama peserta
-            $pdf->SetFont('Arial', 'B', 9.5);
-            $pdf->SetXY(15, $curY);
-            $pdf->Cell($labelW, $lineH, 'Nama Peserta', 0, 0, 'L');
-            $pdf->SetXY($colonX, $curY);
-            $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+                $offsetNumber = $page1Count;
+                while (!empty($remainingItems)) {
+                    $pageNextRows = (int) floor(($safeBottomY - $curY) / $pH);
+                    $pageNextCapacity = max(2, $pageNextRows * 2);
 
-            $pesertaStartY = $curY;
-            $pdf->SetFont('Arial', '', $fontSize);
+                    $chunk = array_slice($remainingItems, 0, $pageNextCapacity);
+                    $remainingItems = array_slice($remainingItems, $pageNextCapacity);
 
-            for ($i = 0; $i < count($col1Peserta); $i++) {
-                $rowY = $pesertaStartY + ($i * $pH);
+                    $halfNext = (int) ceil(count($chunk) / 2);
+                    $chunkCol1 = array_slice($chunk, 0, $halfNext);
+                    $chunkCol2 = array_slice($chunk, $halfNext);
 
-                // Jika daftar peserta sangat banyak sehingga melebihi batas bawah halaman (> 268 mm), buka halaman baru
-                // dan cetak kembali label "Nama Peserta" agar selalu sejajar di halaman berikutnya
-                if ($rowY + $pH > 268) {
-                    $this->addNewPage($pdf);
+                    // Cetak label "Nama Peserta" sejajar di halaman lanjutan
                     $pdf->SetFont('Arial', 'B', 9.5);
-                    $pdf->SetXY(15, 50);
+                    $pdf->SetXY(15, $curY);
                     $pdf->Cell($labelW, $lineH, 'Nama Peserta', 0, 0, 'L');
-                    $pdf->SetXY($colonX, 50);
+                    $pdf->SetXY($colonX, $curY);
                     $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
 
                     $pdf->SetFont('Arial', '', $fontSize);
-                    $pesertaStartY = 50 - ($i * $pH);
-                    $rowY = 50;
-                }
+                    for ($i = 0; $i < count($chunkCol1); $i++) {
+                        $rowY = $curY + ($i * $pH);
+                        $pdf->SetXY($valX, $rowY);
+                        $pdf->Cell(62, $pH, ($offsetNumber + $i + 1) . '. ' . $chunkCol1[$i], 0, 0, 'L');
 
-                // Kolom 1
-                $pdf->SetXY($valX, $rowY);
-                $pdf->Cell(62, $pH, ($i + 1) . '. ' . $col1Peserta[$i], 0, 0, 'L');
+                        if (isset($chunkCol2[$i])) {
+                            $pdf->SetXY(130, $rowY);
+                            $pdf->Cell(65, $pH, ($offsetNumber + $halfNext + $i + 1) . '. ' . $chunkCol2[$i], 0, 0, 'L');
+                        }
+                    }
 
-                // Kolom 2
-                if (isset($col2Peserta[$i])) {
-                    $pdf->SetXY(130, $rowY);
-                    $pdf->Cell(65, $pH, ($half + $i + 1) . '. ' . $col2Peserta[$i], 0, 0, 'L');
+                    $curY += count($chunkCol1) * $pH + 5;
+                    $offsetNumber += count($chunk);
+
+                    if (!empty($remainingItems)) {
+                        $this->addNewPage($pdf);
+                        $curY = 50;
+                    }
                 }
             }
-
-            $curY = $rowY + $pH + 5;
         }
 
         // Cek apakah tabel rincian biaya, deposit, dan tanda tangan muat di sisa halaman (butuh ~102 mm)
@@ -285,11 +334,11 @@ class InvoiceDocumentService
 
         $tableW = [
             'tanggal' => 30,
-            'waktu' => 20,
-            'lokasi' => 40,
-            'jumlah' => 20,
-            'harga' => 35,
-            'total' => 35,
+            'waktu' => 22,
+            'lokasi' => 48,
+            'jumlah' => 14,
+            'harga' => 33,
+            'total' => 33,
         ];
 
         // Header Tabel
@@ -305,7 +354,6 @@ class InvoiceDocumentService
         // Data Baris Tabel
         $rowH = 14;
         $rowY = $pdf->GetY();
-        $pdf->SetFont('Arial', '', 9);
 
         // Data Nilai Finansial (Dinamis dari model Invoice)
         $countVal = $invoice->participant_count > 0 ? $invoice->participant_count : ($totalP > 0 ? $totalP : 0);
@@ -314,7 +362,7 @@ class InvoiceDocumentService
         $depositVal = (float) $invoice->deposit_amount;
         $remainingVal = (float) $invoice->remaining_amount > 0 ? (float) $invoice->remaining_amount : ($totalVal - $depositVal);
 
-        // Kolom Tanggal (2 baris dinamis dari rentang kegiatan)
+        // 1. Kolom Tanggal (2 baris dinamis dari rentang kegiatan)
         $dateLine1 = '-';
         $dateLine2 = '';
         if ($invoice->event_start_date) {
@@ -330,55 +378,84 @@ class InvoiceDocumentService
         }
 
         $pdf->Rect(15, $rowY, $tableW['tanggal'], $rowH);
+        $pdf->SetFont('Arial', '', 8.5);
         if ($dateLine2 !== '') {
             $pdf->SetXY(15, $rowY + 2.5);
-            $pdf->Cell($tableW['tanggal'], 4, $dateLine1, 0, 1, 'C');
+            $pdf->Cell($tableW['tanggal'], 4.2, $dateLine1, 0, 1, 'C');
             $pdf->SetXY(15, $rowY + 7);
-            $pdf->Cell($tableW['tanggal'], 4, $dateLine2, 0, 0, 'C');
+            $pdf->Cell($tableW['tanggal'], 4.2, $dateLine2, 0, 0, 'C');
         } else {
-            $pdf->SetXY(15, $rowY + 5);
-            $pdf->Cell($tableW['tanggal'], 4, $dateLine1, 0, 0, 'C');
+            $pdf->SetXY(15, $rowY + 4.8);
+            $pdf->Cell($tableW['tanggal'], 4.5, $dateLine1, 0, 0, 'C');
         }
 
-        // Kolom Waktu
+        // 2. Kolom Waktu (Di-wrap aman agar tidak pernah keluar batas kolom)
         $xPos = 15 + $tableW['tanggal'];
         $pdf->Rect($xPos, $rowY, $tableW['waktu'], $rowH);
-        $pdf->SetXY($xPos, $rowY + 5);
-        $pdf->Cell($tableW['waktu'], 4, $invoice->event_time ?: '-', 0, 0, 'C');
-
-        // Kolom Lokasi
-        $xPos += $tableW['waktu'];
-        $pdf->Rect($xPos, $rowY, $tableW['lokasi'], $rowH);
-        $locLines = explode("\n", str_replace(["\r\n", "\r"], "\n", $invoice->event_location ?: '-'));
-        $locLine1 = trim($locLines[0] ?? '-');
-        $locLine2 = trim($locLines[1] ?? '');
-        if ($locLine2 !== '') {
+        $pdf->SetFont('Arial', '', 8.5);
+        $waktuLines = $this->wrapTextToWidth($pdf, $invoice->event_time ?: '-', $tableW['waktu'] - 2);
+        if (count($waktuLines) >= 2) {
             $pdf->SetXY($xPos, $rowY + 2.5);
-            $pdf->Cell($tableW['lokasi'], 4, $locLine1, 0, 1, 'C');
+            $pdf->Cell($tableW['waktu'], 4.2, $waktuLines[0], 0, 1, 'C');
             $pdf->SetXY($xPos, $rowY + 7);
-            $pdf->Cell($tableW['lokasi'], 4, $locLine2, 0, 0, 'C');
+            $pdf->Cell($tableW['waktu'], 4.2, $waktuLines[1], 0, 0, 'C');
         } else {
-            $pdf->SetXY($xPos, $rowY + 5);
-            $pdf->Cell($tableW['lokasi'], 4, $locLine1, 0, 0, 'C');
+            $pdf->SetXY($xPos, $rowY + 4.8);
+            $pdf->Cell($tableW['waktu'], 4.5, $waktuLines[0] ?? '-', 0, 0, 'C');
         }
 
-        // Kolom Jumlah
+        // 3. Kolom Lokasi (Auto-wrap ketat di batas 48 mm, teks tidak akan pernah menabrak kolom lain)
+        $xPos += $tableW['waktu'];
+        $pdf->Rect($xPos, $rowY, $tableW['lokasi'], $rowH);
+        $lokasiMaxW = $tableW['lokasi'] - 3; // 45 mm batas lebar teks
+        $pdf->SetFont('Arial', '', 8);
+        $lokasiLines = $this->wrapTextToWidth($pdf, $invoice->event_location ?: '-', $lokasiMaxW);
+
+        if (count($lokasiLines) === 1) {
+            $pdf->SetFont('Arial', '', 8.5);
+            $pdf->SetXY($xPos, $rowY + 4.8);
+            $pdf->Cell($tableW['lokasi'], 4.5, $lokasiLines[0], 0, 0, 'C');
+        } elseif (count($lokasiLines) === 2) {
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->SetXY($xPos, $rowY + 2.5);
+            $pdf->Cell($tableW['lokasi'], 4.2, $lokasiLines[0], 0, 1, 'C');
+            $pdf->SetXY($xPos, $rowY + 7);
+            $pdf->Cell($tableW['lokasi'], 4.2, $lokasiLines[1], 0, 0, 'C');
+        } else {
+            // 3 baris
+            $pdf->SetFont('Arial', '', 7.5);
+            $line3 = $lokasiLines[2] ?? '';
+            if (count($lokasiLines) > 3) {
+                $line3 .= '...';
+            }
+            $pdf->SetXY($xPos, $rowY + 1.6);
+            $pdf->Cell($tableW['lokasi'], 3.6, $lokasiLines[0], 0, 1, 'C');
+            $pdf->SetXY($xPos, $rowY + 5.2);
+            $pdf->Cell($tableW['lokasi'], 3.6, $lokasiLines[1], 0, 1, 'C');
+            $pdf->SetXY($xPos, $rowY + 8.8);
+            $pdf->Cell($tableW['lokasi'], 3.6, $line3, 0, 0, 'C');
+        }
+
+        // 4. Kolom Jumlah
         $xPos += $tableW['lokasi'];
         $pdf->Rect($xPos, $rowY, $tableW['jumlah'], $rowH);
-        $pdf->SetXY($xPos, $rowY + 5);
-        $pdf->Cell($tableW['jumlah'], 4, (string) $countVal, 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY($xPos, $rowY + 4.8);
+        $pdf->Cell($tableW['jumlah'], 4.5, (string) $countVal, 0, 0, 'C');
 
-        // Kolom Harga
+        // 5. Kolom Harga
         $xPos += $tableW['jumlah'];
         $pdf->Rect($xPos, $rowY, $tableW['harga'], $rowH);
-        $pdf->SetXY($xPos, $rowY + 5);
-        $pdf->Cell($tableW['harga'], 4, 'Rp. ' . number_format($priceVal, 0, ',', '.') . ',-', 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 8.5);
+        $pdf->SetXY($xPos, $rowY + 4.8);
+        $pdf->Cell($tableW['harga'], 4.5, 'Rp. ' . number_format($priceVal, 0, ',', '.') . ',-', 0, 0, 'C');
 
-        // Kolom Total
+        // 6. Kolom Total
         $xPos += $tableW['harga'];
         $pdf->Rect($xPos, $rowY, $tableW['total'], $rowH);
-        $pdf->SetXY($xPos, $rowY + 5);
-        $pdf->Cell($tableW['total'], 4, 'Rp. ' . number_format($totalVal, 0, ',', '.') . ',-', 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 8.5);
+        $pdf->SetXY($xPos, $rowY + 4.8);
+        $pdf->Cell($tableW['total'], 4.5, 'Rp. ' . number_format($totalVal, 0, ',', '.') . ',-', 0, 0, 'C');
 
         // Baris Terbilang
         $terbilangY = $rowY + $rowH;
@@ -421,6 +498,48 @@ class InvoiceDocumentService
         $pdf->SetXY(135, $bendaharaY);
         $pdf->Cell(60, 5, 'Bendahara Pelaksana', 0, 1, 'C');
         $pdf->Line(140, $bendaharaY, 190, $bendaharaY);
+    }
+
+    /**
+     * Memecah teks menjadi baris-baris yang lebarnya dijamin muat dalam batas kolom (mm).
+     * Mencegah teks meluber dan menabrak kolom di sebelahnya.
+     */
+    protected function wrapTextToWidth(Fpdi $pdf, string $text, float $maxWidth): array
+    {
+        $rawLines = explode("\n", str_replace(["\r\n", "\r"], "\n", trim($text)));
+        $finalLines = [];
+
+        foreach ($rawLines as $rawLine) {
+            $words = preg_split('/\s+/', trim($rawLine));
+            if (empty($words) || (count($words) === 1 && $words[0] === '')) {
+                continue;
+            }
+
+            $currentLine = '';
+            foreach ($words as $word) {
+                $test = $currentLine === '' ? $word : $currentLine . ' ' . $word;
+                if ($pdf->GetStringWidth($test) <= $maxWidth) {
+                    $currentLine = $test;
+                } else {
+                    if ($currentLine !== '') {
+                        $finalLines[] = $currentLine;
+                    }
+                    // Jika satu kata melebihi lebar kolom, pangkas kata agar tidak tembus batas
+                    if ($pdf->GetStringWidth($word) > $maxWidth) {
+                        while (mb_strlen($word) > 1 && $pdf->GetStringWidth($word . '...') > $maxWidth) {
+                            $word = mb_substr($word, 0, -1);
+                        }
+                        $word .= '...';
+                    }
+                    $currentLine = $word;
+                }
+            }
+            if ($currentLine !== '') {
+                $finalLines[] = $currentLine;
+            }
+        }
+
+        return !empty($finalLines) ? $finalLines : ['-'];
     }
 
     /**

@@ -43,7 +43,7 @@ class Form extends Component
 
     public ?string $event_end_date = null;
 
-    public string $event_time = '08.00 WIB';
+    public string $event_time = '08:00';
 
     public string $event_location = '';
 
@@ -87,7 +87,15 @@ class Form extends Component
 
             $this->event_start_date = $this->invoice->event_start_date ? $this->invoice->event_start_date->format('Y-m-d') : '';
             $this->event_end_date = $this->invoice->event_end_date ? $this->invoice->event_end_date->format('Y-m-d') : null;
-            $this->event_time = $this->invoice->event_time ?? '08.00 WIB';
+
+            // Ekstrak jam dari data tersimpan (misal: "08.00 WIB" -> time "08:00")
+            $rawTime = (string) ($this->invoice->event_time ?? '08.00 WIB');
+            if (preg_match('/(\d{1,2})[:.](\d{2})/', $rawTime, $timeMatch)) {
+                $this->event_time = str_pad($timeMatch[1], 2, '0', STR_PAD_LEFT) . ':' . $timeMatch[2];
+            } else {
+                $this->event_time = '08:00';
+            }
+
             $this->event_location = $this->invoice->event_location ?? '';
 
             $rawParticipants = (array) ($this->invoice->participants ?? []);
@@ -105,7 +113,7 @@ class Form extends Component
             $this->participants = [''];
             $this->menu_type = 'Meeting';
             $this->payment_method = 'Transfer / Cash';
-            $this->event_time = '08.00 WIB';
+            $this->event_time = '08:00';
             $this->price_per_participant = '0';
             $this->deposit_amount = '0';
             $this->status = 'pending';
@@ -235,7 +243,7 @@ class Form extends Component
             'payment_method' => 'required|string|max:100',
             'event_start_date' => 'required|date',
             'event_end_date' => 'nullable|date|after_or_equal:event_start_date',
-            'event_time' => 'required|string|max:100',
+            'event_time' => 'required',
             'event_location' => 'required|string|max:255',
             'participants' => 'required|array|min:1',
             'participants.*' => 'nullable|string|max:255',
@@ -285,7 +293,7 @@ class Form extends Component
             'payment_method' => $this->payment_method,
             'event_start_date' => $this->event_start_date,
             'event_end_date' => $this->event_end_date ?: null,
-            'event_time' => trim($this->event_time) ?: '08.00 WIB',
+            'event_time' => !empty($this->event_time) ? (str_replace(':', '.', trim($this->event_time)) . ' WIB') : '08.00 WIB',
             'event_location' => trim($this->event_location),
             'participants' => $cleanParticipants,
             'participant_count' => count($cleanParticipants),
