@@ -293,7 +293,7 @@ class InvoiceDocumentService
         ];
 
         // Header Tabel
-        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->SetXY(15, $curY);
         $pdf->Cell($tableW['tanggal'], 8, 'Tanggal', 1, 0, 'C');
         $pdf->Cell($tableW['waktu'], 8, 'Waktu', 1, 0, 'C');
@@ -305,7 +305,7 @@ class InvoiceDocumentService
         // Data Baris Tabel
         $rowH = 14;
         $rowY = $pdf->GetY();
-        $pdf->SetFont('Arial', '', 8.5);
+        $pdf->SetFont('Arial', '', 9);
 
         // Data Nilai Finansial (Dinamis dari model Invoice)
         $countVal = $invoice->participant_count > 0 ? $invoice->participant_count : ($totalP > 0 ? $totalP : 0);
@@ -321,10 +321,10 @@ class InvoiceDocumentService
             $startD = Carbon::parse($invoice->event_start_date)->locale('id');
             if ($invoice->event_end_date && !$invoice->event_start_date->isSameDay($invoice->event_end_date)) {
                 $endD = Carbon::parse($invoice->event_end_date)->locale('id');
-                $dateLine1 = $startD->translatedFormat('d M. Y') . ' s.d';
-                $dateLine2 = $endD->translatedFormat('d M. Y');
+                $dateLine1 = $startD->translatedFormat('d M Y') . ' s.d';
+                $dateLine2 = $endD->translatedFormat('d M Y');
             } else {
-                $dateLine1 = $startD->translatedFormat('d M. Y');
+                $dateLine1 = $startD->translatedFormat('d M Y');
                 $dateLine2 = '';
             }
         }
