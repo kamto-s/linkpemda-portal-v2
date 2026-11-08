@@ -105,7 +105,35 @@ class Invoice extends BaseModel
     }
 
     /**
-     * Format tanggal invoice: 2 November 2026
+     * Format rentang tanggal pelaksanaan kegiatan singkat: 18 - 21 Nov 2026
+     */
+    public function getShortEventDateAttribute(): string
+    {
+        if (! $this->event_start_date) {
+            return '-';
+        }
+
+        $start = Carbon::parse($this->event_start_date)->locale('id');
+
+        if (! $this->event_end_date || $this->event_start_date->isSameDay($this->event_end_date)) {
+            return $start->translatedFormat('d M Y');
+        }
+
+        $end = Carbon::parse($this->event_end_date)->locale('id');
+
+        if ($start->year === $end->year) {
+            if ($start->month === $end->month) {
+                return $start->format('j') . ' - ' . $end->format('j') . ' ' . $end->translatedFormat('M Y');
+            }
+
+            return $start->translatedFormat('j M') . ' - ' . $end->translatedFormat('j M Y');
+        }
+
+        return $start->translatedFormat('j M Y') . ' - ' . $end->translatedFormat('j M Y');
+    }
+
+    /**
+     * Format tanggal invoice lengkap: 2 November 2026
      */
     public function getFormattedInvoiceDateAttribute(): string
     {
@@ -114,6 +142,18 @@ class Invoice extends BaseModel
         }
 
         return Carbon::parse($this->invoice_date)->locale('id')->translatedFormat('d F Y');
+    }
+
+    /**
+     * Format tanggal invoice singkat: 02 Nov 2026
+     */
+    public function getShortInvoiceDateAttribute(): string
+    {
+        if (! $this->invoice_date) {
+            return '-';
+        }
+
+        return Carbon::parse($this->invoice_date)->locale('id')->translatedFormat('d M Y');
     }
 
     /**

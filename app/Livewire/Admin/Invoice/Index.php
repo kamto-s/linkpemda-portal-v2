@@ -184,6 +184,11 @@ class Index extends Component
 
     public function render()
     {
+        $totalInvoices = Invoice::count();
+        $approvedCount = Invoice::where('status', 'approved')->count();
+        $pendingCount = Invoice::where('status', 'pending')->count();
+        $totalAmount = (float) Invoice::sum('total_amount');
+
         $invoices = Invoice::query()
             ->with('approver')
             ->when(filled($this->search), function ($query) {
@@ -213,6 +218,10 @@ class Index extends Component
 
         return view('livewire.admin.invoice.index', [
             'invoices' => $invoices,
+            'totalInvoices' => $totalInvoices,
+            'approvedCount' => $approvedCount,
+            'pendingCount' => $pendingCount,
+            'totalAmount' => $totalAmount,
         ]);
     }
 }

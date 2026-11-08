@@ -1,4 +1,5 @@
 <div>
+    <!-- Page Header & Breadcrumb -->
     <div class="py-3 py-lg-4">
         <div class="row">
             <div class="col-lg-6">
@@ -37,9 +38,70 @@
         </div>
     @endif
 
+    <!-- Statistik Ringkasan -->
+    <div class="row g-2 mb-3">
+        <div class="col-6 col-md-3">
+            <div class="card mb-0">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fs-12 d-block">Total Invoice</span>
+                            <h5 class="mb-0 fw-bold">{{ number_format($totalInvoices) }}</h5>
+                        </div>
+                        <i class="mdi mdi-file-document-multiple text-primary fs-24"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card mb-0">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fs-12 d-block">Disetujui (ACC)</span>
+                            <h5 class="mb-0 fw-bold text-success">{{ number_format($approvedCount) }}</h5>
+                        </div>
+                        <i class="mdi mdi-check-decagram text-success fs-24"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card mb-0">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fs-12 d-block">Menunggu ACC</span>
+                            <h5 class="mb-0 fw-bold text-warning">{{ number_format($pendingCount) }}</h5>
+                        </div>
+                        <i class="mdi mdi-clock-outline text-warning fs-24"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card mb-0">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fs-12 d-block">Total Tagihan</span>
+                            <h5 class="mb-0 fw-bold text-dark fs-15">Rp {{ number_format($totalAmount, 0, ',', '.') }}
+                            </h5>
+                        </div>
+                        <i class="mdi mdi-cash-multiple text-info fs-24"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card & Tabel Invoice -->
     <div class="row">
-        <div class="col-12" style="min-width: 0; max-width: 100%;">
-            <div class="card" style="width: 100%; max-width: 100%; min-width: 0;">
+        <div class="col-lg-12">
+            <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
@@ -49,16 +111,17 @@
                             </p>
                         </div>
                         <div>
-                            <a href="{{ route('admin.invoice.linkpemda.create') }}" wire:navigate class="btn btn-primary">
+                            <a href="{{ route('admin.invoice.linkpemda.create') }}" wire:navigate
+                                class="btn btn-primary">
                                 <i class="mdi mdi-plus"></i> Tambah
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-body" style="width: 100%; max-width: 100%; min-width: 0;">
+                <div class="card-body">
 
-                    <!-- Search & Filter Controls -->
+                    <!-- Filter Toolbar -->
                     <div class="row g-2 mb-3 align-items-center">
                         <div class="col-md-3">
                             <div class="input-group">
@@ -66,8 +129,8 @@
                                 <input type="text" class="form-control" placeholder="Cari invoice, instansi, tema..."
                                     wire:model.live.debounce.300ms="search">
                                 @if ($search !== '')
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        wire:click="$set('search', '')" title="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="$set('search', '')"
+                                        title="Hapus pencarian">
                                         <i class="mdi mdi-close"></i>
                                     </button>
                                 @endif
@@ -119,60 +182,20 @@
                         </div>
                     </div>
 
-                    <!-- CSS untuk Kolom Aksi Statis (Sticky Column) -->
-                    <style>
-                        .table-invoice-scroll-container {
-                            width: 100%;
-                            max-width: 100%;
-                            overflow-x: auto;
-                            position: relative;
-                            -webkit-overflow-scrolling: touch;
-                        }
-                        .table-sticky-action {
-                            border-collapse: separate !important;
-                            border-spacing: 0 !important;
-                            width: 100%;
-                            min-width: 1200px;
-                            margin-bottom: 0;
-                        }
-                        .table-sticky-action th,
-                        .table-sticky-action td {
-                            border-bottom: 1px solid var(--bs-border-color, #eff2f7);
-                            padding: 10px 14px;
-                            vertical-align: middle;
-                            white-space: nowrap;
-                        }
-                        .table-sticky-action .sticky-action-col {
-                            position: -webkit-sticky !important;
-                            position: sticky !important;
-                            right: 0 !important;
-                            z-index: 5 !important;
-                            background-color: var(--bs-card-bg, #ffffff) !important;
-                            box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.08);
-                        }
-                        .table-sticky-action thead th.sticky-action-col {
-                            background-color: var(--bs-tertiary-bg, #f8f9fa) !important;
-                            z-index: 6 !important;
-                        }
-                        .table-sticky-action tbody tr:hover td.sticky-action-col {
-                            background-color: var(--bs-table-hover-bg, #f3f6f9) !important;
-                        }
-                    </style>
-
                     <!-- Tabel Invoice Linkpemda -->
-                    <div class="table-invoice-scroll-container border rounded">
-                        <table class="table table-hover table-sticky-action align-middle mb-0">
+                    <div class="table-responsive" style="overflow: visible;">
+                        <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="min-width: 160px;">No. Invoice</th>
-                                    <th style="min-width: 220px;">Instansi / Klien</th>
-                                    <th style="min-width: 260px;">Kegiatan Bimtek</th>
-                                    <th style="min-width: 90px;" class="text-center">Peserta</th>
-                                    <th style="min-width: 140px;">Total Biaya</th>
-                                    <th style="min-width: 130px;" class="text-center">Status ACC</th>
-                                    <th style="min-width: 120px;" class="text-center">Pembayaran</th>
-                                    <th style="min-width: 110px;" class="text-center">E-Invoice</th>
-                                    <th class="sticky-action-col text-end" style="width: 100px; min-width: 100px;">Aksi</th>
+                                    <th style="min-width: 125px;">No. Invoice</th>
+                                    <th style="min-width: 160px; max-width: 180px;">Instansi / Klien</th>
+                                    <th style="min-width: 170px; max-width: 200px;">Kegiatan Bimtek</th>
+                                    <th class="text-center" style="width: 75px;">Peserta</th>
+                                    <th style="min-width: 105px;">Total Biaya</th>
+                                    <th class="text-center" style="width: 100px;">Status ACC</th>
+                                    <th class="text-center" style="width: 105px;">Pembayaran</th>
+                                    <th class="text-center" style="width: 90px;">E-Invoice</th>
+                                    <th class="text-end" style="width: 80px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -181,14 +204,14 @@
                                         $statusEnum = $item->status instanceof \App\Enums\InvoiceStatus ? $item->status : \App\Enums\InvoiceStatus::tryFrom($item->status);
                                         $payEnum = $item->payment_status instanceof \App\Enums\InvoicePaymentStatus ? $item->payment_status : \App\Enums\InvoicePaymentStatus::tryFrom($item->payment_status);
 
-                                        $statusSubtle = match($statusEnum) {
+                                        $statusSubtle = match ($statusEnum) {
                                             \App\Enums\InvoiceStatus::Pending => 'bg-warning-subtle text-warning border border-warning-subtle',
                                             \App\Enums\InvoiceStatus::Approved => 'bg-success-subtle text-success border border-success-subtle',
                                             \App\Enums\InvoiceStatus::Rejected => 'bg-danger-subtle text-danger border border-danger-subtle',
                                             default => 'bg-secondary-subtle text-secondary',
                                         };
 
-                                        $paySubtle = match($payEnum) {
+                                        $paySubtle = match ($payEnum) {
                                             \App\Enums\InvoicePaymentStatus::Unpaid => 'bg-danger-subtle text-danger border border-danger-subtle',
                                             \App\Enums\InvoicePaymentStatus::Partial => 'bg-warning-subtle text-warning border border-warning-subtle',
                                             \App\Enums\InvoicePaymentStatus::Paid => 'bg-success-subtle text-success border border-success-subtle',
@@ -196,45 +219,49 @@
                                         };
                                     @endphp
                                     <tr wire:key="{{ $item->id }}">
-                                        <!-- 1. No. Invoice & Tanggal -->
+                                        <!-- 1. No. Invoice -->
                                         <td>
                                             <a href="{{ route('admin.invoice.linkpemda.show', $item->id) }}" wire:navigate
-                                                class="fw-semibold text-primary font-monospace text-decoration-none fs-13">
+                                                class="fw-semibold text-primary font-monospace text-decoration-none">
                                                 {{ $item->invoice_number }}
                                             </a>
-                                            <small class="text-muted d-block fs-12">{{ $item->formatted_invoice_date }}</small>
+                                            <small class="text-muted d-block">{{ $item->short_invoice_date }}</small>
                                         </td>
 
                                         <!-- 2. Instansi / Klien -->
                                         <td>
-                                            <span class="fw-semibold text-dark d-block fs-13">
+                                            <a href="{{ route('admin.invoice.linkpemda.show', $item->id) }}" wire:navigate
+                                                class="fw-semibold text-dark text-decoration-none text-truncate d-block"
+                                                style="max-width: 175px;" title="{{ $item->company_name }}">
                                                 {{ $item->company_name }}
-                                            </span>
-                                            <small class="text-muted d-block fs-12">
+                                            </a>
+                                            <small class="text-muted d-block text-truncate" style="max-width: 175px;" title="{{ $item->email ?: ($item->phone ?: '-') }}">
                                                 {{ $item->email ?: ($item->phone ?: '-') }}
                                             </small>
                                         </td>
 
                                         <!-- 3. Kegiatan Bimtek & Jadwal -->
                                         <td>
-                                            <span class="text-dark fs-13 d-block">
+                                            <span class="fw-medium text-dark text-truncate d-block"
+                                                style="max-width: 185px;" title="{{ $item->activity_theme }}">
                                                 {{ $item->activity_theme ?: '-' }}
                                             </span>
-                                            <small class="text-muted d-block fs-12">
-                                                <i class="mdi mdi-calendar-blank text-primary me-1"></i>{{ $item->formatted_event_date }}
+                                            <small class="text-muted d-block text-nowrap">
+                                                <i
+                                                    class="mdi mdi-calendar-blank text-primary me-1"></i>{{ $item->short_event_date }}
                                             </small>
                                         </td>
 
                                         <!-- 4. Jumlah Peserta -->
-                                        <td class="text-center">
-                                            <span class="badge bg-light text-dark border px-2 py-1 fs-12">
+                                        <td class="text-center text-nowrap">
+                                            <span class="badge bg-light text-dark border px-2 py-1 fs-11 rounded-pill">
                                                 {{ $item->participant_count }} Orang
                                             </span>
                                         </td>
 
                                         <!-- 5. Total Biaya & Sisa -->
-                                        <td>
-                                            <span class="fw-bold text-dark fs-13">
+                                        <td class="text-nowrap">
+                                            <span class="fw-bold text-dark">
                                                 Rp {{ number_format((float) $item->total_amount, 0, ',', '.') }}
                                             </span>
                                             @if ((float) $item->remaining_amount > 0 && (float) $item->deposit_amount > 0)
@@ -245,47 +272,52 @@
                                         </td>
 
                                         <!-- 6. Status ACC -->
-                                        <td class="text-center">
+                                        <td class="text-center text-nowrap">
                                             @if ($statusEnum)
-                                                <span class="badge {{ $statusSubtle }} px-2 py-1 fs-12">
+                                                <span class="badge {{ $statusSubtle }} px-2 py-1 fs-11 rounded-pill">
                                                     <i class="mdi {{ $statusEnum->icon() }} me-1"></i>{{ $statusEnum->label() }}
                                                 </span>
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 fs-12">{{ ucfirst($item->status) }}</span>
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary px-2 py-1 fs-11 rounded-pill">{{ ucfirst($item->status) }}</span>
                                             @endif
                                         </td>
 
                                         <!-- 7. Status Pembayaran -->
-                                        <td class="text-center">
+                                        <td class="text-center text-nowrap">
                                             @if ($payEnum)
-                                                <span class="badge {{ $paySubtle }} px-2 py-1 fs-12">
+                                                <span class="badge {{ $paySubtle }} px-2 py-1 fs-11 rounded-pill">
                                                     <i class="mdi {{ $payEnum->icon() }} me-1"></i>{{ $payEnum->label() }}
                                                 </span>
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 fs-12">{{ ucfirst($item->payment_status ?? 'unpaid') }}</span>
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary px-2 py-1 fs-11 rounded-pill">{{ ucfirst($item->payment_status ?? 'unpaid') }}</span>
                                             @endif
                                         </td>
 
                                         <!-- 8. E-Invoice Email Status -->
-                                        <td class="text-center">
+                                        <td class="text-center text-nowrap">
                                             @if ($item->email_sent_at)
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fs-12"
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fs-11 rounded-pill"
                                                     title="Terkirim pada {{ $item->email_sent_at->translatedFormat('d M Y, H:i') }} WIB">
                                                     <i class="mdi mdi-email-check me-1"></i>Terkirim
                                                 </span>
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 fs-12">
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 fs-11 rounded-pill">
                                                     <i class="mdi mdi-clock-outline me-1"></i>Belum
                                                 </span>
                                             @endif
                                         </td>
 
-                                        <!-- 9. Kolom Aksi Statis (Sticky Right) -->
-                                        <td class="sticky-action-col text-end">
+                                        <!-- 9. Aksi -->
+                                        <td class="text-end" style="width: 100px;">
                                             <div class="d-flex align-items-center justify-content-end gap-1">
                                                 {{-- Tombol Cepat: Lihat Detail --}}
-                                                <a href="{{ route('admin.invoice.linkpemda.show', $item->id) }}" wire:navigate
-                                                    class="btn btn-sm btn-light border" title="Lihat Detail Invoice">
+                                                <a href="{{ route('admin.invoice.linkpemda.show', $item->id) }}"
+                                                    wire:navigate class="btn btn-sm btn-light border"
+                                                    title="Lihat Detail & Dokumen Invoice">
                                                     <i class="mdi mdi-eye-outline text-primary"></i>
                                                 </a>
 
@@ -293,10 +325,7 @@
                                                 <div class="btn-group">
                                                     <button type="button"
                                                         class="btn btn-sm btn-light border dropdown-toggle"
-                                                        data-bs-toggle="dropdown"
-                                                        data-bs-popper-config='{"strategy":"fixed"}'
-                                                        aria-haspopup="true"
-                                                        aria-expanded="false"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                                         title="Pilihan Aksi">
                                                         <i class="mdi mdi-dots-vertical"></i>
                                                     </button>
@@ -308,12 +337,13 @@
                                                             wire:loading.attr="disabled">
                                                             <i class="mdi mdi-email-send me-2"></i> Kirim via Email
                                                         </a>
-                                                        <div class="dropdown-divider"></div>
+                                                        <div class="dropdown-divider my-1"></div>
 
                                                         <a class="dropdown-item"
                                                             href="{{ route('admin.invoice.linkpemda.preview', $item->id) }}"
                                                             target="_blank">
-                                                            <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Pratinjau PDF
+                                                            <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Pratinjau
+                                                            PDF
                                                         </a>
                                                         <a class="dropdown-item"
                                                             href="{{ route('admin.invoice.linkpemda.download', $item->id) }}">
@@ -326,28 +356,30 @@
                                                         </a>
 
                                                         @if ($item->status === \App\Enums\InvoiceStatus::Pending)
-                                                            <div class="dropdown-divider"></div>
+                                                            <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item text-success" href="javascript:void(0);"
                                                                 wire:click="approveInvoice('{{ $item->id }}')">
-                                                                <i class="mdi mdi-check-decagram text-success me-2"></i> ACC / Setujui
+                                                                <i class="mdi mdi-check-decagram text-success me-2"></i> ACC /
+                                                                Setujui
                                                             </a>
                                                             <a class="dropdown-item text-warning" href="javascript:void(0);"
                                                                 wire:click="confirmReject('{{ $item->id }}')">
-                                                                <i class="mdi mdi-close-circle text-warning me-2"></i> Tolak Invoice
+                                                                <i class="mdi mdi-close-circle text-warning me-2"></i> Tolak
+                                                                Invoice
                                                             </a>
                                                         @endif
 
                                                         @if ($item->payment_status !== \App\Enums\InvoicePaymentStatus::Paid)
-                                                            <div class="dropdown-divider"></div>
+                                                            <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item text-success" href="javascript:void(0);"
                                                                 wire:click="markAsPaid('{{ $item->id }}')">
-                                                                <i class="mdi mdi-cash-check text-success me-2"></i> Tandai Lunas
+                                                                <i class="mdi mdi-cash-check text-success me-2"></i> Tandai
+                                                                Lunas
                                                             </a>
                                                         @endif
 
-                                                        <div class="dropdown-divider"></div>
-                                                        <a class="dropdown-item text-danger"
-                                                            href="javascript:void(0);"
+                                                        <div class="dropdown-divider my-1"></div>
+                                                        <a class="dropdown-item text-danger" href="javascript:void(0);"
                                                             wire:click="confirmDelete('{{ $item->id }}')">
                                                             <i class="mdi mdi-trash-can me-2"></i> Hapus
                                                         </a>
@@ -371,7 +403,8 @@
 
                 @if ($invoices->hasPages())
                     <div class="card-footer mb-0">
-                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                        <div class="pagination-rounded" x-data
+                            x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
                             {{ $invoices->links() }}
                         </div>
                     </div>
@@ -392,12 +425,12 @@
                     </div>
                     <h5 class="fw-bold mb-2">Hapus Invoice?</h5>
                     <p class="text-muted fs-13 mb-3">
-                        Apakah Anda yakin ingin menghapus invoice <strong>{{ $invoiceToDeleteNumber }}</strong>? Tindakan ini tidak dapat dibatalkan.
+                        Apakah Anda yakin ingin menghapus invoice <strong>{{ $invoiceToDeleteNumber }}</strong>?
+                        Tindakan ini tidak dapat dibatalkan.
                     </p>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-danger" wire:click="delete"
-                            wire:loading.attr="disabled">
+                        <button type="button" class="btn btn-danger" wire:click="delete" wire:loading.attr="disabled">
                             <span wire:loading wire:target="delete" class="spinner-border spinner-border-sm me-1"
                                 role="status"></span>
                             Hapus

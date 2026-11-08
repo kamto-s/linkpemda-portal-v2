@@ -54,7 +54,8 @@
                                 {{ $isEditing ? 'Form Perubahan Data Invoice' : 'Form Pembuatan Dokumen Invoice Linkpemda' }}
                             </h4>
                             <p class="sub-header mb-0">
-                                Lengkapi identitas dokumen, instansi klien, jadwal kegiatan, daftar peserta, dan rincian biaya.
+                                Lengkapi identitas dokumen, instansi klien, jadwal kegiatan, daftar peserta, dan rincian
+                                biaya.
                             </p>
                         </div>
                         <a href="{{ route('admin.invoice.linkpemda.index') }}" wire:navigate
@@ -79,17 +80,21 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold">No. Invoice</label>
-                                                <div class="form-control bg-light d-flex align-items-center justify-content-between py-2">
-                                                    <span class="font-monospace fw-bold text-primary fs-14">{{ $invoice_number }}</span>
+                                                <div
+                                                    class="form-control bg-light d-flex align-items-center justify-content-between py-2">
+                                                    <span
+                                                        class="font-monospace fw-bold text-primary fs-14">{{ $invoice_number }}</span>
                                                     <span class="badge badge-soft-info fs-11">
                                                         <i class="mdi mdi-auto-fix me-1"></i>Otomatis Sistem
                                                     </span>
                                                 </div>
-                                                <small class="text-muted fs-11">Nomor berurutan otomatis: <code>LP-[No. Urut]-[Romawi Bulan]-[Tahun]</code></small>
+                                                <small class="text-muted fs-11">Nomor berurutan otomatis:
+                                                    <code>LP-[No. Urut]-[Romawi Bulan]-[Tahun]</code></small>
                                             </div>
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Tanggal Invoice <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Tanggal Invoice <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="date"
                                                     class="form-control @error('invoice_date') is-invalid @enderror"
                                                     wire:model.live="invoice_date">
@@ -99,10 +104,10 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold">Menu <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Menu <span
+                                                        class="text-danger">*</span></label>
                                                 <select class="form-select @error('menu_type') is-invalid @enderror"
                                                     wire:model="menu_type">
-                                                    <option value="Meeting">Meeting</option>
                                                     <option value="Offline">Offline</option>
                                                     <option value="Online">Online</option>
                                                 </select>
@@ -112,8 +117,10 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold">Metode Pembayaran <span class="text-danger">*</span></label>
-                                                <select class="form-select @error('payment_method') is-invalid @enderror"
+                                                <label class="form-label fw-semibold">Metode Pembayaran <span
+                                                        class="text-danger">*</span></label>
+                                                <select
+                                                    class="form-select @error('payment_method') is-invalid @enderror"
                                                     wire:model="payment_method">
                                                     <option value="Transfer / Cash">Transfer / Cash</option>
                                                     <option value="Transfer">Transfer</option>
@@ -125,7 +132,8 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold">Status Persetujuan (ACC) <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Status Persetujuan (ACC) <span
+                                                        class="text-danger">*</span></label>
                                                 <select class="form-select @error('status') is-invalid @enderror"
                                                     wire:model="status">
                                                     <option value="pending">Menunggu ACC</option>
@@ -152,10 +160,12 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-md-12">
-                                                <label class="form-label fw-semibold">Nama Instansi / Perusahaan <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Nama Instansi / Perusahaan <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text"
                                                     class="form-control @error('company_name') is-invalid @enderror"
-                                                    wire:model="company_name" placeholder="Contoh: Sekretariat Daerah Kab. Brebes">
+                                                    wire:model="company_name"
+                                                    placeholder="Contoh: Sekretariat Daerah Kab. Brebes">
                                                 @error('company_name')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -164,21 +174,25 @@
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold">Alamat Email</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text"><i class="mdi mdi-email-outline"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="mdi mdi-email-outline"></i></span>
                                                     <input type="email"
                                                         class="form-control @error('email') is-invalid @enderror"
-                                                        wire:model="email" placeholder="contoh: sekretariat@brebeskab.go.id">
+                                                        wire:model="email"
+                                                        placeholder="contoh: sekretariat@brebeskab.go.id">
                                                 </div>
                                                 @error('email')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
-                                                <small class="text-muted fs-11">Digunakan untuk pengiriman berkas elektronik.</small>
+                                                <small class="text-muted fs-11">Digunakan untuk pengiriman berkas
+                                                    elektronik.</small>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold">No. WhatsApp / Telepon</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text"><i class="bx bxl-whatsapp"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="bx bxl-whatsapp"></i></span>
                                                     <input type="text"
                                                         class="form-control @error('phone') is-invalid @enderror"
                                                         wire:model="phone" placeholder="Opsional / No. Telp">
@@ -191,7 +205,8 @@
                                             <div class="col-12">
                                                 <label class="form-label fw-semibold">Alamat Instansi</label>
                                                 <textarea class="form-control @error('address') is-invalid @enderror"
-                                                    rows="2" wire:model="address" placeholder="Contoh: Jawa Tengah / Jl. Proklamasi No. 10"></textarea>
+                                                    rows="2" wire:model="address"
+                                                    placeholder="Contoh: Jawa Tengah / Jl. Proklamasi No. 10"></textarea>
                                                 @error('address')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -212,8 +227,10 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-12">
-                                                <label class="form-label fw-semibold">Tema / Judul Kegiatan <span class="text-danger">*</span></label>
-                                                <textarea class="form-control @error('activity_theme') is-invalid @enderror"
+                                                <label class="form-label fw-semibold">Tema / Judul Kegiatan <span
+                                                        class="text-danger">*</span></label>
+                                                <textarea
+                                                    class="form-control @error('activity_theme') is-invalid @enderror"
                                                     rows="3" wire:model="activity_theme"
                                                     placeholder="Contoh: Keprotokolan, Komunikasi Pimpinan, dan Kehumasan Pemerintah Daerah"></textarea>
                                                 @error('activity_theme')
@@ -222,7 +239,8 @@
                                             </div>
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Tanggal Mulai <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Tanggal Mulai <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="date"
                                                     class="form-control @error('event_start_date') is-invalid @enderror"
                                                     wire:model.live="event_start_date">
@@ -232,7 +250,8 @@
                                             </div>
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Tanggal Selesai <small class="text-muted">(Bila > 1 hari)</small></label>
+                                                <label class="form-label fw-semibold">Tanggal Selesai <small
+                                                        class="text-muted">(Bila > 1 hari)</small></label>
                                                 <input type="date"
                                                     class="form-control @error('event_end_date') is-invalid @enderror"
                                                     wire:model.live="event_end_date">
@@ -243,15 +262,18 @@
 
                                             @if (!empty($event_start_date))
                                                 <div class="col-12">
-                                                    <div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between">
+                                                    <div
+                                                        class="p-2 bg-white rounded border d-flex align-items-center justify-content-between">
                                                         <span class="fs-12 text-muted">Format Jadwal di Dokumen PDF:</span>
-                                                        <span class="badge badge-soft-primary fs-12">{{ $this->formatted_event_date_preview }}</span>
+                                                        <span
+                                                            class="badge badge-soft-primary fs-12">{{ $this->formatted_event_date_preview }}</span>
                                                     </div>
                                                 </div>
                                             @endif
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Waktu Kegiatan <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Waktu Kegiatan <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text"
                                                     class="form-control @error('event_time') is-invalid @enderror"
                                                     wire:model="event_time" placeholder="Contoh: 08.00 WIB">
@@ -261,10 +283,12 @@
                                             </div>
 
                                             <div class="col-md-6">
-                                                <label class="form-label fw-semibold">Lokasi Acara <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Lokasi Acara <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text"
                                                     class="form-control @error('event_location') is-invalid @enderror"
-                                                    wire:model="event_location" placeholder="Contoh: Yello Hotel Harmoni Jakarta">
+                                                    wire:model="event_location"
+                                                    placeholder="Contoh: Yello Hotel Harmoni Jakarta">
                                                 @error('event_location')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -277,7 +301,8 @@
                             <!-- Card Kelompok 4: Daftar Nama Peserta (Repeater) -->
                             <div class="col-12">
                                 <div class="card border shadow-none bg-light-subtle mb-0">
-                                    <div class="card-header bg-transparent border-bottom py-2 d-flex justify-content-between align-items-center">
+                                    <div
+                                        class="card-header bg-transparent border-bottom py-2 d-flex justify-content-between align-items-center">
                                         <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
                                             Daftar Peserta Bimtek
                                         </h5>
@@ -288,8 +313,10 @@
                                     <div class="card-body">
                                         <div class="d-flex flex-column gap-2">
                                             @foreach ($participants as $index => $participant)
-                                                <div class="d-flex align-items-center gap-2" wire:key="participant-row-{{ $index }}">
-                                                    <span class="badge bg-light text-dark border px-2 py-2 fs-12" style="min-width: 32px;">
+                                                <div class="d-flex align-items-center gap-2"
+                                                    wire:key="participant-row-{{ $index }}">
+                                                    <span class="badge bg-light text-dark border px-2 py-2 fs-12"
+                                                        style="min-width: 32px;">
                                                         {{ $index + 1 }}.
                                                     </span>
                                                     <input type="text"
@@ -307,7 +334,8 @@
                                         </div>
 
                                         <div class="mt-3">
-                                            <button type="button" class="btn btn-outline-primary btn-sm" wire:click="addParticipant">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                wire:click="addParticipant">
                                                 <i class="mdi mdi-plus-circle me-1"></i> Tambah Peserta Lainnya
                                             </button>
                                         </div>
@@ -326,7 +354,8 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold">Harga per Peserta (Rp) <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold">Harga per Peserta (Rp) <span
+                                                        class="text-danger">*</span></label>
                                                 <div class="input-group" x-data="{
                                                     formatRupiah(val) {
                                                         if (!val) return '';
@@ -368,8 +397,10 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold">Status Pembayaran <span class="text-danger">*</span></label>
-                                                <select class="form-select @error('payment_status') is-invalid @enderror"
+                                                <label class="form-label fw-semibold">Status Pembayaran <span
+                                                        class="text-danger">*</span></label>
+                                                <select
+                                                    class="form-select @error('payment_status') is-invalid @enderror"
                                                     wire:model="payment_status">
                                                     <option value="unpaid">Belum Lunas</option>
                                                     <option value="partial">DP (Sebagian)</option>
@@ -384,7 +415,8 @@
                                                 <div class="p-3 bg-white rounded border">
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                                         <span class="text-muted fs-13">Jumlah Peserta:</span>
-                                                        <span class="fw-bold text-dark fs-14">{{ $participant_count }} Orang</span>
+                                                        <span class="fw-bold text-dark fs-14">{{ $participant_count }}
+                                                            Orang</span>
                                                     </div>
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                                         <span class="text-muted fs-13">Total Biaya:</span>
@@ -406,11 +438,13 @@
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                                         <span class="text-muted fs-13">Deposit (DP):</span>
                                                         <span class="fw-bold text-dark fs-14">
-                                                            Rp {{ number_format((float) preg_replace('/[^\d]/', '', (string)$deposit_amount), 0, ',', '.') }},-
+                                                            Rp
+                                                            {{ number_format((float) preg_replace('/[^\d]/', '', (string) $deposit_amount), 0, ',', '.') }},-
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <span class="text-danger fw-semibold fs-13">Sisa Pembayaran:</span>
+                                                        <span class="text-danger fw-semibold fs-13">Sisa
+                                                            Pembayaran:</span>
                                                         <span class="fw-bold text-danger fs-16">
                                                             Rp {{ number_format($remaining_amount, 0, ',', '.') }},-
                                                         </span>
