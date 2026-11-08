@@ -109,7 +109,7 @@ class Form extends Component
             $this->payment_status = $this->invoice->payment_status instanceof InvoicePaymentStatus ? $this->invoice->payment_status->value : ($this->invoice->payment_status ?? 'unpaid');
         } else {
             $this->invoice_date = Carbon::now()->format('Y-m-d');
-            $this->invoice_number = Invoice::generateInvoiceNumber(Carbon::now());
+            $this->invoice_number = '';
             $this->participants = [''];
             $this->menu_type = 'Meeting';
             $this->payment_method = 'Transfer / Cash';
@@ -129,6 +129,12 @@ class Form extends Component
             $date = ! empty($this->invoice_date) ? Carbon::parse($this->invoice_date) : Carbon::now();
             $this->invoice_number = Invoice::generateInvoiceNumber($date);
         }
+    }
+
+    public function regenerateInvoiceNumber(): void
+    {
+        $date = ! empty($this->invoice_date) ? Carbon::parse($this->invoice_date) : Carbon::now();
+        $this->invoice_number = Invoice::generateInvoiceNumber($date);
     }
 
     public function addParticipant(): void
@@ -274,7 +280,7 @@ class Form extends Component
         $cleanPrice = (float) preg_replace('/[^\d]/', '', (string) $this->price_per_participant);
         $cleanDeposit = (float) preg_replace('/[^\d]/', '', (string) $this->deposit_amount);
 
-        // Nomor invoice otomatis berurutan
+        // Nomor invoice: jika buat baru otomatis di-generate unik oleh sistem
         if ($this->isEditing && $this->invoice) {
             $invoiceNumber = $this->invoice->invoice_number;
         } else {
@@ -325,6 +331,8 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.admin.invoice.form');
+        return view('livewire.admin.invoice.form', [
+            'isEditing' => $this->isEditing,
+        ]);
     }
 }

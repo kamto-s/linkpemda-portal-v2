@@ -391,7 +391,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="9" class="text-center py-4 text-muted">
-                                            <i class="mdi mdi-file-document-outline font-size-24 d-block mb-1"></i>
+                                            <!-- <i class="mdi mdi-file-document-outline font-size-24 d-block mb-1"></i> -->
                                             Tidak ada data invoice yang ditemukan.
                                         </td>
                                     </tr>

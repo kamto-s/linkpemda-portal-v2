@@ -47,7 +47,8 @@ class Invoice extends BaseModel
     }
 
     /**
-     * Generate nomor invoice otomatis dengan format: LP-00001-XI-2026
+     * Generate nomor invoice otomatis dengan format: LP-INV-54321-XI-2026
+     * Format: {prefix}-INV-{5 Digit Random}-{Romawi Bulan}-{Tahun}
      */
     public static function generateInvoiceNumber(?\DateTimeInterface $date = null, string $prefix = 'LP'): string
     {
@@ -56,20 +57,17 @@ class Invoice extends BaseModel
         $month = (int) $date->month;
         $romanMonth = self::ROMAN_MONTHS[$month] ?? 'I';
 
-        // Cari nomor invoice terakhir untuk prefix dan tahun yang sama
-        $lastInvoice = static::withTrashed()
-            ->where('invoice_number', 'like', "{$prefix}-%-{$year}")
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $nextSequence = 1;
-        if ($lastInvoice && preg_match("/^{$prefix}-(\d+)-[A-Z]+-{$year}$/", $lastInvoice->invoice_number, $matches)) {
-            $nextSequence = ((int) $matches[1]) + 1;
+        $cleanPrefix = rtrim($prefix, '-');
+        if (! str_ends_with(strtoupper($cleanPrefix), 'INV')) {
+            $cleanPrefix .= '-INV';
         }
 
-        $sequenceStr = str_pad((string) $nextSequence, 5, '0', STR_PAD_LEFT);
+        do {
+            $randomDigits = (string) random_int(10000, 99999);
+            $candidate = "{$cleanPrefix}-{$randomDigits}-{$romanMonth}-{$year}";
+        } while (static::withTrashed()->where('invoice_number', $candidate)->exists());
 
-        return "{$prefix}-{$sequenceStr}-{$romanMonth}-{$year}";
+        return $candidate;
     }
 
     /**

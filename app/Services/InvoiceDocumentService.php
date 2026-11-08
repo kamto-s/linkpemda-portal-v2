@@ -102,7 +102,7 @@ class InvoiceDocumentService
 
         // Data Dokumen & Identitas (Dinamis dari model Invoice)
         $invoiceNumber = $invoice->invoice_number ?: '-';
-        $invoiceDateFormatted = 'Jakarta, ' . ($invoice->invoice_date ? $invoice->formatted_invoice_date : ($invoice->created_at ? $invoice->created_at->locale('id')->translatedFormat('d F Y') : now()->locale('id')->translatedFormat('d F Y')));
+        $invoiceDateFormatted = ($invoice->invoice_date ? $invoice->formatted_invoice_date : ($invoice->created_at ? $invoice->created_at->locale('id')->translatedFormat('d F Y') : now()->locale('id')->translatedFormat('d F Y')));
         $companyName = $invoice->company_name ?: '-';
         $address = $invoice->address ?: '-';
         $phone = $invoice->phone ?: '-';

@@ -363,73 +363,249 @@ class ParticipantDocumentService
     }
 
     // =========================================================================
-    // Render: Kwitansi
+    // Render: Kwitansi Linkpemda
     // =========================================================================
 
     protected function renderKwitansi(Fpdi $pdf, Participant $participant): void
     {
-        $pdf->SetTitle('Kwitansi_' . $participant->name . ' (' . $participant->certificate_number . ')');
-
-        // Tanggal Kwitansi (Kanan Atas)
-        $receiptDate = $participant->receipt_date ?: ($participant->registration_date ?? '');
-        $pdf->SetFont('Arial', '', 11);
+        $safeCert = str_replace('/', '_', $participant->receipt_number ?: ($participant->certificate_number ?? ''));
+        $pdf->SetTitle('Kwitansi_' . $participant->name . ' (' . $safeCert . ')');
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetXY(90, 39);
-        $pdf->MultiCell(100, 7, $receiptDate, 0, 'R');
 
-        // Nomor Kwitansi
-        $pdf->SetFont('Arial', '', 11);
-        $pdf->SetXY(90, 56);
-        $pdf->MultiCell(100, 7, $participant->receipt_number ?? $participant->certificate_number, 0, 'R');
+        // 1. JUDUL KWITANSI & NOMOR (Pola & ukuran font sama persis dengan Invoice: Arial B 17 & Arial B 10)
+        $pdf->SetFont('Arial', 'B', 17);
+        $pdf->SetXY(15, 52);
+        $pdf->Cell(180, 7, 'KWITANSI', 0, 1, 'C');
 
-        // Nama Penerima
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetXY(67, 79.3);
-        $pdf->Write(0, $participant->name);
+        $receiptNum = trim($participant->receipt_number ?: ($participant->certificate_number ?? '-'));
+        $receiptNumFormatted = str_starts_with(strtoupper($receiptNum), 'NO') ? $receiptNum : ('No. ' . $receiptNum);
 
-        // Jabatan & Instansi
-        $jabatan = $participant->position ?? '';
-        $instansi = $participant->institution_name ?? '';
-        $pdf->SetFont('Arial', 'I', 10);
-        $pdf->SetXY(67, 82);
-        $pdf->MultiCell(0, 4.5, $jabatan . "\n" . $instansi, 0, 'L');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetXY(15, 59);
+        $pdf->Cell(180, 5, $receiptNumFormatted, 0, 1, 'C');
 
-        // Nominal Rupiah (angka)
+        // 2. TANGGAL (Kanan - Posisi X=120, Y=67 sama persis dengan tanggal Invoice)
+        $rawDate = trim((string) ($participant->receipt_date ?: ($participant->registration_date ?? '')));
+        if (empty($rawDate)) {
+            $rawDate = now()->locale('id')->translatedFormat('d F Y');
+        } elseif (preg_match('/^\d{4}-\d{2}-\d{2}/', $rawDate)) {
+            try {
+                $rawDate = \Carbon\Carbon::parse($rawDate)->locale('id')->translatedFormat('d F Y');
+            } catch (\Throwable) {
+            }
+        }
+        $dateFormatted = $rawDate;
+
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetXY(120, 67);
+        $pdf->Cell(75, 5, $dateFormatted, 0, 1, 'R');
+
+        // 3. BARIS FORM IDENTITAS & PEMBAYARAN (Margin X=15, Lebar label 48, Kolom nilai X=67 sama persis Invoice)
+        $startY = 80;
+        $lineH = 4.8;
+        $labelW = 48;
+        $colonX = 63;
+        $valX = 67;
+        $valW = 128;
+        $curY = $startY;
+
+        // Row 1: Nama Peserta
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Sudah terima dari ', 0, 0, 'L');
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->Cell($valW, $lineH, $participant->name ?: '-', 0, 1, 'L');
+        $curY += $lineH + 2.2;
+
+        // Row 2: Jabatan
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Jabatan', 0, 0, 'L');
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->Cell($valW, $lineH, $participant->position ?: '-', 0, 1, 'L');
+        $curY += $lineH + 2.2;
+
+        // Row 3: Instansi / Perusahaan
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Instansi / Perusahaan', 0, 0, 'L');
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->MultiCell($valW, 4.4, $participant->institution_name ?: '-', 0, 'L');
+        $curY = max($curY + $lineH + 2.2, $pdf->GetY() + 1.8);
+
+        // Row 4: Uang sebesar (HIGHLIGHT BOX HIJAU LEMBUT DINAMIS PANJANG & LEBAR)
         $amount = (float) ($participant->amount ?? 0);
         $amountFormatted = 'Rp. ' . number_format($amount, 0, ',', '.') . ',-';
-        $pdf->SetFont('Arial', 'BI', 11);
-        $pdf->SetXY(68, 96);
-        $pdf->MultiCell(0, 5, $amountFormatted, 0, 'L');
+        $terbilangWords = trim(self::terbilang((int) $amount));
+        $terbilangFormatted = '(' . ($terbilangWords ? ucwords($terbilangWords) : 'Nol') . ' Rupiah)';
 
-        // Terbilang
-        $terbilang = self::terbilang((int) $amount);
-        $terbilang = '(' . ucwords($terbilang) . ' Rupiah)';
-        $pdf->SetFont('Arial', 'I', 10);
-        $pdf->SetXY(96, 96);
-        $pdf->MultiCell(0, 5, $terbilang, 0, 'L');
+        // Font nominal & terbilang
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $amountW = $pdf->GetStringWidth($amountFormatted);
 
-        // Label tema
-        $pdf->SetFont('Arial', '', 11);
-        $pdf->SetXY(67, 106.2);
-        $pdf->MultiCell(100, 7, 'Pelatihan/ Bimbingan Teknis :', 0, 'L');
+        $pdf->SetFont('Arial', 'I', 9.5);
+        $maxTextWidth = 120;
+        $terbilangLines = $this->wrapTextToWidth($pdf, $terbilangFormatted, $maxTextWidth);
 
-        // Tema
-        $pdf->SetFont('Arial', 'B', 11);
-        $pdf->SetXY(67, 113);
-        $pdf->MultiCell(122, 5, $participant->theme ?? '', 0, 'L');
+        $maxInnerW = $amountW;
+        foreach ($terbilangLines as $tl) {
+            $lw = $pdf->GetStringWidth($tl);
+            if ($lw > $maxInnerW) {
+                $maxInnerW = $lw;
+            }
+        }
 
-        // Pelaksanaan Kegiatan: Tanggal Pelaksanaan Bimtek, Tempat, Lokasi
-        $eventDate = $participant->certificate_date ?: ($participant->receipt_date ?? '');
-        $venue = $participant->event_venue ?? '';
-        $location = $participant->event_location ?? '';
-        $pdf->SetFont('Arial', '', 11);
-        $pdf->SetXY(67, 138.3);
-        $pdf->MultiCell(120, 5, $eventDate . ', ' . $venue . ' - ' . $location, 0, 'L');
+        $boxStartX = 61;
+        $valOffset = $valX - $boxStartX; // 6 mm
+        $rightPadding = 8;
+        $boxWidth = min(134, $valOffset + $maxInnerW + $rightPadding);
+        $boxWidth = max(50, $boxWidth);
+
+        $boxLineH = 4.4;
+        $boxHeight = 3.0 + 4.8 + (count($terbilangLines) * $boxLineH);
+        $boxStartY = $curY - 1.2;
+
+        // Background box hijau muda / mint lembut dinamis mengikuti panjang & lebar teks
+        $pdf->SetFillColor(235, 244, 238);
+        $pdf->Rect($boxStartX, $boxStartY, $boxWidth, $boxHeight, 'F');
+
+        // Label
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Uang sebesar', 0, 0, 'L');
+
+        // Titik dua
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+        // Nominal angka
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->Cell($valW, $lineH, $amountFormatted, 0, 1, 'L');
+
+        // Terbilang baris per baris (otomatis turun ke bawah)
+        $pdf->SetFont('Arial', 'I', 9.5);
+        $textY = $curY + 5.2;
+        foreach ($terbilangLines as $tl) {
+            $pdf->SetXY($valX, $textY);
+            $pdf->Cell($valW, $boxLineH, $tl, 0, 1, 'L');
+            $textY += $boxLineH;
+        }
+
+        $curY = $boxStartY + $boxHeight + 3.5;
+
+        // Row 5: Untuk pembayaran
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Untuk pembayaran', 0, 0, 'L');
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+        // "Bimbingan Teknis / Pelatihan" (Bold 9.5 persis seperti di Invoice)
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->Cell($valW, $lineH, 'Bimbingan Teknis / Pelatihan', 0, 1, 'L');
+
+        // Sub-kegiatan / tema kegiatan (Regular 9.5 persis seperti di Invoice)
+        $theme = trim((string) ($participant->theme ?? ''));
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->SetXY($valX, $curY + $lineH - 0.5);
+        $pdf->MultiCell($valW, 4.4, $theme ?: '-', 0, 'L');
+        $curY = $pdf->GetY() + 2.5;
+
+        // Row 6: Pelaksanaan kegiatan
+        $eventDate = trim((string) ($participant->certificate_date ?: ($participant->receipt_date ?? '')));
+        $venue = trim((string) ($participant->event_venue ?? ''));
+        $location = trim((string) ($participant->event_location ?? ''));
+        $venueLocation = implode(', ', array_filter([$venue, $location]));
+
+        if (!empty($eventDate) && !empty($venueLocation)) {
+            $pelaksanaanText = $eventDate . ' di ' . $venueLocation;
+        } elseif (!empty($eventDate)) {
+            $pelaksanaanText = $eventDate;
+        } elseif (!empty($venueLocation)) {
+            $pelaksanaanText = $venueLocation;
+        } else {
+            $pelaksanaanText = '-';
+        }
+
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $curY);
+        $pdf->Cell($labelW, $lineH, 'Pelaksanaan kegiatan', 0, 0, 'L');
+        $pdf->SetXY($colonX, $curY);
+        $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->SetXY($valX, $curY);
+        $pdf->MultiCell($valW, 4.4, $pelaksanaanText, 0, 'L');
+
+        // 4. CATATAN & TANDA TANGAN (Format, Font & Pola persis seperti di Invoice)
+        $bottomStartY = $pdf->GetY() + 14;
+
+        // Catatan (Kiri)
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(15, $bottomStartY);
+        $pdf->Cell(80, 5, 'Catatan :', 0, 1, 'L');
+
+        $pdf->SetFont('Arial', 'I', 9);
+        $pdf->SetXY(15, $bottomStartY + 5.5);
+        $pdf->MultiCell(80, 4.4, "Kwitansi ini adalah bukti pembayaran\nyang sah apabila dibubuhi tanda\ntangan oleh Bendahara serta stempel.", 0, 'L');
+
+        // Tanda Tangan (Kanan - Mengikuti Invoice: X=135, W=60, Font Arial B 9.5, Garis di Atas Bendahara Pelaksana)
+        $ttdY = $bottomStartY;
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->SetXY(135, $ttdY);
+        $pdf->Cell(60, 5, 'Hormat Kami', 0, 1, 'C');
+
+        $bendaharaY = $ttdY + 24;
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->SetLineWidth(0.3);
+        $pdf->Line(140, $bendaharaY, 190, $bendaharaY);
+
+        $pdf->SetXY(135, $bendaharaY + 1.2);
+        $pdf->Cell(60, 5, 'Bendahara Pelaksana', 0, 1, 'C');
     }
 
     // =========================================================================
     // Helpers
     // =========================================================================
+
+    /**
+     * Memotong teks menjadi beberapa baris berdasarkan lebar maksimal kolom (mm).
+     * Mencegah teks keluar batas sel atau menabrak margin.
+     */
+    protected function wrapTextToWidth(Fpdi $pdf, string $text, float $maxWidth): array
+    {
+        $words = preg_split('/\s+/', trim($text));
+        $lines = [];
+        $currentLine = '';
+
+        foreach ($words as $word) {
+            $testLine = $currentLine === '' ? $word : ($currentLine . ' ' . $word);
+            if ($pdf->GetStringWidth($testLine) <= $maxWidth) {
+                $currentLine = $testLine;
+            } else {
+                if ($currentLine !== '') {
+                    $lines[] = $currentLine;
+                }
+                $currentLine = $word;
+            }
+        }
+        if ($currentLine !== '') {
+            $lines[] = $currentLine;
+        }
+
+        return $lines;
+    }
 
     protected function resolveQrPath(Participant $participant): ?string
     {

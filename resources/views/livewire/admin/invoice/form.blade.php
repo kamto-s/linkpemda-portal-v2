@@ -78,21 +78,17 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label fw-semibold">No. Invoice</label>
-                                                <div
-                                                    class="form-control bg-light d-flex align-items-center justify-content-between py-2">
-                                                    <span
-                                                        class="font-monospace fw-bold text-primary fs-14">{{ $invoice_number }}</span>
-                                                    <span class="badge badge-soft-info fs-11">
-                                                        <i class="mdi mdi-auto-fix me-1"></i>Otomatis Sistem
-                                                    </span>
+                                            @if ($isEditing)
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">No. Invoice</label>
+                                                    <div class="form-control bg-light py-2">
+                                                        <span class="font-monospace fw-bold text-primary fs-14">{{ $invoice_number }}</span>
+                                                    </div>
+                                                    <small class="text-muted fs-11">Nomor invoice resmi yang terdaftar.</small>
                                                 </div>
-                                                <small class="text-muted fs-11">Nomor berurutan otomatis:
-                                                    <code>LP-[No. Urut]-[Romawi Bulan]-[Tahun]</code></small>
-                                            </div>
+                                            @endif
 
-                                            <div class="col-md-6">
+                                            <div class="{{ $isEditing ? 'col-md-6' : 'col-md-3' }}">
                                                 <label class="form-label fw-semibold">Tanggal Invoice <span
                                                         class="text-danger">*</span></label>
                                                 <input type="date"
@@ -103,7 +99,7 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <div class="{{ $isEditing ? 'col-md-4' : 'col-md-3' }}">
                                                 <label class="form-label fw-semibold">Menu <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select @error('menu_type') is-invalid @enderror"
@@ -116,7 +112,7 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <div class="{{ $isEditing ? 'col-md-4' : 'col-md-3' }}">
                                                 <label class="form-label fw-semibold">Metode Pembayaran <span
                                                         class="text-danger">*</span></label>
                                                 <select
@@ -131,7 +127,7 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <div class="{{ $isEditing ? 'col-md-4' : 'col-md-3' }}">
                                                 <label class="form-label fw-semibold">Status Persetujuan (ACC) <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select @error('status') is-invalid @enderror"
