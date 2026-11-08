@@ -112,6 +112,11 @@ class SystemSettingSeeder extends Seeder
                 'value' => 'https://linkpemda.com/uploads/linkpemda-sertifikat-7q3w5k9v.pdf',
                 'description' => 'Path URL berkas template PDF sertifikat resmi Linkpemda (lengkap dengan ornamen dan background warna).',
             ],
+            [
+                'key' => 'temp_absensi_linkpemda',
+                'value' => 'https://linkpemda.com/uploads/blank-potrait-3w7q5v8k.pdf',
+                'description' => 'Path URL berkas template PDF daftar hadir / absensi kegiatan Linkpemda (Kop surat A4 Portrait).',
+            ],
 
             // -----------------------------------------------------------------
             // Template PDF - Tren Media Diklat (Trans Edukasi Nasional)

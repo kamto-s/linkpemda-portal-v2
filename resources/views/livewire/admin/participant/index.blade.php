@@ -233,6 +233,18 @@
                                     </span>
                                 </button>
 
+                                <!-- Tombol Download Absensi Masal (PDF) -->
+                                <button type="button" class="btn btn-sm btn-outline-info" style="--bs-btn-bg: #fff;"
+                                    wire:click="downloadBulkAbsensi" wire:loading.attr="disabled"
+                                    title="Unduh daftar hadir / absensi resmi untuk peserta yang dipilih dalam format PDF">
+                                    <span wire:loading.remove wire:target="downloadBulkAbsensi">
+                                        <i class="mdi mdi-clipboard-text-outline me-1"></i> Absensi (.PDF)
+                                    </span>
+                                    <span wire:loading wire:target="downloadBulkAbsensi">
+                                        <span class="spinner-border spinner-border-sm me-1"></span> Menyiapkan...
+                                    </span>
+                                </button>
+
                                 <!-- Batal Seleksi -->
                                 <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2 text-decoration-none" wire:click="$set('selectedParticipants', [])">
                                     <i class="mdi mdi-close"></i> Batal

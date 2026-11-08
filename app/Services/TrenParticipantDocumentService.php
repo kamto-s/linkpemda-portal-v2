@@ -51,9 +51,9 @@ class TrenParticipantDocumentService
     {
         // 1. Ambil setting key dari SystemSetting
         $settingKey = match ($type) {
-            'blank'    => 'temp_landscape_blank',
+            'blank' => 'temp_landscape_blank',
             'kwitansi' => 'temp_tren_kwitansi',
-            default    => 'temp_tren_sertifikat',
+            default => 'temp_tren_sertifikat',
         };
 
         $configuredPath = trim((string) system_setting($settingKey, ''));
@@ -64,7 +64,7 @@ class TrenParticipantDocumentService
         }
 
         // 2. Jika konfigurasi di SystemSetting ada, proses path/URL-nya
-        if (! empty($configuredPath)) {
+        if (!empty($configuredPath)) {
             $resolved = $this->resolveFileFromConfig($configuredPath);
             if ($resolved && file_exists($resolved)) {
                 return $this->getCompatibleTemplatePath($resolved);
@@ -111,7 +111,7 @@ class TrenParticipantDocumentService
 
             // Cek 2: Apakah file sudah pernah di-cache di storage?
             $cacheDir = storage_path('app/pdf-templates-cache');
-            if (! is_dir($cacheDir)) {
+            if (!is_dir($cacheDir)) {
                 @mkdir($cacheDir, 0755, true);
             }
 
@@ -126,10 +126,10 @@ class TrenParticipantDocumentService
                 curl_setopt_array($ch, [
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_TIMEOUT        => 10,
+                    CURLOPT_TIMEOUT => 10,
                     CURLOPT_SSL_VERIFYPEER => false,
                     CURLOPT_SSL_VERIFYHOST => 0,
-                    CURLOPT_USERAGENT      => 'Linkpemda-Portal/2.0',
+                    CURLOPT_USERAGENT => 'Linkpemda-Portal/2.0',
                 ]);
                 $data = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -147,19 +147,19 @@ class TrenParticipantDocumentService
         }
 
         // B. Jika berupa path lokal absolut
-        if (file_exists($configuredPath) && ! is_dir($configuredPath)) {
+        if (file_exists($configuredPath) && !is_dir($configuredPath)) {
             return $configuredPath;
         }
 
         // C. Jika berupa path relatif dari public_path()
         $relativePublic = public_path(ltrim($configuredPath, '/\\'));
-        if (file_exists($relativePublic) && ! is_dir($relativePublic)) {
+        if (file_exists($relativePublic) && !is_dir($relativePublic)) {
             return $relativePublic;
         }
 
         // D. Jika berupa path relatif dari storage_path()
         $relativeStorage = storage_path('app/' . ltrim($configuredPath, '/\\'));
-        if (file_exists($relativeStorage) && ! is_dir($relativeStorage)) {
+        if (file_exists($relativeStorage) && !is_dir($relativeStorage)) {
             return $relativeStorage;
         }
 

@@ -254,6 +254,47 @@ class Index extends Component
         return response()->download($zipPath, $downloadName)->deleteFileAfterSend(true);
     }
 
+    /**
+     * Unduh berkas PDF Absensi / Daftar Hadir resmi masal untuk peserta yang dipilih.
+     */
+    public function downloadBulkAbsensi()
+    {
+        abort_unless(
+            auth()->user()?->can('view-participants') || auth()->user()?->can('view-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengunduh dokumen.'
+        );
+
+        if (empty($this->selectedParticipants)) {
+            session()->flash('error', 'Pilih minimal 1 peserta untuk mengunduh absensi.');
+
+            return null;
+        }
+
+        $participants = Participant::whereIn('id', $this->selectedParticipants)
+            ->orderBy('name')
+            ->get();
+
+        if ($participants->isEmpty()) {
+            session()->flash('error', 'Data peserta yang dipilih tidak ditemukan.');
+
+            return null;
+        }
+
+        $service = app(\App\Services\ParticipantDocumentService::class);
+        $pdfBinary = $service->generateAbsensiPdf($participants);
+
+        $firstP = $participants->first();
+        $cleanTheme = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::limit($firstP->theme ?: 'Kegiatan', 25), '_');
+        $downloadName = "Absensi_Linkpemda_{$cleanTheme}_" . date('Ymd_His') . ".pdf";
+
+        return response()->streamDownload(function () use ($pdfBinary) {
+            echo $pdfBinary;
+        }, $downloadName, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     public function showQrModal(string $id): void
     {
         $participant = Participant::findOrFail($id);

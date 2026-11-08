@@ -96,6 +96,7 @@ class ParticipantDocumentService
         $settingKey = match ($type) {
             'blank' => 'temp_landscape_blank',
             'kwitansi' => 'temp_linkpemda_kwitansi',
+            'absensi' => 'temp_absensi_linkpemda',
             default => 'temp_linkpemda_sertifikat',
         };
 
@@ -104,6 +105,14 @@ class ParticipantDocumentService
         // Fallback jika blank landscape belum diset, cek kemungkinan key alternatif
         if ($type === 'blank' && empty($configuredPath)) {
             $configuredPath = trim((string) system_setting('temp_linkpemda_sertifikat_blank', ''));
+        }
+
+        // Fallback jika absensi belum diset di db, fallback ke template kop surat kwitansi/invoice
+        if ($type === 'absensi' && empty($configuredPath)) {
+            $configuredPath = trim((string) system_setting('temp_linkpemda_kwitansi', ''));
+            if (empty($configuredPath)) {
+                $configuredPath = trim((string) system_setting('temp_linkpemda_invoice', ''));
+            }
         }
 
         // 2. Jika konfigurasi di SystemSetting ada, proses path/URL-nya
@@ -117,14 +126,14 @@ class ParticipantDocumentService
         // 3. Fallback aset lokal jika setting kosong atau file belum dapat diakses
         $fallback = match ($type) {
             'blank' => public_path('assets/pdf-templates/linkpemda/sertifikat_blank.pdf'),
-            'kwitansi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
+            'kwitansi', 'absensi' => public_path('assets/pdf-templates/linkpemda/kwitansi.pdf'),
             default => public_path('assets/pdf-templates/linkpemda/sertifikat.pdf'),
         };
 
         if (!file_exists($fallback)) {
             $fallbackAlternative = match ($type) {
                 'blank' => public_path('assets/pdf-templates/sertifikat_blank.pdf'),
-                'kwitansi' => public_path('assets/pdf-templates/kwitansi.pdf'),
+                'kwitansi', 'absensi' => public_path('assets/pdf-templates/kwitansi.pdf'),
                 default => public_path('assets/pdf-templates/sertifikat.pdf'),
             };
             if (file_exists($fallbackAlternative)) {
@@ -806,6 +815,437 @@ class ParticipantDocumentService
         } catch (\Throwable) {
             return $path;
         }
+    }
+
+    // =========================================================================
+    // Render: Absensi / Daftar Hadir (Kop Surat A4 Portrait)
+    // =========================================================================
+
+    /**
+     * Menghasilkan berkas PDF Absensi / Daftar Hadir resmi Linkpemda untuk kumpulan peserta.
+     * Menggunakan template kop surat dari setting temp_absensi_linkpemda.
+     *
+     * @param iterable<Participant> $participants
+     * @return string Binary string PDF
+     */
+    public function generateAbsensiPdf(iterable $participants): string
+    {
+        $list = collect($participants)->values();
+        if ($list->isEmpty()) {
+            throw new \InvalidArgumentException('Daftar peserta untuk absensi tidak boleh kosong.');
+        }
+
+        $templatePath = $this->resolveTemplatePath('absensi');
+
+        $pdf = new Fpdi();
+        $pdf->SetAutoPageBreak(false);
+        $pdf->setSourceFile($templatePath);
+        $template = $pdf->importPage(1);
+        $size = $pdf->getTemplateSize($template);
+
+        $addNewPage = function () use ($pdf, $template, $size) {
+            $pdf->AddPage($size['orientation'] ?? 'P', [$size['width'] ?? 210, $size['height'] ?? 297]);
+            $pdf->useTemplate($template, 0, 0, $size['width'] ?? 210, $size['height'] ?? 297);
+        };
+
+        // Ambil data event dari peserta pertama / data umum
+        $firstP = $list->first();
+        $dateStr = trim((string) ($firstP->certificate_date ?: ($firstP->registration_date ?? '')));
+        $sched = $this->parseAbsensiSchedule($dateStr);
+        $hariText = $sched['hari'];
+        $tanggalText = $sched['tanggal'];
+        $daysCount = $sched['days_count'];
+
+        // Lokasi kegiatan
+        $venue = trim((string) ($firstP->event_venue ?? ''));
+        $location = trim((string) ($firstP->event_location ?? ''));
+        if (!empty($venue) && !empty($location)) {
+            $lokasiText = $venue . ' - ' . $location;
+        } elseif (!empty($venue)) {
+            $lokasiText = $venue;
+        } elseif (!empty($location)) {
+            $lokasiText = $location;
+        } else {
+            $lokasiText = '-';
+        }
+
+        // Kegiatan / Tema
+        $kegiatanText = trim((string) ($firstP->theme ?? '')) ?: '-';
+
+        $pdf->SetTitle('Absensi_' . ($firstP->theme ? \Illuminate\Support\Str::slug(\Illuminate\Support\Str::limit($firstP->theme, 25), '_') : 'Linkpemda'));
+        $pdf->SetTextColor(0, 0, 0);
+
+        // Bangun daftar lembar absensi:
+        // 1. Lembar Registrasi (berdiri sendiri)
+        // 2. Lembar per Hari Kegiatan (Hari 1 s.d. Hari N, masing-masing 1 hari per lembar)
+        $sections = [];
+
+        $firstDayDetail = $sched['days_detail'][1] ?? null;
+        $firstDateBrief = !empty($firstDayDetail['tanggal_singkat']) ? $firstDayDetail['tanggal_singkat'] : (!empty($firstDayDetail['tanggal']) ? $firstDayDetail['tanggal'] : '');
+
+        $sections[] = [
+            'type' => 'registrasi',
+            'title' => 'ABSENSI REGISTRASI',
+            'column_label' => 'Registrasi' . (!empty($firstDateBrief) ? ' (' . $firstDateBrief . ')' : ''),
+            'day_number' => null,
+            'hari' => $hariText,
+            'tanggal' => $tanggalText,
+        ];
+
+        for ($d = 1; $d <= $daysCount; $d++) {
+            $dayDetail = $sched['days_detail'][$d] ?? null;
+            $dayDateBrief = !empty($dayDetail['tanggal_singkat']) ? $dayDetail['tanggal_singkat'] : (!empty($dayDetail['tanggal']) ? $dayDetail['tanggal'] : '');
+
+            $sections[] = [
+                'type' => 'hari',
+                'title' => 'ABSENSI - HARI ' . $d,
+                'column_label' => 'Hari ' . $d . (!empty($dayDateBrief) ? ' (' . $dayDateBrief . ')' : ''),
+                'day_number' => $d,
+                'hari' => $hariText,
+                'tanggal' => $tanggalText,
+            ];
+        }
+
+        // Dimensi kolom tabel absensi per 1 hari (total lebar pas 180 mm di kertas A4)
+        $noW = 10.0;
+        $namaW = 68.0;
+        $instansiW = 57.0;
+        $parafW = 45.0;
+        $parafStartX = 15.0 + $noW + $namaW + $instansiW; // 150.0
+
+        // Render setiap bagian lembar absensi
+        foreach ($sections as $section) {
+            // Setiap lembar/bagian selalu mulai di halaman baru lengkap dengan Kop Surat
+            $addNewPage();
+
+            // 1. JUDUL DOKUMEN
+            $pdf->SetFont('Arial', 'B', 16);
+            $pdf->SetXY(15, 50);
+            $pdf->Cell(180, 7, $section['title'], 0, 1, 'C');
+
+            // 2. METADATA (Hari, Tanggal, Lokasi, Kegiatan)
+            $metaY = 60;
+            $labelW = 22;
+            $colonX = 37;
+            $valX = 40;
+            $valW = 155;
+            $lineH = 5.2;
+
+            $metaItems = [
+                ['Hari', $section['hari']],
+                ['Tanggal', $section['tanggal']],
+                ['Lokasi', $lokasiText],
+                ['Kegiatan', $kegiatanText],
+            ];
+
+            foreach ($metaItems as [$lbl, $val]) {
+                $pdf->SetFont('Arial', 'B', 9.5);
+                $pdf->SetXY(15, $metaY);
+                $pdf->Cell($labelW, $lineH, $lbl, 0, 0, 'L');
+                $pdf->SetXY($colonX, $metaY);
+                $pdf->Cell(3, $lineH, ':', 0, 0, 'C');
+
+                $pdf->SetFont('Arial', '', 9.5);
+                $pdf->SetXY($valX, $metaY);
+                if ($lbl === 'Kegiatan' && $pdf->GetStringWidth($val) > $valW) {
+                    $pdf->MultiCell($valW, 4.6, $val, 0, 'L');
+                    $metaY = $pdf->GetY() + 1.0;
+                } else {
+                    $pdf->Cell($valW, $lineH, $val, 0, 1, 'L');
+                    $metaY += $lineH;
+                }
+            }
+
+            // Callback render Header Tabel
+            $columnLabel = $section['column_label'];
+            $renderHeader = function (float $startY) use ($pdf, $noW, $namaW, $instansiW, $parafW, $parafStartX, $columnLabel) {
+                $pdf->SetDrawColor(0, 0, 0);
+                $pdf->SetLineWidth(0.3);
+
+                // Baris 1: Kolom No (12 mm)
+                $pdf->Rect(15, $startY, $noW, 12);
+                $pdf->SetFont('Arial', 'B', 9);
+                $pdf->SetXY(15, $startY + 3.5);
+                $pdf->Cell($noW, 5, 'No', 0, 0, 'C');
+
+                // Baris 1: Kolom Nama (12 mm)
+                $pdf->Rect(15 + $noW, $startY, $namaW, 12);
+                $pdf->SetFont('Arial', 'B', 9);
+                $pdf->SetXY(15 + $noW, $startY + 3.5);
+                $pdf->Cell($namaW, 5, 'Nama', 0, 0, 'C');
+
+                // Baris 1: Kolom Instansi (12 mm)
+                $instX = 15 + $noW + $namaW;
+                $pdf->Rect($instX, $startY, $instansiW, 12);
+                $pdf->SetFont('Arial', 'B', 9);
+                $pdf->SetXY($instX, $startY + 3.5);
+                $pdf->Cell($instansiW, 5, 'Instansi', 0, 0, 'C');
+
+                // Baris 1: Kolom Utama Paraf (6 mm)
+                $pdf->Rect($parafStartX, $startY, $parafW, 6);
+                $pdf->SetFont('Arial', 'B', 9);
+                $pdf->SetXY($parafStartX, $startY + 0.5);
+                $pdf->Cell($parafW, 5, 'Paraf', 0, 0, 'C');
+
+                // Baris 2: Sub-kolom Nama Hari / Registrasi (6 mm)
+                $pdf->Rect($parafStartX, $startY + 6, $parafW, 6);
+                $pdf->SetFont('Arial', 'B', 8.5);
+                $pdf->SetXY($parafStartX, $startY + 6.5);
+                $pdf->Cell($parafW, 5, $columnLabel, 0, 0, 'C');
+            };
+
+            // Render Header di Halaman Awal Lembar Ini
+            $tableStartY = $metaY + 4;
+            $renderHeader($tableStartY);
+
+            // DATA BARIS PESERTA
+            $curY = $tableStartY + 12;
+            $maxPageY = 275;
+
+            foreach ($list as $idx => $p) {
+                $rawName = trim((string) ($p->name ?? '')) ?: '-';
+                $rawInstansi = trim((string) ($p->institution_name ?? '')) ?: '-';
+
+                $nameFontSize = 8.5;
+                $instFontSize = 8.0;
+                $pdf->SetFont('Arial', '', $nameFontSize);
+                $nameLines = $this->wrapTextToWidth($pdf, $rawName, $namaW - 3);
+                $pdf->SetFont('Arial', '', $instFontSize);
+                $instLines = $this->wrapTextToWidth($pdf, $rawInstansi, $instansiW - 3);
+
+                $lineCount = max(count($nameLines), count($instLines), 1);
+                $lineSpacing = 3.8;
+                $minRowH = 9.0;
+                $actualRowH = max($minRowH, ($lineCount * $lineSpacing) + 2.8);
+
+                if ($curY + $actualRowH > $maxPageY) {
+                    $addNewPage();
+                    $tableStartY = 50;
+                    $renderHeader($tableStartY);
+                    $curY = $tableStartY + 12;
+                }
+
+                $pdf->SetDrawColor(0, 0, 0);
+                $pdf->SetLineWidth(0.2);
+
+                // Kolom No
+                $pdf->Rect(15, $curY, $noW, $actualRowH);
+                $pdf->SetFont('Arial', '', 9);
+                $pdf->SetXY(15, $curY + ($actualRowH / 2) - 2.5);
+                $pdf->Cell($noW, 5, (string) ($idx + 1), 0, 0, 'C');
+
+                // Kolom Nama (multi-line)
+                $pdf->Rect(15 + $noW, $curY, $namaW, $actualRowH);
+                $nameBlockH = count($nameLines) * $lineSpacing;
+                $nameStartY = $curY + ($actualRowH - $nameBlockH) / 2;
+                $pdf->SetFont('Arial', '', $nameFontSize);
+                foreach ($nameLines as $k => $l) {
+                    $pdf->SetXY(15 + $noW + 1.5, $nameStartY + ($k * $lineSpacing));
+                    $pdf->Cell($namaW - 3, $lineSpacing, $l, 0, 0, 'L');
+                }
+
+                // Kolom Instansi (multi-line)
+                $instX = 15 + $noW + $namaW;
+                $pdf->Rect($instX, $curY, $instansiW, $actualRowH);
+                $instBlockH = count($instLines) * $lineSpacing;
+                $instStartY = $curY + ($actualRowH - $instBlockH) / 2;
+                $pdf->SetFont('Arial', '', $instFontSize);
+                foreach ($instLines as $k => $l) {
+                    $pdf->SetXY($instX + 1.5, $instStartY + ($k * $lineSpacing));
+                    $pdf->Cell($instansiW - 3, $lineSpacing, $l, 0, 0, 'L');
+                }
+
+                // Kolom Paraf (kotak tanda tangan bersih selebar 45 mm)
+                $pdf->Rect($parafStartX, $curY, $parafW, $actualRowH);
+
+                $curY += $actualRowH;
+            }
+        }
+
+        return $pdf->Output('', 'S');
+    }
+
+    /**
+     * Mem-parsing string tanggal kegiatan untuk mengekstrak hari, tanggal rapi, dan jumlah hari acara.
+     */
+    public function parseAbsensiSchedule(string $dateStr): array
+    {
+        $dateStr = trim($dateStr);
+        if (empty($dateStr)) {
+            return [
+                'hari' => '-',
+                'tanggal' => '-',
+                'days_count' => 2,
+            ];
+        }
+
+        $monthMap = [
+            'januari' => 1,
+            'februari' => 2,
+            'maret' => 3,
+            'april' => 4,
+            'mei' => 5,
+            'juni' => 6,
+            'juli' => 7,
+            'agustus' => 8,
+            'september' => 9,
+            'oktober' => 10,
+            'november' => 11,
+            'desember' => 12,
+            'jan' => 1,
+            'feb' => 2,
+            'mar' => 3,
+            'apr' => 4,
+            'jun' => 6,
+            'jul' => 7,
+            'agu' => 8,
+            'agt' => 8,
+            'sep' => 9,
+            'okt' => 10,
+            'nov' => 11,
+            'des' => 12,
+        ];
+
+        // Format 1: "11 - 12 November 2026" atau "07 s.d 10 November 2026"
+        if (preg_match('~^(\d{1,2})\s*(?:[-–—]|s\.d\.?|s/d)\s*(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$~iu', $dateStr, $m)) {
+            $startDay = (int) $m[1];
+            $endDay = (int) $m[2];
+            $monthName = strtolower($m[3]);
+            $year = (int) $m[4];
+
+            if (isset($monthMap[$monthName])) {
+                try {
+                    $start = \Carbon\Carbon::createFromDate($year, $monthMap[$monthName], $startDay)->locale('id');
+                    $end = \Carbon\Carbon::createFromDate($year, $monthMap[$monthName], $endDay)->locale('id');
+
+                    $hariStart = $start->translatedFormat('l');
+                    $hariEnd = $end->translatedFormat('l');
+                    $hariText = ($startDay === $endDay) ? $hariStart : ($hariStart . ' - ' . $hariEnd);
+                    $daysCount = max(1, abs($endDay - $startDay) + 1);
+
+                    $daysDetail = [];
+                    for ($d = 1; $d <= $daysCount; $d++) {
+                        $cur = (clone $start)->addDays($d - 1);
+                        $daysDetail[$d] = [
+                            'hari' => $cur->translatedFormat('l'),
+                            'tanggal' => $cur->translatedFormat('d F Y'),
+                            'tanggal_singkat' => $cur->translatedFormat('d M Y'),
+                        ];
+                    }
+
+                    return [
+                        'hari' => $hariText,
+                        'tanggal' => $dateStr,
+                        'days_count' => $daysCount,
+                        'days_detail' => $daysDetail,
+                    ];
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // Format 2: Tanggal tunggal "15 November 2026"
+        if (preg_match('~^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$~iu', $dateStr, $m)) {
+            $day = (int) $m[1];
+            $monthName = strtolower($m[2]);
+            $year = (int) $m[3];
+
+            if (isset($monthMap[$monthName])) {
+                try {
+                    $date = \Carbon\Carbon::createFromDate($year, $monthMap[$monthName], $day)->locale('id');
+
+                    return [
+                        'hari' => $date->translatedFormat('l'),
+                        'tanggal' => $dateStr,
+                        'days_count' => 1,
+                        'days_detail' => [
+                            1 => [
+                                'hari' => $date->translatedFormat('l'),
+                                'tanggal' => $date->translatedFormat('d F Y'),
+                                'tanggal_singkat' => $date->translatedFormat('d M Y'),
+                            ],
+                        ],
+                    ];
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // Format 3: Lintas bulan "29 November - 01 Desember 2026" atau "29 Nov 2026 s.d 01 Des 2026"
+        if (preg_match('~^(\d{1,2})\s+([a-zA-Z]+)(?:\s+(\d{4}))?\s*(?:[-–—]|s\.d\.?|s/d)\s*(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$~iu', $dateStr, $m)) {
+            $startDay = (int) $m[1];
+            $m1 = strtolower($m[2]);
+            $endDay = (int) $m[4];
+            $m2 = strtolower($m[5]);
+            $year = (int) $m[6];
+            $y1 = !empty($m[3]) ? (int) $m[3] : $year;
+
+            if (isset($monthMap[$m1], $monthMap[$m2])) {
+                try {
+                    $start = \Carbon\Carbon::createFromDate($y1, $monthMap[$m1], $startDay)->locale('id');
+                    $end = \Carbon\Carbon::createFromDate($year, $monthMap[$m2], $endDay)->locale('id');
+
+                    $hariStart = $start->translatedFormat('l');
+                    $hariEnd = $end->translatedFormat('l');
+                    $daysCount = max(1, (int) $start->diffInDays($end, true) + 1);
+
+                    $daysDetail = [];
+                    for ($d = 1; $d <= $daysCount; $d++) {
+                        $cur = (clone $start)->addDays($d - 1);
+                        $daysDetail[$d] = [
+                            'hari' => $cur->translatedFormat('l'),
+                            'tanggal' => $cur->translatedFormat('d F Y'),
+                            'tanggal_singkat' => $cur->translatedFormat('d M Y'),
+                        ];
+                    }
+
+                    return [
+                        'hari' => $hariStart . ' - ' . $hariEnd,
+                        'tanggal' => $dateStr,
+                        'days_count' => $daysCount,
+                        'days_detail' => $daysDetail,
+                    ];
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        return [
+            'hari' => '-',
+            'tanggal' => $dateStr,
+            'days_count' => 2,
+            'days_detail' => [
+                1 => ['hari' => '-', 'tanggal' => $dateStr, 'tanggal_singkat' => $dateStr],
+                2 => ['hari' => '-', 'tanggal' => $dateStr, 'tanggal_singkat' => $dateStr],
+            ],
+        ];
+    }
+
+    /**
+     * Menyesuaikan ukuran font teks agar tidak keluar dari lebar maksimal kolom (mm).
+     * Jika tetap melebihi batas setelah ukuran terkecil, teks dipangkas dengan ellipsis (...).
+     */
+    protected function fitText(Fpdi $pdf, string $text, float $maxW, float $baseFontSize = 9.0, float $minFontSize = 7.0): array
+    {
+        $pdf->SetFontSize($baseFontSize);
+        if ($pdf->GetStringWidth($text) <= $maxW) {
+            return [$text, $baseFontSize];
+        }
+
+        for ($sz = $baseFontSize - 0.5; $sz >= $minFontSize; $sz -= 0.5) {
+            $pdf->SetFontSize($sz);
+            if ($pdf->GetStringWidth($text) <= $maxW) {
+                return [$text, $sz];
+            }
+        }
+
+        $pdf->SetFontSize($minFontSize);
+        $truncated = $text;
+        while (mb_strlen($truncated) > 1 && $pdf->GetStringWidth($truncated . '...') > $maxW) {
+            $truncated = mb_substr($truncated, 0, -1);
+        }
+
+        return [$truncated . '...', $minFontSize];
     }
 }
 
