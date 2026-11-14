@@ -261,7 +261,7 @@
                         </div>
 
                         <!-- Footer Tombol Aksi Simpan -->
-                        <div class="d-flex justify-content-end align-items-center gap-2 pt-3 mt-3 border-top">
+                        <div class="d-flex justify-content-end align-items-center flex-wrap gap-2 pt-3 mt-3 border-top">
                             <a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate
                                 class="btn btn-light border px-4">
                                 Batal

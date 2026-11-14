@@ -161,7 +161,7 @@
                 <!-- 1. Linkpemda (Dropdown) -->
                 @canany(['view-participants', 'view-certificates'])
                     @php
-                        $isLinkpemdaActive = request()->routeIs(['admin.participant.linkpemda.*', 'admin.invoice.linkpemda.*']);
+                        $isLinkpemdaActive = request()->routeIs(['admin.participant.linkpemda.*', 'admin.invoice.linkpemda.*', 'admin.attendance.linkpemda.*']);
                     @endphp
                     <li class="menu-item {{ $isLinkpemdaActive ? 'active' : '' }}">
                         <a href="#menuLinkpemda" data-bs-toggle="collapse"
@@ -178,6 +178,13 @@
                                         class='menu-link {{ request()->routeIs('admin.participant.linkpemda.*') ? 'active' : '' }}'
                                         href='{{ route('admin.participant.linkpemda.index') }}'>
                                         <span class="menu-text">Data Peserta</span>
+                                    </a>
+                                </li>
+                                <li class="menu-item {{ request()->routeIs('admin.attendance.linkpemda.*') ? 'active' : '' }}">
+                                    <a wire:navigate
+                                        class='menu-link {{ request()->routeIs('admin.attendance.linkpemda.*') ? 'active' : '' }}'
+                                        href='{{ route('admin.attendance.linkpemda.index') }}'>
+                                        <span class="menu-text">Absensi</span>
                                     </a>
                                 </li>
                                 <li class="menu-item {{ request()->routeIs('admin.invoice.linkpemda.*') ? 'active' : '' }}">

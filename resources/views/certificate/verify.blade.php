@@ -67,6 +67,10 @@
             background: linear-gradient(135deg, #008F83 0%, #006b62 100%);
         }
 
+        .status-in-progress {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        }
+
         .status-invalid {
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
         }
@@ -182,13 +186,29 @@
         <div class="verify-card">
             <!-- Header Status -->
             @if ($participant)
-                <div class="card-status-header status-valid">
-                    <div class="status-icon-circle">
-                        <i class="mdi mdi-check-decagram text-white fs-28"></i>
+                @php
+                    $validity = $validity ?? (app(\App\Services\AttendanceService::class)->checkCertificateValidity($participant));
+                    $isValid = $validity['is_valid'] ?? true;
+                    $isInProgress = $validity['is_in_progress'] ?? false;
+                @endphp
+
+                @if ($isValid)
+                    <div class="card-status-header status-valid">
+                        <div class="status-icon-circle">
+                            <i class="mdi mdi-check-decagram text-white fs-28"></i>
+                        </div>
+                        <h3 class="fw-bold mb-1 fs-20">{{ $validity['status_title'] ?? 'Sertifikat Resmi Terverifikasi' }}</h3>
+                        <p class="mb-0 text-white-50 fs-13">{{ $validity['status_desc'] ?? 'Data terdaftar resmi dalam pangkalan data sistem Linkpemda' }}</p>
                     </div>
-                    <h3 class="fw-bold mb-1 fs-20">Sertifikat Resmi Terverifikasi</h3>
-                    <p class="mb-0 text-white-50 fs-13">Data terdaftar resmi dalam pangkalan data sistem Linkpemda</p>
-                </div>
+                @else
+                    <div class="card-status-header status-in-progress">
+                        <div class="status-icon-circle">
+                            <i class="mdi mdi-account-clock text-white fs-28"></i>
+                        </div>
+                        <h3 class="fw-bold mb-1 fs-20">{{ $validity['status_title'] ?? 'Peserta Terdaftar (Kegiatan Berlangsung)' }}</h3>
+                        <p class="mb-0 text-white-75 fs-13">{{ $validity['status_desc'] ?? 'Sertifikat digital akan aktif tervalidasi setelah menyelesaikan absensi penutupan.' }}</p>
+                    </div>
+                @endif
             @elseif (!empty($certificate_number))
                 <div class="card-status-header status-invalid">
                     <div class="status-icon-circle">
@@ -255,11 +275,19 @@
                         @endif
                     </div>
 
-                    <div class="alert alert-success d-flex align-items-center gap-2 mb-0 py-2 fs-13"
-                        style="background-color: rgba(0, 143, 131, 0.08); border-color: rgba(0, 143, 131, 0.25); color: #007369;">
-                        <i class="mdi mdi-shield-check fs-18"></i>
-                        <div>Dokumen ini sah dan terdaftar resmi oleh penyelenggara <strong>Linkpemda</strong>.</div>
-                    </div>
+                    @if ($isValid ?? true)
+                        <div class="alert alert-success d-flex align-items-center gap-2 mb-0 py-2 fs-13"
+                            style="background-color: rgba(0, 143, 131, 0.08); border-color: rgba(0, 143, 131, 0.25); color: #007369;">
+                            <i class="mdi mdi-shield-check fs-18 flex-shrink-0"></i>
+                            <div>Dokumen ini sah dan terdaftar resmi oleh penyelenggara <strong>Linkpemda</strong>.</div>
+                        </div>
+                    @else
+                        <div class="alert alert-info d-flex align-items-center gap-2 mb-0 py-2 fs-13"
+                            style="background-color: rgba(2, 132, 199, 0.08); border-color: rgba(2, 132, 199, 0.25); color: #0369a1;">
+                            <i class="mdi mdi-clock-check-outline fs-18 flex-shrink-0"></i>
+                            <div>Peserta telah terdaftar secara sah. Dokumen sertifikat digital akan aktif penuh setelah peserta menyelesaikan absensi di hari terakhir kegiatan.</div>
+                        </div>
+                    @endif
                 @elseif (!empty($certificate_number))
                     <div class="cert-badge-box">
                         <div class="text-muted fs-12 mb-1">Nomor Sertifikat Dicari</div>

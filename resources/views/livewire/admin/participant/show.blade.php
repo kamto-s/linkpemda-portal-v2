@@ -142,14 +142,28 @@
                     </div>
 
                     @canany(['edit-participants', 'edit-certificates'])
+                        {{-- Tombol Kirim Undangan & Tiket QR --}}
+                        <button type="button" class="btn btn-outline-success" wire:click="sendInvitationEmail"
+                            wire:loading.attr="disabled" title="Kirim email undangan & kartu barcode QR Code absensi">
+                            <span wire:loading.remove wire:target="sendInvitationEmail">
+                                <i class="mdi mdi-qrcode-scan me-1"></i>
+                                {{ $participant->is_invitation_sent ? 'Kirim Ulang Undangan' : 'Kirim Undangan & QR' }}
+                            </span>
+                            <span wire:loading wire:target="sendInvitationEmail">
+                                <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Undangan...
+                            </span>
+                        </button>
+
+                        {{-- Tombol Kirim E-Sertifikat --}}
                         <button type="button" class="btn btn-outline-primary" wire:click="sendCertificateEmail"
-                            wire:loading.attr="disabled">
+                            wire:loading.attr="disabled" title="Kirim email e-sertifikat resmi kelulusan">
                             <span wire:loading.remove wire:target="sendCertificateEmail">
-                                <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync' : 'mdi-send' }} me-1"></i>
-                                {{ $participant->is_email_sent ? 'Kirim Ulang Email' : 'Kirim E-Sertifikat' }}
+                                <i
+                                    class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync' : 'mdi-certificate' }} me-1"></i>
+                                {{ $participant->is_email_sent ? 'Kirim Ulang Sertifikat' : 'Kirim E-Sertifikat' }}
                             </span>
                             <span wire:loading wire:target="sendCertificateEmail">
-                                <span class="spinner-border spinner-border-sm me-1"></span> Mengirim...
+                                <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Sertifikat...
                             </span>
                         </button>
 
@@ -329,12 +343,43 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Status Pengiriman Undangan & Tiket QR -->
                     <div class="mb-3">
-                        <span class="text-muted fs-12 d-block mb-1">Status Pengiriman E-Sertifikat</span>
+                        <span class="text-muted fs-12 d-block mb-1">Status Undangan &amp; Tiket QR</span>
+                        @if ($participant->is_invitation_sent)
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fs-12 px-2 py-1">
+                                <i class="mdi mdi-check-circle me-1"></i> Terkirim
+                            </span>
+                            @if ($participant->invitation_sent_at)
+                                <div class="text-muted fs-11 mt-1">
+                                    <i class="mdi mdi-calendar-clock me-1 text-success"></i>
+                                    {{ $participant->invitation_sent_at->translatedFormat('d M Y, H:i') }} WIB
+                                </div>
+                            @endif
+                        @elseif ($participant->invitation_status === 'failed')
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-12 px-2 py-1">
+                                <i class="mdi mdi-alert-circle me-1"></i> Gagal Terkirim
+                            </span>
+                        @else
+                            <span class="badge bg-secondary-subtle text-secondary border fs-12 px-2 py-1">
+                                <i class="mdi mdi-clock-outline me-1"></i> Belum Dikirim
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- Status Pengiriman E-Sertifikat -->
+                    <div class="mb-3">
+                        <span class="text-muted fs-12 d-block mb-1">Status E-Sertifikat Resmi</span>
                         @if ($participant->is_email_sent)
                             <span class="badge bg-success-subtle text-success border border-success-subtle fs-12 px-2 py-1">
                                 <i class="mdi mdi-check-circle me-1"></i> Terkirim
                             </span>
+                            @if ($participant->email_sent_at)
+                                <div class="text-muted fs-11 mt-1">
+                                    <i class="mdi mdi-calendar-clock me-1 text-success"></i>
+                                    {{ $participant->email_sent_at->translatedFormat('d M Y, H:i') }} WIB
+                                </div>
+                            @endif
                         @elseif ($participant->email_status === 'failed')
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-12 px-2 py-1">
                                 <i class="mdi mdi-alert-circle me-1"></i> Gagal Terkirim
@@ -345,16 +390,6 @@
                             </span>
                         @endif
                     </div>
-
-                    @if ($participant->email_sent_at)
-                        <div class="mb-3">
-                            <span class="text-muted fs-12 d-block">Waktu Pengiriman Email</span>
-                            <span class="text-dark fs-13 fw-medium">
-                                <i class="mdi mdi-calendar-clock me-1 text-success"></i>
-                                {{ $participant->email_sent_at->translatedFormat('d F Y, H:i') }} WIB
-                            </span>
-                        </div>
-                    @endif
 
                     <div class="border-top pt-3">
                         <span class="text-muted fs-12 d-block">Waktu Pembuatan Data</span>

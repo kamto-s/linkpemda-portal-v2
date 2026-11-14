@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CampaignImageUploadController;
 use App\Http\Controllers\Admin\InvoiceDocumentController;
 use App\Http\Controllers\Admin\ParticipantDocumentController;
 use App\Http\Controllers\Admin\TrenParticipantDocumentController;
+use App\Livewire\Admin\Attendance\Index as AttendanceIndex;
 use App\Livewire\Admin\Campaign\Form as CampaignForm;
 use App\Livewire\Admin\Campaign\Index as CampaignIndex;
 use App\Livewire\Admin\Campaign\Show as CampaignShow;
@@ -48,13 +49,15 @@ Route::view('/', 'welcome')->name('home');
 |--------------------------------------------------------------------------
 */
 // Halaman verifikasi publik (direct scan QR code baru)
-Route::get('/sertifikat/cek/{certificate_number}', function (string $certificate_number) {
+Route::get('/sertifikat/cek/{certificate_number}', function (string $certificate_number, \App\Services\AttendanceService $attendanceService) {
     $cleanNumber = trim(urldecode($certificate_number));
-    $participant = \App\Models\Participant::where('certificate_number', $cleanNumber)
+    $participant = \App\Models\Participant::with('attendances')->where('certificate_number', $cleanNumber)
         ->orWhere('certificate_number', $certificate_number)
         ->first();
 
-    return view('certificate.verify', compact('participant', 'certificate_number'));
+    $validity = $participant ? $attendanceService->checkCertificateValidity($participant) : null;
+
+    return view('certificate.verify', compact('participant', 'certificate_number', 'validity'));
 })->name('certificate.verify')->where('certificate_number', '.*');
 
 // Alias kompatibilitas mundur dengan sistem lama linkpemda (direct scan QR code lama)
@@ -137,6 +140,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/linkpemda/create', ParticipantForm::class)->name('participant.linkpemda.create');
         Route::get('/participants/linkpemda/{participant}/edit', ParticipantForm::class)->name('participant.linkpemda.edit');
         Route::get('/participants/linkpemda/{participant}', ParticipantShow::class)->name('participant.linkpemda.show');
+
+        // Administrasi - Absensi Kegiatan (Linkpemda)
+        Route::get('/attendances/linkpemda', AttendanceIndex::class)->name('attendance.linkpemda.index');
 
         // Administrasi - Invoice (Linkpemda)
         Route::get('/invoices/linkpemda', InvoiceIndex::class)->name('invoice.linkpemda.index');

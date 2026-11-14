@@ -137,6 +137,109 @@ class Index extends Component
     }
 
     /**
+     * Kirim email undangan & tiket barcode absensi ke peserta perorangan.
+     */
+    public function sendInvitationEmail(string $id): void
+    {
+        abort_unless(
+            auth()->user()?->can('edit-participants') || auth()->user()?->can('edit-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengirim undangan.'
+        );
+
+        $participant = Participant::findOrFail($id);
+
+        if (empty($participant->email)) {
+            session()->flash('error', "Gagal: Peserta \"{$participant->name}\" belum memiliki alamat email. Silakan lengkapi email terlebih dahulu.");
+
+            return;
+        }
+
+        if (empty($participant->qr_code_path) || !file_exists(public_path('uploads/qr_code/' . $participant->qr_code_path))) {
+            Participant::generateQrCodeFile($participant);
+        }
+
+        try {
+            Mail::to($participant->email)->send(new \App\Mail\InvitationTicketMail($participant));
+
+            $update = [];
+            if (\Illuminate\Support\Facades\Schema::hasColumn('participants', 'invitation_sent_at')) {
+                $update['invitation_sent_at'] = now();
+                $update['invitation_status'] = 'sent';
+            }
+            if (!empty($update)) {
+                $participant->update($update);
+            }
+
+            session()->flash('success', "Undangan & tiket barcode absensi berhasil dikirim ke {$participant->email} ({$participant->name})!");
+        } catch (\Throwable $e) {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('participants', 'invitation_status')) {
+                $participant->update(['invitation_status' => 'failed']);
+            }
+            session()->flash('error', "Gagal mengirimkan undangan ke {$participant->email}: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * Kirim email undangan & tiket barcode absensi masal ke peserta terpilih.
+     */
+    public function sendBulkInvitationEmail(): void
+    {
+        abort_unless(
+            auth()->user()?->can('edit-participants') || auth()->user()?->can('edit-certificates'),
+            403,
+            'Anda tidak memiliki hak akses untuk mengirim undangan.'
+        );
+
+        if (empty($this->selectedParticipants)) {
+            session()->flash('error', 'Pilih minimal 1 peserta untuk pengiriman undangan masal.');
+
+            return;
+        }
+
+        $participants = Participant::whereIn('id', $this->selectedParticipants)->get();
+        $sentCount = 0;
+        $failedCount = 0;
+
+        foreach ($participants as $participant) {
+            if (empty($participant->email)) {
+                $failedCount++;
+
+                continue;
+            }
+
+            if (empty($participant->qr_code_path) || !file_exists(public_path('uploads/qr_code/' . $participant->qr_code_path))) {
+                Participant::generateQrCodeFile($participant);
+            }
+
+            try {
+                Mail::to($participant->email)->send(new \App\Mail\InvitationTicketMail($participant));
+
+                $update = [];
+                if (\Illuminate\Support\Facades\Schema::hasColumn('participants', 'invitation_sent_at')) {
+                    $update['invitation_sent_at'] = now();
+                    $update['invitation_status'] = 'sent';
+                }
+                if (!empty($update)) {
+                    $participant->update($update);
+                }
+
+                $sentCount++;
+            } catch (\Throwable $e) {
+                if (\Illuminate\Support\Facades\Schema::hasColumn('participants', 'invitation_status')) {
+                    $participant->update(['invitation_status' => 'failed']);
+                }
+                $failedCount++;
+            }
+        }
+
+        $this->selectedParticipants = [];
+        $this->selectAll = false;
+
+        session()->flash('success', "Pengiriman undangan masal selesai: {$sentCount} tiket barcode berhasil dikirim.".($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
+    }
+
+    /**
      * Kirim e-sertifikat via email ke peserta perorangan.
      */
     public function sendCertificateEmail(string $id): void

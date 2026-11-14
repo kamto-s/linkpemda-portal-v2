@@ -82,13 +82,14 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.invoice.linkpemda.preview', $invoice->id) }}"
-                                    target="_blank">
+                                <a class="dropdown-item"
+                                    href="{{ route('admin.invoice.linkpemda.preview', $invoice->id) }}" target="_blank">
                                     <i class="mdi mdi-eye-outline me-2 text-info"></i> Lihat Invoice
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.invoice.linkpemda.download', $invoice->id) }}">
+                                <a class="dropdown-item"
+                                    href="{{ route('admin.invoice.linkpemda.download', $invoice->id) }}">
                                     <i class="mdi mdi-download me-2 text-danger"></i> Unduh Invoice
                                 </a>
                             </li>
@@ -165,8 +166,7 @@
                         <div class="col-sm-6">
                             <span class="text-muted fs-12 d-block">Alamat Email</span>
                             @if ($invoice->email)
-                                <a href="mailto:{{ $invoice->email }}"
-                                    class="text-primary text-decoration-none fw-medium">
+                                <a href="mailto:{{ $invoice->email }}" class="text-primary text-decoration-none fw-medium">
                                     <i class="mdi mdi-email-outline me-1"></i>{{ $invoice->email }}
                                 </a>
                             @else
@@ -176,8 +176,8 @@
                         <div class="col-sm-6">
                             <span class="text-muted fs-12 d-block">No. WhatsApp / HP</span>
                             @if ($invoice->phone)
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $invoice->phone) }}"
-                                    target="_blank" class="text-success text-decoration-none fw-medium">
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $invoice->phone) }}" target="_blank"
+                                    class="text-success text-decoration-none fw-medium">
                                     <i class="bx bxl-whatsapp me-1"></i>{{ $invoice->phone }}
                                 </a>
                             @else
@@ -282,7 +282,7 @@
                             @endphp
                             @if ($payEnum)
                                 @php
-                                    $paySubtle = match($payEnum) {
+                                    $paySubtle = match ($payEnum) {
                                         \App\Enums\InvoicePaymentStatus::Unpaid => 'bg-danger-subtle text-danger border border-danger-subtle',
                                         \App\Enums\InvoicePaymentStatus::Partial => 'bg-warning-subtle text-warning border border-warning-subtle',
                                         \App\Enums\InvoicePaymentStatus::Paid => 'bg-success-subtle text-success border border-success-subtle',
@@ -305,7 +305,8 @@
 
             <!-- 4. Daftar Peserta Bimtek -->
             <div class="card mb-3">
-                <div class="card-header bg-light-subtle border-bottom py-2 d-flex justify-content-between align-items-center">
+                <div
+                    class="card-header bg-light-subtle border-bottom py-2 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
                         Daftar Peserta Bimtek
                     </h5>
@@ -330,7 +331,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="2" class="text-center py-3 text-muted">Tidak ada data nama peserta.</td>
+                                        <td colspan="2" class="text-center py-3 text-muted">Tidak ada data nama peserta.
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -371,7 +373,7 @@
                         @endphp
                         @if ($statusEnum)
                             @php
-                                $statusSubtle = match($statusEnum) {
+                                $statusSubtle = match ($statusEnum) {
                                     \App\Enums\InvoiceStatus::Pending => 'bg-warning-subtle text-warning border border-warning-subtle',
                                     \App\Enums\InvoiceStatus::Approved => 'bg-success-subtle text-success border border-success-subtle',
                                     \App\Enums\InvoiceStatus::Rejected => 'bg-danger-subtle text-danger border border-danger-subtle',
@@ -434,7 +436,8 @@
                     @if ($invoice->email)
                         <div class="mb-3">
                             <span class="text-muted fs-12 d-block">Email Tujuan</span>
-                            <a href="mailto:{{ $invoice->email }}" class="text-primary text-decoration-none fw-medium fs-13">
+                            <a href="mailto:{{ $invoice->email }}"
+                                class="text-primary text-decoration-none fw-medium fs-13">
                                 <i class="mdi mdi-email-outline me-1"></i>{{ $invoice->email }}
                             </a>
                         </div>
@@ -489,7 +492,8 @@
                     </div>
                     <div class="d-flex justify-content-center gap-2">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-warning" wire:click="rejectInvoice" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-warning" wire:click="rejectInvoice"
+                            data-bs-dismiss="modal">
                             Tolak Invoice
                         </button>
                     </div>

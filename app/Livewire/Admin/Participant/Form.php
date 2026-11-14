@@ -266,11 +266,19 @@ class Form extends Component
 
         if ($this->isEditing && $this->participant) {
             $this->participant->update($data);
-            session()->flash('success', "Data peserta \"{$this->participant->name}\" berhasil diperbarui.");
+            $participant = $this->participant;
+            $msg = "Data peserta \"{$participant->name}\" berhasil diperbarui.";
         } else {
             $participant = Participant::create($data);
-            session()->flash('success', "Peserta baru \"{$participant->name}\" berhasil ditambahkan.");
+            $msg = "Peserta baru \"{$participant->name}\" berhasil ditambahkan.";
         }
+
+        // Pastikan file QR Code fisik tersedia di storage agar siap digunakan
+        if (empty($participant->qr_code_path) || !file_exists(public_path('uploads/qr_code/' . $participant->qr_code_path))) {
+            Participant::generateQrCodeFile($participant);
+        }
+
+        session()->flash('success', $msg);
 
         return $this->redirect(route('admin.participant.linkpemda.index'), navigate: true);
     }

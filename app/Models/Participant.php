@@ -29,6 +29,8 @@ class Participant extends BaseModel
         'amount',
         'email_sent_at',
         'email_status',
+        'invitation_sent_at',
+        'invitation_status',
         'notes',
     ];
 
@@ -36,6 +38,7 @@ class Participant extends BaseModel
     {
         return [
             'email_sent_at' => 'datetime',
+            'invitation_sent_at' => 'datetime',
             'amount' => 'decimal:2',
         ];
     }
@@ -254,6 +257,45 @@ class Participant extends BaseModel
     }
 
     /**
+     * Cek apakah undangan & tiket barcode absensi sudah pernah dikirimkan ke email peserta.
+     */
+    public function getIsInvitationSentAttribute(): bool
+    {
+        return ! is_null($this->invitation_sent_at) && $this->invitation_status === 'sent';
+    }
+
+    /**
+     * Label badge status email pengiriman undangan & tiket absensi.
+     */
+    public function getInvitationStatusBadgeAttribute(): array
+    {
+        if ($this->is_invitation_sent) {
+            return [
+                'label' => 'Terkirim',
+                'class' => 'bg-success-subtle text-success border border-success-subtle',
+                'icon' => 'mdi mdi-check-circle',
+                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+            ];
+        }
+
+        if ($this->invitation_status === 'failed') {
+            return [
+                'label' => 'Gagal Terkirim',
+                'class' => 'bg-danger-subtle text-danger border border-danger-subtle',
+                'icon' => 'mdi mdi-close-circle',
+                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+            ];
+        }
+
+        return [
+            'label' => 'Belum Dikirim',
+            'class' => 'bg-secondary-subtle text-secondary border',
+            'icon' => 'mdi mdi-clock-outline',
+            'time' => null,
+        ];
+    }
+
+    /**
      * Scope pencarian peserta.
      */
     public function scopeSearch(Builder $query, ?string $term): Builder
@@ -314,5 +356,25 @@ class Participant extends BaseModel
             get: fn () => $this->amount,
             set: fn ($value) => ['amount' => $value],
         );
+    }
+
+    public function attendances(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function attendanceFor(string $sessionType): ?Attendance
+    {
+        if ($this->relationLoaded('attendances')) {
+            return $this->attendances->firstWhere('session_type', $sessionType);
+        }
+
+        return $this->attendances()->where('session_type', $sessionType)->first();
+    }
+
+    public function isAttended(string $sessionType): bool
+    {
+        $att = $this->attendanceFor($sessionType);
+        return $att !== null && $att->status === 'hadir';
     }
 }

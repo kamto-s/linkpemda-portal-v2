@@ -465,25 +465,14 @@ class ParticipantDocumentService
         $maxTextWidth = 120;
         $terbilangLines = $this->wrapTextToWidth($pdf, $terbilangFormatted, $maxTextWidth);
 
-        $maxInnerW = $amountW;
-        foreach ($terbilangLines as $tl) {
-            $lw = $pdf->GetStringWidth($tl);
-            if ($lw > $maxInnerW) {
-                $maxInnerW = $lw;
-            }
-        }
-
         $boxStartX = 61;
-        $valOffset = $valX - $boxStartX; // 6 mm
-        $rightPadding = 8;
-        $boxWidth = min(134, $valOffset + $maxInnerW + $rightPadding);
-        $boxWidth = max(50, $boxWidth);
+        $boxWidth = 134; // Full width sampai batas margin kanan (61 + 134 = 195 mm)
 
         $boxLineH = 4.4;
         $boxHeight = 3.0 + 4.8 + (count($terbilangLines) * $boxLineH);
         $boxStartY = $curY - 1.2;
 
-        // Background box hijau muda / mint lembut dinamis mengikuti panjang & lebar teks
+        // Background box hijau muda / mint lembut full width sampai batas margin kanan
         $pdf->SetFillColor(235, 244, 238);
         $pdf->Rect($boxStartX, $boxStartY, $boxWidth, $boxHeight, 'F');
 
@@ -1121,7 +1110,7 @@ class ParticipantDocumentService
                     $hariStart = $start->translatedFormat('l');
                     $hariEnd = $end->translatedFormat('l');
                     $hariText = ($startDay === $endDay) ? $hariStart : ($hariStart . ' - ' . $hariEnd);
-                    $daysCount = max(1, abs($endDay - $startDay) + 1);
+                    $daysCount = min(7, max(1, abs($endDay - $startDay) + 1));
 
                     $daysDetail = [];
                     for ($d = 1; $d <= $daysCount; $d++) {
@@ -1138,6 +1127,8 @@ class ParticipantDocumentService
                         'tanggal' => $dateStr,
                         'days_count' => $daysCount,
                         'days_detail' => $daysDetail,
+                        'start_date' => $start->toDateString(),
+                        'end_date' => $end->toDateString(),
                     ];
                 } catch (\Throwable) {
                 }
@@ -1165,6 +1156,8 @@ class ParticipantDocumentService
                                 'tanggal_singkat' => $date->translatedFormat('d M Y'),
                             ],
                         ],
+                        'start_date' => $date->toDateString(),
+                        'end_date' => $date->toDateString(),
                     ];
                 } catch (\Throwable) {
                 }
@@ -1187,7 +1180,9 @@ class ParticipantDocumentService
 
                     $hariStart = $start->translatedFormat('l');
                     $hariEnd = $end->translatedFormat('l');
-                    $daysCount = max(1, (int) $start->diffInDays($end, true) + 1);
+                    $rawDays = (int) $start->diffInDays($end, true) + 1;
+                    // Batasi maksimal 7 hari untuk keamanan layout PDF dan tab absensi
+                    $daysCount = min(7, max(1, $rawDays));
 
                     $daysDetail = [];
                     for ($d = 1; $d <= $daysCount; $d++) {
@@ -1204,6 +1199,8 @@ class ParticipantDocumentService
                         'tanggal' => $dateStr,
                         'days_count' => $daysCount,
                         'days_detail' => $daysDetail,
+                        'start_date' => $start->toDateString(),
+                        'end_date' => $end->toDateString(),
                     ];
                 } catch (\Throwable) {
                 }
@@ -1218,6 +1215,8 @@ class ParticipantDocumentService
                 1 => ['hari' => '-', 'tanggal' => $dateStr, 'tanggal_singkat' => $dateStr],
                 2 => ['hari' => '-', 'tanggal' => $dateStr, 'tanggal_singkat' => $dateStr],
             ],
+            'start_date' => null,
+            'end_date' => null,
         ];
     }
 
