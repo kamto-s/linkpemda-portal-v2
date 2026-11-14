@@ -18,16 +18,17 @@ class CertificateMail extends Mailable
      */
     public function __construct(
         public Participant $participant
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
-        $subject = 'E-Sertifikat Pelatihan Bimtek Linkpemda - '.$this->participant->name;
-        if (! empty($this->participant->certificate_number)) {
-            $subject .= ' (No: '.$this->participant->certificate_number.')';
+        $subject = 'Sertifikat Pelatihan Bimtek Linkpemda - ' . $this->participant->name;
+        if (!empty($this->participant->certificate_number)) {
+            $subject .= ' (No: ' . $this->participant->certificate_number . ')';
         }
 
         return new Envelope(
@@ -49,7 +50,7 @@ class CertificateMail extends Mailable
     }
 
     /**
-     * Lampirkan file PDF E-Sertifikat ke dalam email.
+     * Lampirkan file PDF Sertifikat ke dalam email.
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
@@ -62,7 +63,7 @@ class CertificateMail extends Mailable
             $filename = "Sertifikat_{$safeName}_{$this->participant->certificate_number}.pdf";
 
             return [
-                \Illuminate\Mail\Mailables\Attachment::fromData(fn () => $binary, $filename)
+                \Illuminate\Mail\Mailables\Attachment::fromData(fn() => $binary, $filename)
                     ->withMime('application/pdf'),
             ];
         } catch (\Throwable) {

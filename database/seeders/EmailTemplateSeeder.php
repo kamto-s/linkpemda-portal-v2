@@ -45,7 +45,7 @@ class EmailTemplateSeeder extends Seeder
     </div>
     <div style="margin-bottom: 12px; font-size: 14px; color: #334155; line-height: 1.6;">
         <span style="color: #2563eb; font-weight: bold; margin-right: 8px;">📜</span>
-        <strong>Fasilitas &amp; Dokumen Resmi:</strong> E-Sertifikat bernomor resmi, modul panduan praktis, rekaman sesi (jika online), serta template dokumen siap pakai.
+        <strong>Fasilitas &amp; Dokumen Resmi:</strong> Sertifikat bernomor resmi, modul panduan praktis, rekaman sesi (jika online), serta template dokumen siap pakai.
     </div>
     <div style="margin-bottom: 0; font-size: 14px; color: #334155; line-height: 1.6;">
         <span style="color: #2563eb; font-weight: bold; margin-right: 8px;">☕</span>

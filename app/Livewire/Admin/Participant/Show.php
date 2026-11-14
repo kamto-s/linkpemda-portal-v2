@@ -66,7 +66,7 @@ class Show extends Component
                 $this->participant->update(['invitation_status' => 'failed']);
             }
             $this->participant->refresh();
-            session()->flash('error', "Gagal mengirimkan undangan ke {$this->participant->email}: ".$e->getMessage());
+            session()->flash('error', "Gagal mengirimkan undangan ke {$this->participant->email}: " . $e->getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ class Show extends Component
         abort_unless(
             auth()->user()?->can('edit-participants') || auth()->user()?->can('edit-certificates'),
             403,
-            'Anda tidak memiliki hak akses untuk mengirim e-sertifikat.'
+            'Anda tidak memiliki hak akses untuk mengirim Sertifikat.'
         );
 
         if (empty($this->participant->email)) {
@@ -93,11 +93,11 @@ class Show extends Component
             ]);
 
             $this->participant->refresh();
-            session()->flash('success', "E-Sertifikat berhasil dikirimkan ke email {$this->participant->email}!");
+            session()->flash('success', "Sertifikat berhasil dikirimkan ke email {$this->participant->email}!");
         } catch (\Throwable $e) {
             $this->participant->update(['email_status' => 'failed']);
             $this->participant->refresh();
-            session()->flash('error', "Gagal mengirimkan email ke {$this->participant->email}: ".$e->getMessage());
+            session()->flash('error', "Gagal mengirimkan email ke {$this->participant->email}: " . $e->getMessage());
         }
     }
 
@@ -109,13 +109,13 @@ class Show extends Component
     {
         $routeMap = [
             'sertifikat' => [
-                'view'           => 'admin.participant.linkpemda.certificate.view',
-                'download'       => 'admin.participant.linkpemda.certificate.download',
-                'print'          => 'admin.participant.linkpemda.certificate.print',
+                'view' => 'admin.participant.linkpemda.certificate.view',
+                'download' => 'admin.participant.linkpemda.certificate.download',
+                'print' => 'admin.participant.linkpemda.certificate.print',
                 'download-blank' => 'admin.participant.linkpemda.certificate.download-blank',
             ],
             'kwitansi' => [
-                'view'     => 'admin.participant.linkpemda.kwitansi.view',
+                'view' => 'admin.participant.linkpemda.kwitansi.view',
                 'download' => 'admin.participant.linkpemda.kwitansi.download',
             ],
         ];

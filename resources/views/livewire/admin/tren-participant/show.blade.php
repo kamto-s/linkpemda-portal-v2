@@ -218,7 +218,7 @@
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
-                        Kegiatan Pelatihan &amp; E-Sertifikat
+                        Kegiatan Pelatihan &amp; Sertifikat
                     </h5>
                 </div>
                 <div class="card-body">

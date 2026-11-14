@@ -36,7 +36,7 @@ return new class extends Migration {
             $table->string('receipt_date')->nullable();
             $table->decimal('amount', 15, 2)->default(0);
 
-            // Tracking Pengiriman E-Sertifikat via Email (Ember disiapkan)
+            // Tracking Pengiriman Sertifikat via Email (Ember disiapkan)
             $table->timestamp('email_sent_at')->nullable();
             $table->string('email_status')->default('pending')->index();
 

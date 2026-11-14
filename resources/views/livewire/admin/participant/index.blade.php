@@ -88,7 +88,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="text-muted fs-12 d-block">Total Biaya</span>
-                            <h5 class="mb-0 fw-bold text-dark fs-15">Rp {{ number_format($totalAmount, 0, ',', '.') }}</h5>
+                            <h5 class="mb-0 fw-bold text-dark fs-15">Rp {{ number_format($totalAmount, 0, ',', '.') }}
+                            </h5>
                         </div>
                         <i class="mdi mdi-cash-multiple text-info fs-24"></i>
                     </div>
@@ -104,11 +105,13 @@
                     <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                         <div>
                             <h4 class="">Daftar {{ $pageTitle }}</h4>
-                            <p class="mb-0">Kelola data peserta pelatihan bimtek, penerbitan sertifikat, kwitansi, dan pengiriman email.</p>
+                            <p class="mb-0">Kelola data peserta pelatihan bimtek, penerbitan sertifikat, kwitansi, dan
+                                pengiriman email.</p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
                             @canany(['create-participants', 'create-certificates'])
-                                <a href="{{ route('admin.participant.linkpemda.create') }}" wire:navigate class="btn btn-primary">
+                                <a href="{{ route('admin.participant.linkpemda.create') }}" wire:navigate
+                                    class="btn btn-primary">
                                     <i class="mdi mdi-plus"></i> Tambah
                                 </a>
                             @endcanany
@@ -122,11 +125,12 @@
                         <div class="col-md-3">
                             <div class="input-group">
                                 <span class="input-group-text"><i class="mdi mdi-magnify"></i></span>
-                                <input type="text" class="form-control" placeholder="Cari nama, email, instansi, no. sertifikat..."
+                                <input type="text" class="form-control"
+                                    placeholder="Cari nama, email, instansi, no. sertifikat..."
                                     wire:model.live.debounce.300ms="search">
                                 @if ($search !== '')
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        wire:click="$set('search', '')" title="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary" type="button" wire:click="$set('search', '')"
+                                        title="Hapus pencarian">
                                         <i class="mdi mdi-close"></i>
                                     </button>
                                 @endif
@@ -180,28 +184,33 @@
 
                     <!-- Bar Aksi Masal (Bulk Actions) -->
                     @if (count($selectedParticipants) > 0)
-                        <div class="alert alert-primary d-flex align-items-center justify-content-between mb-3 py-2 px-3 border-0 bg-primary-subtle text-primary-emphasis flex-wrap gap-2">
+                        <div
+                            class="alert alert-primary d-flex align-items-center justify-content-between mb-3 py-2 px-3 border-0 bg-primary-subtle text-primary-emphasis flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-primary fs-12 rounded-pill px-2 py-1">{{ count($selectedParticipants) }}</span>
+                                <span
+                                    class="badge bg-primary fs-12 rounded-pill px-2 py-1">{{ count($selectedParticipants) }}</span>
                                 <span class="fw-semibold">Peserta terpilih</span>
                             </div>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <!-- Tombol Kirim Undangan Masal -->
                                 <button type="button" class="btn btn-sm btn-success" wire:click="sendBulkInvitationEmail"
-                                    wire:loading.attr="disabled" title="Kirim email undangan dan barcode QR Code absensi ke peserta terpilih">
+                                    wire:loading.attr="disabled"
+                                    title="Kirim email undangan dan barcode QR Code absensi ke peserta terpilih">
                                     <span wire:loading.remove wire:target="sendBulkInvitationEmail">
-                                        <i class="mdi mdi-qrcode-scan me-1"></i> Kirim Undangan &amp; QR ({{ count($selectedParticipants) }})
+                                        <i class="mdi mdi-qrcode-scan me-1"></i> Kirim Undangan &amp; QR
+                                        ({{ count($selectedParticipants) }})
                                     </span>
                                     <span wire:loading wire:target="sendBulkInvitationEmail">
                                         <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Undangan...
                                     </span>
                                 </button>
 
-                                <!-- Tombol Kirim E-Sertifikat Masal -->
+                                <!-- Tombol Kirim Sertifikat Masal -->
                                 <button type="button" class="btn btn-sm btn-primary" wire:click="sendBulkCertificateEmail"
-                                    wire:loading.attr="disabled" title="Kirim email e-sertifikat resmi ke peserta terpilih">
+                                    wire:loading.attr="disabled" title="Kirim email Sertifikat resmi ke peserta terpilih">
                                     <span wire:loading.remove wire:target="sendBulkCertificateEmail">
-                                        <i class="mdi mdi-certificate me-1"></i> Kirim E-Sertifikat ({{ count($selectedParticipants) }})
+                                        <i class="mdi mdi-certificate me-1"></i> Kirim Sertifikat
+                                        ({{ count($selectedParticipants) }})
                                     </span>
                                     <span wire:loading wire:target="sendBulkCertificateEmail">
                                         <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Sertifikat...
@@ -257,7 +266,8 @@
                                 </button>
 
                                 <!-- Batal Seleksi -->
-                                <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2 text-decoration-none" wire:click="$set('selectedParticipants', [])">
+                                <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2 text-decoration-none"
+                                    wire:click="$set('selectedParticipants', [])">
                                     <i class="mdi mdi-close"></i> Batal
                                 </button>
                             </div>
@@ -270,11 +280,12 @@
                             <thead>
                                 <tr>
                                     <th style="width: 36px;">
-                                        <input type="checkbox" class="form-check-input" wire:model.live="selectAll" title="Pilih Semua di Halaman Ini">
+                                        <input type="checkbox" class="form-check-input" wire:model.live="selectAll"
+                                            title="Pilih Semua di Halaman Ini">
                                     </th>
                                     <th>Peserta</th>
                                     <th>Email &amp; No. HP</th>
-                                    <th>Instansi / OPD</th>
+                                    <th>Instansi / Perusahaan</th>
                                     <th>No. Sertifikat</th>
                                     <th>Kwitansi</th>
                                     <th>Status Email</th>
@@ -284,9 +295,12 @@
                             </thead>
                             <tbody>
                                 @forelse ($participants as $participant)
-                                    <tr wire:key="{{ $participant->id }}" class="{{ in_array((string) $participant->id, $selectedParticipants) ? 'table-active' : '' }}">
+                                    <tr wire:key="{{ $participant->id }}"
+                                        class="{{ in_array((string) $participant->id, $selectedParticipants) ? 'table-active' : '' }}">
                                         <td>
-                                            <input type="checkbox" class="form-check-input" value="{{ (string) $participant->id }}" wire:model.live="selectedParticipants">
+                                            <input type="checkbox" class="form-check-input"
+                                                value="{{ (string) $participant->id }}"
+                                                wire:model.live="selectedParticipants">
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
@@ -296,11 +310,12 @@
                                                     {{ mb_substr($participant->name, 0, 2) }}
                                                 </span>
                                                 <div>
-                                                    <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate
-                                                        class="fw-semibold text-dark text-decoration-none">
+                                                    <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}"
+                                                        wire:navigate class="fw-semibold text-dark text-decoration-none">
                                                         {{ $participant->name }}
                                                     </a>
-                                                    <small class="text-muted d-block">{{ $participant->position ?: '-' }}</small>
+                                                    <small
+                                                        class="text-muted d-block">{{ $participant->position ?: '-' }}</small>
                                                 </div>
                                             </div>
                                         </td>
@@ -318,17 +333,21 @@
                                             <small class="text-muted">{{ $participant->phone ?: '-' }}</small>
                                         </td>
                                         <td>
-                                            <span class="fw-medium text-dark text-truncate d-block" style="max-width: 180px;" title="{{ $participant->institution_name }}">
+                                            <span class="fw-medium text-dark text-truncate d-block"
+                                                style="max-width: 180px;" title="{{ $participant->institution_name }}">
                                                 {{ $participant->institution_name ?: '-' }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-light text-dark border font-monospace fs-11" title="{{ $participant->theme ?: 'Sertifikat Bimtek' }}">
+                                            <span class="badge bg-light text-dark border font-monospace fs-11"
+                                                title="{{ $participant->theme ?: 'Sertifikat Bimtek' }}">
                                                 {{ $participant->certificate_number ?: '-' }}
                                             </span>
                                             @if ($participant->qr_code_path)
-                                                <button type="button" class="btn btn-xs btn-link text-muted p-0 ms-1 align-baseline"
-                                                    wire:click="showQrModal('{{ $participant->id }}')" title="Lihat gambar QR Code">
+                                                <button type="button"
+                                                    class="btn btn-xs btn-link text-muted p-0 ms-1 align-baseline"
+                                                    wire:click="showQrModal('{{ $participant->id }}')"
+                                                    title="Lihat gambar QR Code">
                                                     <i class="bx bx-qr fs-14"></i>
                                                 </button>
                                             @endif
@@ -337,55 +356,69 @@
                                             <span class="text-dark fw-medium">{{ $participant->formatted_amount }}</span>
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-column gap-1">
-                                                {{-- Status Undangan & Tiket QR --}}
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <small class="text-muted fs-11" style="width: 58px;">Undangan:</small>
-                                                    @if ($participant->is_invitation_sent)
-                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-1 py-0 fs-11"
-                                                            title="Terkirim: {{ $participant->invitation_sent_at?->translatedFormat('d M Y, H:i') }}">
-                                                            <i class="mdi mdi-check-circle me-1"></i> Terkirim
-                                                        </span>
-                                                    @elseif ($participant->invitation_status === 'failed')
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-1 py-0 fs-11">
-                                                            Gagal
-                                                        </span>
-                                                    @else
-                                                        <span class="badge bg-secondary-subtle text-secondary border px-1 py-0 fs-11">
-                                                            Belum
-                                                        </span>
-                                                    @endif
-                                                </div>
+                                            @php
+                                                $hasEmail = !empty($participant->email);
+                                                $tiketSent = $participant->is_invitation_sent;
+                                                $certSent = $participant->is_email_sent;
+                                                $tiketFail = $participant->invitation_status === 'failed';
+                                                $certFail = $participant->email_status === 'failed';
+                                            @endphp
 
-                                                {{-- Status E-Sertifikat --}}
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <small class="text-muted fs-11" style="width: 58px;">Sertifikat:</small>
-                                                    @if ($participant->is_email_sent)
-                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-1 py-0 fs-11"
-                                                            title="Terkirim: {{ $participant->email_sent_at?->translatedFormat('d M Y, H:i') }}">
-                                                            <i class="mdi mdi-check-circle me-1"></i> Terkirim
-                                                        </span>
-                                                    @elseif ($participant->email_status === 'failed')
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-1 py-0 fs-11">
-                                                            Gagal
-                                                        </span>
-                                                    @else
-                                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-1 py-0 fs-11">
-                                                            Belum
-                                                        </span>
-                                                    @endif
+                                            @if (!$hasEmail)
+                                                <span class="badge bg-light text-secondary border px-2 py-1"
+                                                    title="Alamat email belum diisi pada data peserta ini">
+                                                    <i class="mdi mdi-email-off-outline me-1"></i> Tanpa Email
+                                                </span>
+                                            @elseif ($tiketFail || $certFail)
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"
+                                                    title="{{ $tiketFail ? 'Pengiriman tiket QR gagal. ' : '' }}{{ $certFail ? 'Pengiriman sertifikat gagal.' : '' }}">
+                                                    <i class="mdi mdi-alert-circle me-1"></i> Gagal Terkirim
+                                                </span>
+                                            @elseif ($tiketSent && $certSent)
+                                                <div class="d-inline-flex align-items-center gap-1">
+                                                    <span
+                                                        class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
+                                                        title="Tiket QR Terkirim: {{ $participant->invitation_sent_at?->translatedFormat('d M Y, H:i') }}">
+                                                        <i class="mdi mdi-qrcode-scan me-1"></i> Tiket
+                                                    </span>
+                                                    <span
+                                                        class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
+                                                        title="E-Sertifikat Terkirim: {{ $participant->email_sent_at?->translatedFormat('d M Y, H:i') }}">
+                                                        <i class="mdi mdi-certificate me-1"></i> Sertifikat
+                                                    </span>
                                                 </div>
-                                            </div>
+                                            @elseif ($tiketSent)
+                                                <span
+                                                    class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
+                                                    title="Tiket QR Terkirim: {{ $participant->invitation_sent_at?->translatedFormat('d M Y, H:i') }} (Sertifikat belum dikirim)">
+                                                    <i class="mdi mdi-qrcode-scan me-1"></i> Tiket Terkirim
+                                                </span>
+                                            @elseif ($certSent)
+                                                <span
+                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
+                                                    title="E-Sertifikat Terkirim: {{ $participant->email_sent_at?->translatedFormat('d M Y, H:i') }}">
+                                                    <i class="mdi mdi-certificate me-1"></i> Sertifikat Terkirim
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted border px-2 py-1">
+                                                    Belum Dikirim
+                                                </span>
+                                            @endif
                                         </td>
                                         <td>
-                                            <div class="text-dark fs-12">{{ $participant->created_at?->translatedFormat('d M Y') ?? '-' }}</div>
-                                            <small class="text-muted">{{ $participant->created_at ? $participant->created_at->format('H:i') . ' WIB' : '-' }}</small>
+                                            <div class="text-dark fs-12">
+                                                {{ $participant->created_at?->translatedFormat('d M Y') ?? '-' }}
+                                            </div>
+                                            <small
+                                                class="text-muted">{{ $participant->created_at ? $participant->created_at->format('H:i') . ' WIB' : '-' }}</small>
                                         </td>
                                         <td class="text-end">
                                             <div class="d-flex align-items-center justify-content-end gap-1">
                                                 {{-- Tombol Cepat: Lihat Detail --}}
-                                                <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}" wire:navigate
-                                                    class="btn btn-sm btn-light border" title="Lihat Detail & Dokumen Lengkap">
+                                                <a href="{{ route('admin.participant.linkpemda.show', $participant->id) }}"
+                                                    wire:navigate class="btn btn-sm btn-light border"
+                                                    title="Lihat Detail & Dokumen Lengkap">
                                                     <i class="mdi mdi-eye-outline text-primary"></i>
                                                 </a>
 
@@ -397,29 +430,51 @@
                                                         aria-expanded="false">
                                                         <i class="mdi mdi-dots-vertical"></i>
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-end shadow-sm" style="z-index: 9999;">
+                                                    <div class="dropdown-menu dropdown-menu-end shadow-sm"
+                                                        style="z-index: 9999;">
                                                         @canany(['edit-participants', 'edit-certificates'])
                                                             {{-- 1. Kirim Undangan & Tiket QR Barcode --}}
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                wire:click="sendInvitationEmail('{{ $participant->id }}')">
-                                                                <i class="mdi mdi-qrcode-scan text-success me-2"></i>
-                                                                {{ $participant->is_invitation_sent ? 'Kirim Ulang Undangan & QR' : 'Kirim Undangan & Tiket QR' }}
-                                                            </a>
+                                                            @if (!empty($participant->email))
+                                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                                    wire:click="sendInvitationEmail('{{ $participant->id }}')">
+                                                                    <i class="mdi mdi-qrcode-scan text-success me-2"></i>
+                                                                    {{ $participant->is_invitation_sent ? 'Kirim Ulang Undangan' : 'Kirim Undangan' }}
+                                                                </a>
+                                                            @else
+                                                                <span class="dropdown-item text-muted disabled"
+                                                                    style="cursor: not-allowed; opacity: 0.5;"
+                                                                    title="Peserta tidak memiliki alamat email">
+                                                                    <i class="mdi mdi-qrcode-scan text-muted me-2"></i> Kirim
+                                                                    Undangan
+                                                                </span>
+                                                            @endif
 
-                                                            {{-- 2. Kirim E-Sertifikat --}}
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                wire:click="sendCertificateEmail('{{ $participant->id }}')">
-                                                                <i class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync text-info' : 'mdi-certificate text-primary' }} me-2"></i>
-                                                                {{ $participant->is_email_sent ? 'Kirim Ulang E-Sertifikat' : 'Kirim E-Sertifikat' }}
-                                                            </a>
+                                                            {{-- 2. Kirim Sertifikat --}}
+                                                            @if (!empty($participant->email))
+                                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                                    wire:click="sendCertificateEmail('{{ $participant->id }}')">
+                                                                    <i
+                                                                        class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync text-info' : 'mdi-certificate text-primary' }} me-2"></i>
+                                                                    {{ $participant->is_email_sent ? 'Kirim Ulang Sertifikat' : 'Kirim Sertifikat' }}
+                                                                </a>
+                                                            @else
+                                                                <span class="dropdown-item text-muted disabled"
+                                                                    style="cursor: not-allowed; opacity: 0.5;"
+                                                                    title="Peserta tidak memiliki alamat email">
+                                                                    <i class="mdi mdi-certificate text-muted me-2"></i> Kirim
+                                                                    Sertifikat
+                                                                </span>
+                                                            @endif
                                                             <div class="dropdown-divider my-1"></div>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.certificate.view', $participant->id) }}">
-                                                                <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Sertifikat Warna
+                                                                <i class="mdi mdi-file-pdf-box me-2 text-danger"></i> Sertifikat
+                                                                Warna
                                                             </a>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.certificate.print', $participant->id) }}">
-                                                                <i class="mdi mdi-printer me-2 text-secondary"></i> Sertifikat Blank
+                                                                <i class="mdi mdi-printer me-2 text-secondary"></i> Sertifikat
+                                                                Blank
                                                             </a>
                                                             <a class="dropdown-item" target="_blank"
                                                                 href="{{ route('admin.participant.linkpemda.kwitansi.view', $participant->id) }}">
@@ -458,7 +513,8 @@
 
                 @if ($participants->hasPages())
                     <div class="card-footer mb-0">
-                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                        <div class="pagination-rounded" x-data
+                            x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
                             {{ $participants->links() }}
                         </div>
                     </div>
@@ -468,14 +524,16 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus -->
-    <div wire:ignore.self class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="deleteConfirmModal" tabindex="-1"
+        aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white py-2">
                     <h6 class="modal-title text-white mb-0" id="deleteConfirmModalLabel">
                         <i class="mdi mdi-alert-circle me-1"></i> Konfirmasi Hapus Peserta
                     </h6>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body py-4">
                     <p class="mb-0 text-dark">
@@ -494,7 +552,8 @@
     </div>
 
     <!-- Modal Pratinjau QR Code -->
-    <div wire:ignore.self class="modal fade" id="qrPreviewModal" tabindex="-1" aria-labelledby="qrPreviewModalLabel" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="qrPreviewModal" tabindex="-1" aria-labelledby="qrPreviewModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header py-2">
@@ -505,7 +564,8 @@
                 </div>
                 <div class="modal-body text-center py-4 bg-light">
                     @if ($previewQrUrl)
-                        <img src="{{ $previewQrUrl }}" alt="QR Code" class="img-fluid border rounded p-2 bg-white shadow-sm" style="max-height: 220px;">
+                        <img src="{{ $previewQrUrl }}" alt="QR Code" class="img-fluid border rounded p-2 bg-white shadow-sm"
+                            style="max-height: 220px;">
                     @else
                         <div class="text-muted fs-13">
                             <i class="bx bx-image-alt fs-36 d-block mb-1 text-muted"></i>

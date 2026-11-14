@@ -94,7 +94,7 @@ class Index extends Component
         return $this->getQuery()
             ->paginate($this->perPage)
             ->pluck('id')
-            ->map(fn ($id) => (string) $id)
+            ->map(fn($id) => (string) $id)
             ->toArray();
     }
 
@@ -122,7 +122,7 @@ class Index extends Component
         );
 
         $targetId = $id ?: $this->participantToDeleteId;
-        if (! $targetId) {
+        if (!$targetId) {
             return;
         }
 
@@ -176,7 +176,7 @@ class Index extends Component
             if (\Illuminate\Support\Facades\Schema::hasColumn('participants', 'invitation_status')) {
                 $participant->update(['invitation_status' => 'failed']);
             }
-            session()->flash('error', "Gagal mengirimkan undangan ke {$participant->email}: ".$e->getMessage());
+            session()->flash('error', "Gagal mengirimkan undangan ke {$participant->email}: " . $e->getMessage());
         }
     }
 
@@ -236,18 +236,18 @@ class Index extends Component
         $this->selectedParticipants = [];
         $this->selectAll = false;
 
-        session()->flash('success', "Pengiriman undangan masal selesai: {$sentCount} tiket barcode berhasil dikirim.".($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
+        session()->flash('success', "Pengiriman undangan masal selesai: {$sentCount} tiket barcode berhasil dikirim." . ($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
     }
 
     /**
-     * Kirim e-sertifikat via email ke peserta perorangan.
+     * Kirim Sertifikat via email ke peserta perorangan.
      */
     public function sendCertificateEmail(string $id): void
     {
         abort_unless(
             auth()->user()?->can('edit-participants') || auth()->user()?->can('edit-certificates'),
             403,
-            'Anda tidak memiliki hak akses untuk mengirim e-sertifikat.'
+            'Anda tidak memiliki hak akses untuk mengirim Sertifikat.'
         );
 
         $participant = Participant::findOrFail($id);
@@ -266,26 +266,26 @@ class Index extends Component
                 'email_status' => 'sent',
             ]);
 
-            session()->flash('success', "E-Sertifikat berhasil dikirimkan ke email {$participant->email} ({$participant->name})!");
+            session()->flash('success', "Sertifikat berhasil dikirimkan ke email {$participant->email} ({$participant->name})!");
         } catch (\Throwable $e) {
             $participant->update(['email_status' => 'failed']);
-            session()->flash('error', "Gagal mengirimkan email ke {$participant->email}: ".$e->getMessage());
+            session()->flash('error', "Gagal mengirimkan email ke {$participant->email}: " . $e->getMessage());
         }
     }
 
     /**
-     * Kirim e-sertifikat masal ke seluruh peserta yang dicentang.
+     * Kirim Sertifikat masal ke seluruh peserta yang dicentang.
      */
     public function sendBulkCertificateEmail(): void
     {
         abort_unless(
             auth()->user()?->can('edit-participants') || auth()->user()?->can('edit-certificates'),
             403,
-            'Anda tidak memiliki hak akses untuk mengirim e-sertifikat.'
+            'Anda tidak memiliki hak akses untuk mengirim Sertifikat.'
         );
 
         if (empty($this->selectedParticipants)) {
-            session()->flash('error', 'Pilih minimal 1 peserta untuk pengiriman e-sertifikat masal.');
+            session()->flash('error', 'Pilih minimal 1 peserta untuk pengiriman Sertifikat masal.');
 
             return;
         }
@@ -317,7 +317,7 @@ class Index extends Component
         $this->selectedParticipants = [];
         $this->selectAll = false;
 
-        session()->flash('success', "Pengiriman masal selesai: {$sentCount} e-sertifikat berhasil dikirim.".($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
+        session()->flash('success', "Pengiriman masal selesai: {$sentCount} Sertifikat berhasil dikirim." . ($failedCount > 0 ? " ({$failedCount} dilewati/gagal karena tanpa email)" : ''));
     }
 
     /**
@@ -341,7 +341,7 @@ class Index extends Component
         $service = app(\App\Services\ParticipantDocumentService::class);
         $zipPath = $service->buildBulkZip($participants, $type);
 
-        if (! $zipPath || ! file_exists($zipPath)) {
+        if (!$zipPath || !file_exists($zipPath)) {
             session()->flash('error', 'Gagal membuat file ZIP dokumen masal.');
 
             return null;
@@ -349,8 +349,8 @@ class Index extends Component
 
         $label = match ($type) {
             'kwitansi' => 'Kwitansi',
-            'blank'    => 'Sertifikat_Blank',
-            default    => 'Sertifikat_Warna',
+            'blank' => 'Sertifikat_Blank',
+            default => 'Sertifikat_Warna',
         };
         $downloadName = "Bulk_{$label}_Linkpemda_" . date('Ymd_His') . ".zip";
 
@@ -414,19 +414,19 @@ class Index extends Component
     public function getPdfRoute(string $type, string $action, string $participantId): string
     {
         $participant = Participant::find($participantId);
-        if (! $participant) {
+        if (!$participant) {
             return '#';
         }
 
         $routeMap = [
             'sertifikat' => [
-                'view'           => 'admin.participant.linkpemda.certificate.view',
-                'download'       => 'admin.participant.linkpemda.certificate.download',
-                'print'          => 'admin.participant.linkpemda.certificate.print',
+                'view' => 'admin.participant.linkpemda.certificate.view',
+                'download' => 'admin.participant.linkpemda.certificate.download',
+                'print' => 'admin.participant.linkpemda.certificate.print',
                 'download-blank' => 'admin.participant.linkpemda.certificate.download-blank',
             ],
             'kwitansi' => [
-                'view'     => 'admin.participant.linkpemda.kwitansi.view',
+                'view' => 'admin.participant.linkpemda.kwitansi.view',
                 'download' => 'admin.participant.linkpemda.kwitansi.download',
             ],
         ];
@@ -446,13 +446,32 @@ class Index extends Component
             ->when($this->selectedMonth !== '', function ($q) {
                 $monthNum = (int) $this->selectedMonth;
                 $romanMonths = [
-                    1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
-                    7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+                    1 => 'I',
+                    2 => 'II',
+                    3 => 'III',
+                    4 => 'IV',
+                    5 => 'V',
+                    6 => 'VI',
+                    7 => 'VII',
+                    8 => 'VIII',
+                    9 => 'IX',
+                    10 => 'X',
+                    11 => 'XI',
+                    12 => 'XII',
                 ];
                 $indonesianMonths = [
-                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+                    1 => 'Januari',
+                    2 => 'Februari',
+                    3 => 'Maret',
+                    4 => 'April',
+                    5 => 'Mei',
+                    6 => 'Juni',
+                    7 => 'Juli',
+                    8 => 'Agustus',
+                    9 => 'September',
+                    10 => 'Oktober',
+                    11 => 'November',
+                    12 => 'Desember',
                 ];
 
                 $roman = $romanMonths[$monthNum] ?? '';

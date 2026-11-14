@@ -54,7 +54,7 @@
                                 {{ $isEditing ? 'Form Perubahan Data Peserta' : 'Form Pendaftaran Peserta Linkpemda' }}
                             </h4>
                             <p class="sub-header mb-0">
-                                Lengkapi data identitas peserta bimtek, rincian e-sertifikat, dan dokumen kwitansi.
+                                Lengkapi data identitas peserta bimtek, rincian Sertifikat, dan dokumen kwitansi.
                             </p>
                         </div>
                         <a href="{{ route('admin.participant.linkpemda.index') }}" wire:navigate
@@ -155,9 +155,15 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-md-12">
-                                                <label class="form-label fw-semibold">Tema / Judul Kegiatan</label>
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <label class="form-label fw-semibold mb-0">Tema / Judul Kegiatan</label>
+                                                    <button type="button" class="btn btn-xs btn-outline-primary py-1 px-2 fs-11"
+                                                        data-bs-toggle="modal" data-bs-target="#modalSearchTheme">
+                                                        <i class="mdi mdi-magnify me-1"></i> Cari &amp; Pilih dari Tema yang Ada
+                                                    </button>
+                                                </div>
                                                 <textarea class="form-control @error('theme') is-invalid @enderror"
-                                                    rows="3" wire:model="theme"></textarea>
+                                                    rows="3" wire:model="theme" placeholder="Ketik tema kegiatan pelatihan atau gunakan tombol 'Cari & Pilih' di atas untuk auto-fill jadwal & lokasi..."></textarea>
                                                 @error('theme')
                                                 <div class="invalid-feedback">{{ $message }}</div> @enderror
                                             </div>
@@ -281,4 +287,91 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Pencarian & Pemilihan Tema yang Sudah Pernah Ada -->
+    <div class="modal fade" id="modalSearchTheme" tabindex="-1" aria-labelledby="modalSearchThemeLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow" style="border-radius: 14px;">
+                <div class="modal-header bg-light border-bottom py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="mdi mdi-bookmark-check text-primary fs-20"></i>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0 text-dark" id="modalSearchThemeLabel">Pilih Tema Kegiatan Pelatihan</h5>
+                            <small class="text-muted fs-12">Pilih tema yang pernah ada untuk auto-fill jadwal &amp; lokasi tanpa salah ketik</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-3 p-md-4">
+                    <!-- Input Pencarian Realtime -->
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-white"><i class="mdi mdi-magnify fs-16"></i></span>
+                        <input type="text" class="form-control"
+                            placeholder="Ketik kata kunci tema kegiatan, lokasi, gedung acara, atau tanggal..."
+                            wire:model.live.debounce.250ms="themeSearchQuery" autofocus>
+                        @if ($themeSearchQuery !== '')
+                            <button class="btn btn-outline-secondary" type="button" wire:click="$set('themeSearchQuery', '')">
+                                <i class="mdi mdi-close"></i>
+                            </button>
+                        @endif
+                    </div>
+
+                    <!-- Daftar Hasil Pencarian Tema -->
+                    <div class="list-group" style="max-height: 380px; overflow-y: auto;">
+                        @forelse ($this->existingThemes as $ex)
+                            <div class="list-group-item list-group-item-action p-3 d-flex justify-content-between align-items-center gap-3">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 fs-14" style="line-height: 1.4;">{{ $ex->theme }}</h6>
+                                    <div class="d-flex align-items-center flex-wrap gap-2 text-muted fs-12 mt-1">
+                                        <span>
+                                            <i class="mdi mdi-calendar-range text-primary me-1"></i> {{ $ex->certificate_date ?: '-' }}
+                                        </span>
+                                        @if ($ex->event_venue || $ex->event_location)
+                                            <span>&bull;</span>
+                                            <span>
+                                                <i class="mdi mdi-map-marker text-danger me-1"></i>
+                                                {{ $ex->event_venue }}{{ $ex->event_location ? ', ' . $ex->event_location : '' }}
+                                            </span>
+                                        @endif
+                                        <span>&bull;</span>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $ex->total_participants }} Peserta
+                                        </span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-primary fw-semibold flex-shrink-0 px-3"
+                                    wire:click="selectExistingTheme('{{ addslashes($ex->theme) }}')">
+                                    <i class="mdi mdi-check me-1"></i> Gunakan
+                                </button>
+                            </div>
+                        @empty
+                            <div class="text-center py-4 text-muted">
+                                <i class="mdi mdi-magnify-close fs-36 text-secondary mb-1"></i>
+                                <div class="fw-semibold">Tidak ada tema yang cocok dengan pencarian</div>
+                                <small class="text-muted">Anda bisa menutup modal ini dan mengetik tema baru secara manual.</small>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('close-modal', event => {
+            const modalId = event.detail.modal;
+            const el = document.getElementById(modalId);
+            if (el) {
+                const m = bootstrap.Modal.getInstance(el);
+                if (m) m.hide();
+            }
+        });
+    });
+</script>
+@endpush

@@ -58,7 +58,7 @@ class Participant extends BaseModel
                 $participant->receipt_number = $participant->certificate_number;
             }
 
-            if (empty($participant->qr_code_path) && ! empty($participant->certificate_number)) {
+            if (empty($participant->qr_code_path) && !empty($participant->certificate_number)) {
                 $sanitized = preg_replace('/[^a-zA-Z0-9_-]/', '-', $participant->certificate_number);
                 $participant->qr_code_path = "{$sanitized}.png";
             }
@@ -70,7 +70,7 @@ class Participant extends BaseModel
         });
 
         static::updating(function (Participant $participant) {
-            if ($participant->isDirty('certificate_number') && ! empty($participant->certificate_number)) {
+            if ($participant->isDirty('certificate_number') && !empty($participant->certificate_number)) {
                 if (empty($participant->receipt_number) || $participant->receipt_number === $participant->getOriginal('certificate_number')) {
                     $participant->receipt_number = $participant->certificate_number;
                 }
@@ -101,17 +101,17 @@ class Participant extends BaseModel
             $verifyUrl = route('certificate.verify', ['certificate_number' => $participant->certificate_number]);
 
             $options = new \chillerlan\QRCode\QROptions([
-                'outputInterface'  => \chillerlan\QRCode\Output\QRGdImagePNG::class,
-                'eccLevel'         => \chillerlan\QRCode\Common\EccLevel::L,
-                'outputBase64'     => false,
+                'outputInterface' => \chillerlan\QRCode\Output\QRGdImagePNG::class,
+                'eccLevel' => \chillerlan\QRCode\Common\EccLevel::L,
+                'outputBase64' => false,
                 'imageTransparent' => false,
-                'scale'            => 10,
+                'scale' => 10,
             ]);
 
             $imageData = (new \chillerlan\QRCode\QRCode($options))->render($verifyUrl);
 
             $dir = public_path('uploads/qr_code');
-            if (! file_exists($dir)) {
+            if (!file_exists($dir)) {
                 mkdir($dir, 0755, true);
             }
 
@@ -136,8 +136,18 @@ class Participant extends BaseModel
         $year = $date->format('Y');
 
         $romanMonths = [
-            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
-            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
         ];
         $monthRoman = $romanMonths[(int) $date->format('n')] ?? 'I';
 
@@ -179,7 +189,7 @@ class Participant extends BaseModel
      */
     public function getFormattedAmountAttribute(): string
     {
-        return 'Rp '.number_format((float) $this->amount, 0, ',', '.');
+        return 'Rp ' . number_format((float) $this->amount, 0, ',', '.');
     }
 
     /**
@@ -201,28 +211,30 @@ class Participant extends BaseModel
         }
 
         // Jika file belum ada di disk, generate otomatis
-        if (! file_exists(public_path('uploads/qr_code/'.$this->qr_code_path)) &&
-            ! file_exists(public_path('assets/images/qr_codes/'.$this->qr_code_path))) {
+        if (
+            !file_exists(public_path('uploads/qr_code/' . $this->qr_code_path)) &&
+            !file_exists(public_path('assets/images/qr_codes/' . $this->qr_code_path))
+        ) {
             static::generateQrCodeFile($this);
         }
 
-        if (file_exists(public_path('uploads/qr_code/'.$this->qr_code_path))) {
-            return asset('uploads/qr_code/'.$this->qr_code_path);
+        if (file_exists(public_path('uploads/qr_code/' . $this->qr_code_path))) {
+            return asset('uploads/qr_code/' . $this->qr_code_path);
         }
 
-        if (file_exists(public_path('assets/images/qr_codes/'.$this->qr_code_path))) {
-            return asset('assets/images/qr_codes/'.$this->qr_code_path);
+        if (file_exists(public_path('assets/images/qr_codes/' . $this->qr_code_path))) {
+            return asset('assets/images/qr_codes/' . $this->qr_code_path);
         }
 
-        return asset('uploads/qr_code/'.$this->qr_code_path);
+        return asset('uploads/qr_code/' . $this->qr_code_path);
     }
 
     /**
-     * Cek apakah e-sertifikat sudah pernah dikirimkan ke email peserta.
+     * Cek apakah Sertifikat sudah pernah dikirimkan ke email peserta.
      */
     public function getIsEmailSentAttribute(): bool
     {
-        return ! is_null($this->email_sent_at) && $this->email_status === 'sent';
+        return !is_null($this->email_sent_at) && $this->email_status === 'sent';
     }
 
     /**
@@ -235,7 +247,7 @@ class Participant extends BaseModel
                 'label' => 'Terkirim',
                 'class' => 'bg-success-subtle text-success border border-success-subtle',
                 'icon' => 'mdi mdi-check-circle',
-                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -244,7 +256,7 @@ class Participant extends BaseModel
                 'label' => 'Gagal Terkirim',
                 'class' => 'bg-danger-subtle text-danger border border-danger-subtle',
                 'icon' => 'mdi mdi-close-circle',
-                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -261,7 +273,7 @@ class Participant extends BaseModel
      */
     public function getIsInvitationSentAttribute(): bool
     {
-        return ! is_null($this->invitation_sent_at) && $this->invitation_status === 'sent';
+        return !is_null($this->invitation_sent_at) && $this->invitation_status === 'sent';
     }
 
     /**
@@ -274,7 +286,7 @@ class Participant extends BaseModel
                 'label' => 'Terkirim',
                 'class' => 'bg-success-subtle text-success border border-success-subtle',
                 'icon' => 'mdi mdi-check-circle',
-                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -283,7 +295,7 @@ class Participant extends BaseModel
                 'label' => 'Gagal Terkirim',
                 'class' => 'bg-danger-subtle text-danger border border-danger-subtle',
                 'icon' => 'mdi mdi-close-circle',
-                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->invitation_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -321,40 +333,40 @@ class Participant extends BaseModel
     protected function noCertf(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->certificate_number,
-            set: fn ($value) => ['certificate_number' => $value],
+            get: fn() => $this->certificate_number,
+            set: fn($value) => ['certificate_number' => $value],
         );
     }
 
     protected function jabatan(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->position,
-            set: fn ($value) => ['position' => $value],
+            get: fn() => $this->position,
+            set: fn($value) => ['position' => $value],
         );
     }
 
     protected function instansi(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->institution_name,
-            set: fn ($value) => ['institution_name' => $value],
+            get: fn() => $this->institution_name,
+            set: fn($value) => ['institution_name' => $value],
         );
     }
 
     protected function tema(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->theme,
-            set: fn ($value) => ['theme' => $value],
+            get: fn() => $this->theme,
+            set: fn($value) => ['theme' => $value],
         );
     }
 
     protected function biaya(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->amount,
-            set: fn ($value) => ['amount' => $value],
+            get: fn() => $this->amount,
+            set: fn($value) => ['amount' => $value],
         );
     }
 

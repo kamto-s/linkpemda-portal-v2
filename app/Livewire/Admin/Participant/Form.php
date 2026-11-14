@@ -29,7 +29,7 @@ class Form extends Component
 
     public ?string $registration_date = null;
 
-    // Data E-Sertifikat & Kegiatan Bimtek
+    // Data Sertifikat & Kegiatan Bimtek
     public string $certificate_number = '';
 
     public string $qr_code_path = '';
@@ -55,6 +55,9 @@ class Form extends Component
 
     // Catatan Tambahan
     public string $notes = '';
+
+    // Pencarian tema pada modal pemilihan tema
+    public string $themeSearchQuery = '';
 
     public function mount(Participant|string|null $participant = null): void
     {
@@ -120,10 +123,18 @@ class Form extends Component
         }
 
         $months = [
-            'Januari' => 'January', 'Februari' => 'February', 'Maret' => 'March',
-            'April' => 'April', 'Mei' => 'May', 'Juni' => 'June',
-            'Juli' => 'July', 'Agustus' => 'August', 'September' => 'September',
-            'Oktober' => 'October', 'November' => 'November', 'Desember' => 'December',
+            'Januari' => 'January',
+            'Februari' => 'February',
+            'Maret' => 'March',
+            'April' => 'April',
+            'Mei' => 'May',
+            'Juni' => 'June',
+            'Juli' => 'July',
+            'Agustus' => 'August',
+            'September' => 'September',
+            'Oktober' => 'October',
+            'November' => 'November',
+            'Desember' => 'December',
         ];
 
         try {
@@ -161,6 +172,61 @@ class Form extends Component
         }
     }
 
+    /**
+     * Dapatkan daftar tema kegiatan yang sudah pernah diinput sebelumnya untuk opsi cepat (anti typo).
+     * Mendukung live search kata kunci tema jika judul tema sangat banyak.
+     */
+    public function getExistingThemesProperty()
+    {
+        $query = Participant::whereNotNull('theme')
+            ->where('theme', '!=', '')
+            ->selectRaw('
+                theme,
+                MAX(certificate_date) as certificate_date,
+                MAX(event_venue) as event_venue,
+                MAX(event_location) as event_location,
+                MAX(created_at) as latest_created_at,
+                COUNT(*) as total_participants
+            ')
+            ->groupBy('theme')
+            ->orderByDesc('latest_created_at');
+
+        if (!empty($this->themeSearchQuery)) {
+            $term = '%' . trim($this->themeSearchQuery) . '%';
+            $query->where(function ($q) use ($term) {
+                $q->where('theme', 'like', $term)
+                    ->orWhere('event_venue', 'like', $term)
+                    ->orWhere('event_location', 'like', $term)
+                    ->orWhere('certificate_date', 'like', $term);
+            });
+        }
+
+        return $query->take(30)->get();
+    }
+
+    /**
+     * Terapkan tema kegiatan yang dipilih dan otomatis isi tanggal & lokasi acara.
+     */
+    public function selectExistingTheme(string $theme): void
+    {
+        $existing = Participant::where('theme', $theme)->latest('created_at')->first();
+        if ($existing) {
+            $this->theme = $existing->theme;
+            if (!empty($existing->event_venue)) {
+                $this->event_venue = $existing->event_venue;
+            }
+            if (!empty($existing->event_location)) {
+                $this->event_location = $existing->event_location;
+            }
+            if (!empty($existing->certificate_date)) {
+                $this->parseCertificateDateRange($existing->certificate_date);
+            }
+        }
+
+        $this->themeSearchQuery = '';
+        $this->dispatch('close-modal', modal: 'modalSearchTheme');
+    }
+
     protected function rules(): array
     {
         return [
@@ -191,7 +257,7 @@ class Form extends Component
 
     public function updatedAmount($value): void
     {
-        if (! empty($value)) {
+        if (!empty($value)) {
             $digits = preg_replace('/[^0-9]/', '', (string) $value);
             $this->amount = $digits !== '' ? number_format((float) $digits, 0, ',', '.') : '';
         } else {
@@ -211,11 +277,11 @@ class Form extends Component
                 if ($this->event_end_date && $this->event_end_date !== $this->event_start_date) {
                     $end = Carbon::parse($this->event_end_date)->locale('id');
                     if ($start->isSameMonth($end) && $start->isSameYear($end)) {
-                        $certDate = $start->format('d').' - '.$end->translatedFormat('d F Y');
+                        $certDate = $start->format('d') . ' - ' . $end->translatedFormat('d F Y');
                     } elseif ($start->isSameYear($end)) {
-                        $certDate = $start->translatedFormat('d F').' - '.$end->translatedFormat('d F Y');
+                        $certDate = $start->translatedFormat('d F') . ' - ' . $end->translatedFormat('d F Y');
                     } else {
-                        $certDate = $start->translatedFormat('d F Y').' - '.$end->translatedFormat('d F Y');
+                        $certDate = $start->translatedFormat('d F Y') . ' - ' . $end->translatedFormat('d F Y');
                     }
                 } else {
                     $certDate = $start->translatedFormat('d F Y');
@@ -243,7 +309,7 @@ class Form extends Component
         }
 
         $certNumber = $this->certificate_number ?: Participant::generateCertificateNumber();
-        $numericAmount = ! empty($this->amount) ? (float) preg_replace('/[^0-9]/', '', (string) $this->amount) : 0;
+        $numericAmount = !empty($this->amount) ? (float) preg_replace('/[^0-9]/', '', (string) $this->amount) : 0;
 
         $data = [
             'name' => $this->name,

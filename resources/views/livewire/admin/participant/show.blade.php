@@ -144,23 +144,27 @@
                     @canany(['edit-participants', 'edit-certificates'])
                         {{-- Tombol Kirim Undangan & Tiket QR --}}
                         <button type="button" class="btn btn-outline-success" wire:click="sendInvitationEmail"
-                            wire:loading.attr="disabled" title="Kirim email undangan & kartu barcode QR Code absensi">
+                            wire:loading.attr="disabled"
+                            @disabled(empty($participant->email))
+                            title="{{ empty($participant->email) ? 'Peserta tidak memiliki alamat email' : 'Kirim email undangan & kartu barcode QR Code absensi' }}">
                             <span wire:loading.remove wire:target="sendInvitationEmail">
                                 <i class="mdi mdi-qrcode-scan me-1"></i>
-                                {{ $participant->is_invitation_sent ? 'Kirim Ulang Undangan' : 'Kirim Undangan & QR' }}
+                                {{ $participant->is_invitation_sent ? 'Kirim Ulang Undangan' : 'Kirim Undangan' }}
                             </span>
                             <span wire:loading wire:target="sendInvitationEmail">
                                 <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Undangan...
                             </span>
                         </button>
 
-                        {{-- Tombol Kirim E-Sertifikat --}}
+                        {{-- Tombol Kirim Sertifikat --}}
                         <button type="button" class="btn btn-outline-primary" wire:click="sendCertificateEmail"
-                            wire:loading.attr="disabled" title="Kirim email e-sertifikat resmi kelulusan">
+                            wire:loading.attr="disabled"
+                            @disabled(empty($participant->email))
+                            title="{{ empty($participant->email) ? 'Peserta tidak memiliki alamat email' : 'Kirim email Sertifikat resmi kelulusan' }}">
                             <span wire:loading.remove wire:target="sendCertificateEmail">
                                 <i
                                     class="mdi {{ $participant->is_email_sent ? 'mdi-email-sync' : 'mdi-certificate' }} me-1"></i>
-                                {{ $participant->is_email_sent ? 'Kirim Ulang Sertifikat' : 'Kirim E-Sertifikat' }}
+                                {{ $participant->is_email_sent ? 'Kirim Ulang Sertifikat' : 'Kirim Sertifikat' }}
                             </span>
                             <span wire:loading wire:target="sendCertificateEmail">
                                 <span class="spinner-border spinner-border-sm me-1"></span> Mengirim Sertifikat...
@@ -243,7 +247,7 @@
             <div class="card mb-3">
                 <div class="card-header bg-light-subtle border-bottom py-2">
                     <h5 class="card-title mb-0 fs-14 fw-bold text-dark py-2">
-                        Kegiatan Pelatihan &amp; E-Sertifikat
+                        Kegiatan Pelatihan &amp; Sertifikat
                     </h5>
                 </div>
                 <div class="card-body">
@@ -346,7 +350,12 @@
                     <!-- Status Pengiriman Undangan & Tiket QR -->
                     <div class="mb-3">
                         <span class="text-muted fs-12 d-block mb-1">Status Undangan &amp; Tiket QR</span>
-                        @if ($participant->is_invitation_sent)
+                        @if (empty($participant->email))
+                            <span class="badge bg-light text-secondary border fs-12 px-2 py-1">
+                                <i class="mdi mdi-email-off-outline me-1"></i> Tidak Ada Email
+                            </span>
+                            <div class="text-muted fs-11 mt-1">Alamat email belum diisi</div>
+                        @elseif ($participant->is_invitation_sent)
                             <span class="badge bg-success-subtle text-success border border-success-subtle fs-12 px-2 py-1">
                                 <i class="mdi mdi-check-circle me-1"></i> Terkirim
                             </span>
@@ -367,10 +376,15 @@
                         @endif
                     </div>
 
-                    <!-- Status Pengiriman E-Sertifikat -->
+                    <!-- Status Pengiriman Sertifikat -->
                     <div class="mb-3">
-                        <span class="text-muted fs-12 d-block mb-1">Status E-Sertifikat Resmi</span>
-                        @if ($participant->is_email_sent)
+                        <span class="text-muted fs-12 d-block mb-1">Status Sertifikat Resmi</span>
+                        @if (empty($participant->email))
+                            <span class="badge bg-light text-secondary border fs-12 px-2 py-1">
+                                <i class="mdi mdi-email-off-outline me-1"></i> Tidak Ada Email
+                            </span>
+                            <div class="text-muted fs-11 mt-1">Alamat email belum diisi</div>
+                        @elseif ($participant->is_email_sent)
                             <span class="badge bg-success-subtle text-success border border-success-subtle fs-12 px-2 py-1">
                                 <i class="mdi mdi-check-circle me-1"></i> Terkirim
                             </span>

@@ -7,6 +7,7 @@ use App\Services\AttendanceService;
 use App\Services\ParticipantDocumentService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,15 +19,36 @@ class Index extends Component
 
     protected string $paginationTheme = 'bootstrap';
 
-    public string $pageTitle = 'Absensi';
+    public string $pageTitle = 'Absensi Kegiatan Bimtek';
 
-    // Filter Kegiatan
+    // Tema kegiatan yang sedang dibuka (jika kosong, tampilkan katalog card tema)
+    #[Url(as: 'tema')]
     public string $selectedTheme = '';
+
+    // Filter & pencarian modul tema
+    public string $themeSearch = '';
+    public string $themeFilter = 'all'; // 'all', 'today', 'this_month', 'upcoming'
+    public int $themePerPage = 10;
+
+    public function updatedThemeSearch(): void
+    {
+        $this->resetPage('themePage');
+    }
+
+    public function updatedThemeFilter(): void
+    {
+        $this->resetPage('themePage');
+    }
+
+    public function updatedThemePerPage(): void
+    {
+        $this->resetPage('themePage');
+    }
 
     // Sesi aktif saat ini: 'registrasi', 'hari_1', 'hari_2', dst.
     public string $activeSession = 'registrasi';
 
-    // Pencarian cepat
+    // Pencarian cepat peserta
     public string $search = '';
 
     // Filter status kehadiran di sesi ini: 'all', 'hadir', 'belum_hadir', 'izin', 'sakit'
@@ -52,14 +74,49 @@ class Index extends Component
             'Anda tidak memiliki hak akses untuk membuka halaman absensi.'
         );
 
-        // Pilih tema kegiatan yang sedang berlangsung hari ini atau yang terdekat
-        if (empty($this->selectedTheme)) {
-            $events = $this->eventList;
-            $first = $events->first(fn($e) => $e->is_today) ?? $events->first();
-            if ($first) {
-                $this->selectedTheme = $first->theme;
+        // Jika tema diberikan lewat parameter URL (?tema=...), pastikan kegiatannya masih aktif
+        if (!empty($this->selectedTheme)) {
+            $exists = $this->eventList->contains('theme', $this->selectedTheme);
+            if (!$exists) {
+                $this->selectedTheme = '';
             }
         }
+    }
+
+    public function selectTheme(string $theme): void
+    {
+        $this->selectedTheme = $theme;
+        $this->activeSession = 'registrasi';
+        $this->resetPage();
+        $this->search = '';
+        $this->statusFilter = 'all';
+        $this->selectedParticipants = [];
+        $this->selectAll = false;
+    }
+
+    public function clearSelectedTheme(): void
+    {
+        $this->selectedTheme = '';
+        $this->resetPage();
+        $this->search = '';
+        $this->selectedParticipants = [];
+        $this->selectAll = false;
+    }
+
+    public function resetThemeFilters(): void
+    {
+        $this->themeSearch = '';
+        $this->themeFilter = 'all';
+        $this->resetPage('themePage');
+    }
+
+    public function getSelectedEventProperty()
+    {
+        if (empty($this->selectedTheme)) {
+            return null;
+        }
+
+        return $this->eventList->firstWhere('theme', $this->selectedTheme);
     }
 
     public function updatedSelectedTheme(): void
@@ -110,7 +167,14 @@ class Index extends Component
         $docService = app(ParticipantDocumentService::class);
         $events = Participant::whereNotNull('theme')
             ->where('theme', '!=', '')
-            ->selectRaw('theme, MAX(certificate_date) as certificate_date, MAX(created_at) as latest_created_at, COUNT(*) as total_participants')
+            ->selectRaw('
+                theme,
+                MAX(certificate_date) as certificate_date,
+                MAX(event_venue) as event_venue,
+                MAX(event_location) as event_location,
+                MAX(created_at) as latest_created_at,
+                COUNT(*) as total_participants
+            ')
             ->groupBy('theme')
             ->orderByDesc('latest_created_at')
             ->get();
@@ -138,12 +202,68 @@ class Index extends Component
                 $startDate = !empty($startDateStr) ? \Carbon\Carbon::parse($startDateStr)->startOfDay() : $endDate;
                 $event->is_today = $now->betweenIncluded($startDate, $endDate);
                 $event->status_label = $event->is_today ? 'Hari Ini' : 'Akan Datang';
+                $event->start_date = $startDate;
+                $event->end_date = $endDate;
+                $event->days_count = $sched['days_count'] ?? 1;
+
+                // Hitung total hadir pada sesi registrasi untuk preview di card
+                $event->total_hadir_registrasi = Participant::where('theme', $event->theme)
+                    ->whereHas('attendances', function ($q) {
+                        $q->where('session_type', 'registrasi')->where('status', 'hadir');
+                    })->count();
 
                 return true;
             } catch (\Throwable) {
                 return false;
             }
         })->values();
+    }
+
+    /**
+     * Dapatkan daftar kegiatan yang terfilter pencarian & status tab pada modul tema.
+     */
+    public function getFilteredEventListProperty()
+    {
+        $events = $this->eventList;
+        $now = \Carbon\Carbon::now()->startOfDay();
+
+        if (!empty($this->themeSearch)) {
+            $term = mb_strtolower(trim($this->themeSearch));
+            $events = $events->filter(function ($e) use ($term) {
+                return str_contains(mb_strtolower($e->theme), $term)
+                    || str_contains(mb_strtolower($e->event_venue ?? ''), $term)
+                    || str_contains(mb_strtolower($e->event_location ?? ''), $term)
+                    || str_contains(mb_strtolower($e->certificate_date ?? ''), $term);
+            });
+        }
+
+        if ($this->themeFilter === 'today') {
+            $events = $events->filter(fn($e) => $e->is_today);
+        } elseif ($this->themeFilter === 'this_month') {
+            $events = $events->filter(fn($e) => $e->start_date && $e->start_date->month === $now->month && $e->start_date->year === $now->year);
+        } elseif ($this->themeFilter === 'upcoming') {
+            $events = $events->filter(fn($e) => $e->start_date && $e->start_date->gt($now->copy()->endOfMonth()));
+        }
+
+        return $events->values();
+    }
+
+    /**
+     * Dapatkan daftar kegiatan terpaginasi (10, 25, 50 per halaman) agar rapi walau banyak tema.
+     */
+    public function getPaginatedEventListProperty()
+    {
+        $events = $this->filteredEventList;
+        $page = $this->getPage('themePage');
+        $perPage = $this->themePerPage;
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $events->forPage($page, $perPage)->values(),
+            $events->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'pageName' => 'themePage']
+        );
     }
 
     /**

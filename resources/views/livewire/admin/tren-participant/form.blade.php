@@ -54,7 +54,7 @@
                                 {{ $isEditing ? 'Form Perubahan Data Peserta' : 'Form Pendaftaran Peserta Tren Media' }}
                             </h4>
                             <p class="sub-header mb-0">
-                                Lengkapi data identitas peserta tren media, rincian e-sertifikat, dan dokumen kwitansi.
+                                Lengkapi data identitas peserta tren media, rincian Sertifikat, dan dokumen kwitansi.
                             </p>
                         </div>
                         <a href="{{ route('admin.participant.trendiklat.index') }}" wire:navigate

@@ -247,7 +247,7 @@
                             <div class="detail-value">{{ $participant->position ?: '-' }}</div>
                         </div>
                         <div class="detail-row">
-                            <div class="detail-label"><i class="mdi mdi-city me-1 text-muted"></i> Instansi / OPD</div>
+                            <div class="detail-label"><i class="mdi mdi-city me-1 text-muted"></i> Instansi / Perusahaan</div>
                             <div class="detail-value">{{ $participant->institution_name ?: '-' }}</div>
                         </div>
                         <div class="detail-row">

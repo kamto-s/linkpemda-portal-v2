@@ -59,7 +59,7 @@ class TrenParticipant extends BaseModel
         });
 
         static::updating(function (TrenParticipant $participant) {
-            if ($participant->isDirty('certificate_number') && ! empty($participant->certificate_number)) {
+            if ($participant->isDirty('certificate_number') && !empty($participant->certificate_number)) {
                 if (empty($participant->receipt_number) || $participant->receipt_number === $participant->getOriginal('certificate_number')) {
                     $participant->receipt_number = $participant->certificate_number;
                 }
@@ -78,8 +78,18 @@ class TrenParticipant extends BaseModel
         $year = $date->format('Y');
 
         $romanMonths = [
-            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
-            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
         ];
         $monthRoman = $romanMonths[(int) $date->format('n')] ?? 'I';
 
@@ -112,15 +122,15 @@ class TrenParticipant extends BaseModel
      */
     public function getFormattedAmountAttribute(): string
     {
-        return 'Rp '.number_format((float) $this->amount, 0, ',', '.');
+        return 'Rp ' . number_format((float) $this->amount, 0, ',', '.');
     }
 
     /**
-     * Cek apakah e-sertifikat sudah pernah dikirimkan ke email peserta.
+     * Cek apakah Sertifikat sudah pernah dikirimkan ke email peserta.
      */
     public function getIsEmailSentAttribute(): bool
     {
-        return ! is_null($this->email_sent_at) && $this->email_status === 'sent';
+        return !is_null($this->email_sent_at) && $this->email_status === 'sent';
     }
 
     /**
@@ -133,7 +143,7 @@ class TrenParticipant extends BaseModel
                 'label' => 'Terkirim',
                 'class' => 'bg-success-subtle text-success border border-success-subtle',
                 'icon' => 'mdi mdi-check-circle',
-                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -142,7 +152,7 @@ class TrenParticipant extends BaseModel
                 'label' => 'Gagal Terkirim',
                 'class' => 'bg-danger-subtle text-danger border border-danger-subtle',
                 'icon' => 'mdi mdi-close-circle',
-                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i').' WIB',
+                'time' => $this->email_sent_at?->translatedFormat('d M Y, H:i') . ' WIB',
             ];
         }
 
@@ -180,40 +190,40 @@ class TrenParticipant extends BaseModel
     protected function noCertf(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->certificate_number,
-            set: fn ($value) => ['certificate_number' => $value],
+            get: fn() => $this->certificate_number,
+            set: fn($value) => ['certificate_number' => $value],
         );
     }
 
     protected function jabatan(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->position,
-            set: fn ($value) => ['position' => $value],
+            get: fn() => $this->position,
+            set: fn($value) => ['position' => $value],
         );
     }
 
     protected function instansi(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->institution_name,
-            set: fn ($value) => ['institution_name' => $value],
+            get: fn() => $this->institution_name,
+            set: fn($value) => ['institution_name' => $value],
         );
     }
 
     protected function tema(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->theme,
-            set: fn ($value) => ['theme' => $value],
+            get: fn() => $this->theme,
+            set: fn($value) => ['theme' => $value],
         );
     }
 
     protected function biaya(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->amount,
-            set: fn ($value) => ['amount' => $value],
+            get: fn() => $this->amount,
+            set: fn($value) => ['amount' => $value],
         );
     }
 }

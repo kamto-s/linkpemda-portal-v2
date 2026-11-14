@@ -212,7 +212,7 @@
                                     </th>
                                     <th>Peserta</th>
                                     <th>Email &amp; No. HP</th>
-                                    <th>Instansi / OPD</th>
+                                    <th>Instansi / Perusahaan</th>
                                     <th>No. Sertifikat</th>
                                     <th>Kwitansi</th>
                                     <th>Tgl Pembuatan</th>
@@ -362,7 +362,8 @@
 
                 @if ($participants->hasPages())
                     <div class="card-footer mb-0">
-                        <div class="pagination-rounded" x-data x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
+                        <div class="pagination-rounded" x-data
+                            x-effect="$el.querySelectorAll('.pagination').forEach(el => el.classList.add('pagination-rounded'))">
                             {{ $participants->links() }}
                         </div>
                     </div>
